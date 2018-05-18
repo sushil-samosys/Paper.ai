@@ -1,0 +1,5 @@
+com.ibm.watson.developer_cloud.android.speech_to_text.v1.test
+int drawable ic_launcher 0x7f010000
+int mipmap ic_launcher 0x7f020000
+int style AppBaseTheme 0x7f030000
+int style AppTheme 0x7f030001

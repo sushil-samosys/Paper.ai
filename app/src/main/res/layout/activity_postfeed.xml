@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <RelativeLayout
+        android:id="@+id/rlHomeSearch"
+        android:layout_width="match_parent"
+
+        android:layout_height="wrap_content"
+        android:background="#e5e5e5">
+
+
+        <ImageView
+            android:id="@+id/img_arroe"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+
+            android:src="@mipmap/home_arrow" />
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/imgMenuIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/img_arroe"
+
+            android:src="@mipmap/home_paper" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="@dimen/_5sdp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:padding="@dimen/_5sdp"
+                android:scaleType="fitXY"
+                android:src="@mipmap/home_search" />
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/mypic"
+                android:layout_width="@dimen/_20sdp"
+                android:layout_height="@dimen/_20sdp"
+
+                />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/_5sdp"
+                android:scaleType="fitXY"
+                android:src="@mipmap/home_notification" />
+
+            <ImageView
+                android:id="@+id/img_log"
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+                android:padding="@dimen/_5sdp"
+                android:scaleType="fitXY"
+                android:src="@mipmap/home_chat" />
+        </LinearLayout>
+
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/rl_workname"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/rlHomeSearch"
+        android:layout_centerHorizontal="true">
+
+        <TextView
+            android:id="@+id/work_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="@dimen/_5sdp"
+            android:background="@mipmap/home_rchain"
+            android:gravity="center"
+            android:padding="@dimen/_5sdp"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_15sdp"
+            android:textStyle="bold" />
+
+
+    </RelativeLayout>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_below="@+id/rlHomeSearch"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+
+
+
+    <RelativeLayout
+        android:id="@+id/RL_imagefeed"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/rlHomeSearch"
+        android:visibility="visible">
+
+
+        <ImageView
+            android:id="@+id/imagesPost"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:scaleType="centerCrop" />
+
+    </RelativeLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+        android:layout_margin="@dimen/_8sdp"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/txt_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:text="This is a summary of tour action:"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_15sdp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:id="@+id/btn_fullscren"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/myprofile_post"
+                android:padding="@dimen/_5sdp"
+                android:layout_alignParentRight="true" />
+        </RelativeLayout>
+
+        <EditText
+            android:id="@+id/caption_txt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/ll_mainsend"
+            android:layout_below="@+id/txt_text"
+            android:background="@drawable/light_border"
+            android:gravity="top|left"
+            android:hint="add caption."
+            android:inputType="textMultiLine"
+            android:maxLines="10"
+            android:minLines="6"
+            android:paddingLeft="@dimen/_5sdp"
+            android:scrollbars="vertical"
+
+            />
+
+
+    </LinearLayout>
+
+
+
+        </LinearLayout>
+    </ScrollView>
+    <LinearLayout
+        android:id="@+id/ll_mainsend"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:weightSum="1">
+
+        <TextView
+            android:id="@+id/workname"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginRight="2dp"
+            android:layout_weight="0.7"
+            android:background="@drawable/light_border"
+            android:padding="@dimen/_10sdp"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_15sdp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/btn_sendPost"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="@dimen/_20sdp"
+            android:layout_weight="0.3"
+            android:background="@drawable/light_border"
+            android:gravity="center"
+            android:padding="@dimen/_10sdp"
+            android:text="SEND"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_15sdp"
+            android:textStyle="bold" />
+
+
+    </LinearLayout>
+</RelativeLayout>

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.samosys.paperai.activity.activity.CreateCategoryActivity">
+
+    <RelativeLayout
+        android:id="@+id/rlHomeSearch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:background="#e5e5e5"
+        android:padding="@dimen/_10sdp">
+
+        <ImageView
+            android:id="@+id/img_catewgory_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:padding="@dimen/_5sdp"
+            android:src="@mipmap/signin_back_icon" />
+
+        <TextView
+            android:id="@+id/txt_workname_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
+            android:ellipsize="end"
+            android:maxLength="15"
+            android:maxLines="1"
+
+            android:singleLine="true"
+            android:text=""
+            android:textColor="@color/black"
+            android:textSize="@dimen/_18sdp" />
+
+        <LinearLayout
+            android:id="@+id/ll_saveCategory"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="@dimen/_5sdp">
+
+            <TextView
+                android:id="@+id/txtsave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ADD"
+
+                android:textColor="@color/basecolor"
+                android:textSize="@dimen/_12sdp" />
+        </LinearLayout>
+
+
+    </RelativeLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/txtinputCategoryName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/rlHomeSearch"
+        android:padding="15dp"
+        android:textColorHint="@color/txt_light"
+        app:backgroundTint="@color/txt_light"
+        app:hintAnimationEnabled="true"
+
+        app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
+
+        <EditText
+            android:id="@+id/edt_catname"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Category Name"
+
+            android:paddingBottom="@dimen/_10sdp"
+            android:paddingTop="@dimen/_5sdp"
+            android:inputType="textCapSentences"
+            android:capitalize="sentences"
+            android:textColor="@color/black"
+            android:textColorHint="@color/txt_light"
+            android:textSize="@dimen/_12sdp" />
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/cateList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/txtinputCategoryName"
+        android:padding="@dimen/_10sdp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_alignParentBottom="true">
+
+        <TextView
+            android:id="@+id/txtSignup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@mipmap/first_screen_signup_btn"
+            android:gravity="center"
+            android:padding="@dimen/_10sdp"
+            android:text="SIGN UP"
+            android:textColor="#fff"
+            android:textSize="@dimen/_15sdp"
+            android:textStyle="bold" />
+    </LinearLayout>
+</RelativeLayout>

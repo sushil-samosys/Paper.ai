@@ -1,0 +1,72 @@
+<resources>
+    <string name="app_name">Papr.ai</string>
+    <!--//=====Autho-->
+    <string name="com_auth0_client_id">IbQhkWZRKepbgpxUdaYAbTH21Lu8jIMM</string>
+    <string name="com_auth0_domain">papr.auth0.com</string>
+    <string name="com_auth0_applicatioinid">601c7d2e-2ce5-4f60-9426-790cfd0ff00b</string>
+
+    <!--parse/main-->
+    <!--<string name="parse_server_url">https://parseservert.azurewebsites.net/parse</string>-->
+    <!--<string name="parse_app_id">601c7d2e-2ce5-4f60-9426-790cfd0ff00b</string>-->
+    <!--<string name="parse_clientKey">077ac866-640d-4a71-ad60-9d3a2c086ef9</string>-->
+
+    <!--parse/demo-->
+    <string name="parse_server_url">https://parseserverdev.azurewebsites.net/parse</string>
+    <string name="parse_app_id">671e705a-f735-4ec0-8474-15899a475440</string>
+    <string name="title_activity_home_feed">Paprfeed</string>
+    <string name="modelDefault">en-US_BroadbandModel</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <!--<string name="parse_clientKey">f24d6630-a35a-4db8-9fc7-6a851042bfd6</string>-->
+    <string name="defaultTokenFactory">&lt;token-factory-url&gt;</string>
+    <string name="STTUsername">f49873ec-3944-4579-8493-5af70c2624af</string>
+    <string name="defaultUsername">&lt;username&gt;</string>
+    <string name="defaultPassword">&lt;password&gt;</string>
+    <!--<string name="STTUsername">&lt;username&gt;</string>-->
+    <string name="STTPassword">BHJjALDcj58O</string>
+    <string name="action_settings">Settings</string>
+    <string-array name="home">
+        <item>Home</item>
+        <item>Direct message</item>
+        <item>Starred items</item>
+    </string-array>
+
+    <string name="camera_permission_confirmation">This app demonstrates the usage of CameraView. In order to do that, it needs permission to access camera.</string>
+    <string name="camera_permission_not_granted">Camera app cannot do anything without camera permission.</string>
+    <string name="picture_taken">Picture taken</string>
+    <string name="aspect_ratio">Aspect ratio</string>
+    <string name="switch_flash">Switch flash</string>
+    <string name="switch_camera">Switch camera</string>
+    <string name="flash_auto">Flash auto</string>
+    <string name="flash_off">Flash off</string>
+    <string name="flash_on">Flash on</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragmentfdfvbdfvb</string>
+    <string name="title_center">Center</string>
+    <string name="title_left">Left</string>
+    <string name="title_right">Right</string>
+    <string name="title_top">Top</string>
+    <string name="title_top_left">Top Left</string>
+    <string name="title_top_right">Top Right</string>
+    <string name="title_bottom">Bottom</string>
+    <string name="title_bottom_left">Bottom Left</string>
+    <string name="title_bottom_right">Bottom Right</string>
+    <string name="title_advanced_freeangle">Advanced: Free angle</string>
+    <string name="title_advanced_tumblr">Advanced: Like a Tumblr</string>
+    <string name="title_advanced_path">Advanced: Like a Path</string>
+
+    <string name="note_center"><![CDATA[app:arc_origin=&quot;<b>center</b>&quot;<br/>Full arc of from 270 degrees]]></string>
+    <string name="note_left"><![CDATA[app:arc_origin=&quot;<b>left</b>&quot;<br/>Semi arc of from 270 degrees]]></string>
+    <string name="note_right"><![CDATA[app:arc_origin=&quot;<b>right</b>&quot;<br/>Semi arc of from 90 degrees]]></string>
+    <string name="note_top"><![CDATA[app:arc_origin=&quot;<b>top</b>&quot;<br/>Semi arc of from 0 degrees]]></string>
+    <string name="note_top_left"><![CDATA[app:arc_origin=&quot;<b>top|left</b>&quot;<br/>Quarter arc of from 0 degrees]]></string>
+    <string name="note_top_right"><![CDATA[app:arc_origin=&quot;<b>top|right</b>&quot;<br/>Quarter arc of from 90 degrees]]></string>
+    <string name="note_bottom"><![CDATA[app:arc_origin=&quot;<b>bottom</b>&quot;<br/>Semi arc of from 180 degrees]]></string>
+    <string name="note_bottom_left"><![CDATA[app:arc_origin=&quot;<b>bottom|left</b>&quot;<br/>Quarter arc of from 270 degrees]]></string>
+    <string name="note_bottom_right"><![CDATA[app:arc_origin=&quot;<b>bottom|right</b>&quot;<br/>Quarter arc of from 180 degrees]]></string>
+    <string name="note_advanced_freeangle"><![CDATA[app:arc_freeAngle=&quot;<b>true</b>&quot;<br/>Can be free angle to place the child view]]></string>
+    <string name="note_advanced_tumblr">Try pressing the button</string>
+    <string name="note_advanced_path">Try pressing the button</string>
+
+</resources>

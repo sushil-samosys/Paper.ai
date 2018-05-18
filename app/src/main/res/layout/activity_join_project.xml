@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <EditText
+        android:id="@+id/edtSerchproject"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+
+        android:layout_margin="@dimen/_10sdp"
+
+        android:background="@drawable/login"
+        android:focusableInTouchMode="true"
+        android:hint="Search..."
+        android:imeOptions="actionDone"
+        android:padding="@dimen/_8sdp"
+
+        android:textColor="@color/txt_dark"
+        android:textColorHint="@color/txt_light" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/RV_project"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+
+</LinearLayout>

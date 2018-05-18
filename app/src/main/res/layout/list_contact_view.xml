@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rl_item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+
+
+    android:orientation="horizontal">
+
+
+    <TextView
+        android:id="@+id/txtSelect"
+        android:layout_width="7dp"
+        android:layout_height="@dimen/_45sdp"
+        android:layout_gravity="center"
+        android:background="@color/basecolor"
+        android:visibility="visible" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <ProgressBar
+            android:id="@+id/img_progrss"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true" />
+
+        <com.samosys.paperai.activity.utils.ShapedImageView
+            android:id="@+id/imgwork"
+            android:layout_width="@dimen/_50sdp"
+            android:layout_height="@dimen/_50sdp"
+            android:layout_centerInParent="true"
+            android:layout_margin="@dimen/_8sdp"
+            android:scaleType="centerCrop"
+            app:round_radius="7dp"
+            app:shape_mode="round_rect"
+            app:stroke_color="@color/drawer_dark"
+            app:stroke_width="1dp" />
+    </RelativeLayout>
+
+</LinearLayout>

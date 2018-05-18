@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_search"
+        android:icon="@mipmap/seacrh_icon"
+        android:title="Search"
+        app:showAsAction="ifRoom|collapseActionView" />
+
+    <item
+        android:icon="@mipmap/menu_icon"
+        android:title="Search"
+
+        app:showAsAction="ifRoom|collapseActionView">
+        <menu>
+            <item
+                android:id="@+id/action_settings"
+                android:icon="@mipmap/home_search"
+                android:orderInCategory="101"
+                android:title="Set a status"
+
+                android:drawable="@drawable/login"
+                />
+            <item
+                android:id="@+id/action_settings1"
+                android:orderInCategory="101"
+                android:icon="@drawable/ic_keyboard_arrow_left_black_24dp"
+                android:title="Activity" />
+            <item
+                android:id="@+id/action_settings2"
+                android:icon="@mipmap/home_search"
+                android:orderInCategory="101"
+                android:title="Directory" />
+            <item
+                android:id="@+id/action_settings3"
+                android:icon="@mipmap/home_search"
+                android:orderInCategory="101"
+                android:title="Snooze" />
+            <item
+                android:id="@+id/action_settings4"
+                android:icon="@mipmap/home_search"
+                android:orderInCategory="101"
+                android:title="Invite members" />
+            <item
+                android:id="@+id/action_settings5"
+                android:icon="@mipmap/home_search"
+                android:orderInCategory="101"
+                android:title="Settings" />
+        </menu>
+    </item>
+</menu>

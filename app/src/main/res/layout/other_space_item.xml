@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rl_item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/_5sdp">
+
+    <RelativeLayout
+
+        android:layout_width="match_parent"
+
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/imgwork"
+            android:layout_width="@dimen/_80sdp"
+            android:layout_height="60dp"
+            android:layout_centerVertical="true"
+
+            android:scaleType="fitXY"
+            android:src="@mipmap/index1" />
+
+        <LinearLayout
+            android:id="@+id/ll_follow_list"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:background="#e5e5e5"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/txtworkurl"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="follow"
+                android:textColor="@color/txt_dark"
+                android:textSize="@dimen/_9sdp" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ll_follow_list"
+            android:layout_marginLeft="@dimen/_10sdp"
+            android:layout_toRightOf="@+id/imgwork"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txtworkName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="xvgdg"
+                android:textColor="@color/txt_light"
+
+                android:textSize="@dimen/_13sdp" />
+
+            <TextView
+                android:id="@+id/txtURL"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="xvgdg"
+                android:textColor="@color/txt_light"
+                android:textSize="@dimen/_11sdp" />
+
+
+        </LinearLayout>
+
+
+    </RelativeLayout>
+
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.1dp"
+        android:background="@color/txt_dark" />
+</LinearLayout>

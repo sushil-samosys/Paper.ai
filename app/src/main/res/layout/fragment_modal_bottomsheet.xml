@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+
+    android:background="@drawable/shape"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@null"
+        app:cardCornerRadius="@dimen/_5sdp">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:orientation="vertical"
+            android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/txtworkSetting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:padding="@dimen/_12sdp"
+            android:text="Workspace Settings"
+            android:textColor="@color/pop_txt_blue"
+            android:textSize="@dimen/_15sdp" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#80000000"/>
+            <TextView
+                android:id="@+id/createCategory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:padding="@dimen/_12sdp"
+                android:text="Category Settings"
+                android:textColor="@color/pop_txt_blue"
+                android:textSize="@dimen/_15sdp" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#80000000"/>
+            <TextView
+                android:id="@+id/txt_createproject"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:padding="@dimen/_12sdp"
+                android:text="Project Settings"
+                android:textColor="@color/pop_txt_blue"
+                android:textSize="@dimen/_15sdp" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#80000000"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:padding="@dimen/_12sdp"
+                android:text="Notification Settings"
+                android:textColor="@color/pop_txt_blue"
+                android:textSize="@dimen/_15sdp" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+
+                android:background="#80000000"/>
+            <TextView
+                android:id="@+id/txt_cancel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:padding="@dimen/_12sdp"
+                android:text="Cancel"
+                android:textColor="@color/pop_txt_blue"
+                android:textSize="@dimen/_15sdp" />
+
+
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+</LinearLayout>
+
+
