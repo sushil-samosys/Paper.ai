@@ -57,7 +57,7 @@
                         android:inputType="textEmailAddress"
                         android:paddingBottom="@dimen/_10sdp"
                         android:paddingTop="@dimen/_5sdp"
-android:text="aman@gmail.com"
+                        android:text="roli@gmail.com"
                         android:textColor="@color/txt_dark"
                         android:textColorHint="@color/txt_light"
                         android:textSize="@dimen/_12sdp" />
@@ -70,7 +70,8 @@ android:text="aman@gmail.com"
                     android:padding="10dp"
                     android:textColorHint="@color/txt_light"
                     app:hintAnimationEnabled="true"
-
+                    app:passwordToggleEnabled="true"
+                    app:passwordToggleDrawable="@drawable/show_password_selector"
                     app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
 
                     <EditText
@@ -85,7 +86,7 @@ android:text="aman@gmail.com"
                         android:maxLength="15"
                         android:paddingBottom="@dimen/_10sdp"
                         android:paddingTop="@dimen/_5sdp"
-android:text="123456"
+                        android:text="123456"
                         android:textColor="@color/txt_dark"
                         android:textColorHint="@color/txt_light"
                         android:textSize="@dimen/_12sdp" />
@@ -148,6 +149,7 @@ android:text="123456"
 
 
         </RelativeLayout>
+
 
         <RelativeLayout
             android:id="@+id/rl_slack"

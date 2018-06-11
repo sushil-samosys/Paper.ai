@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -39,6 +40,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import cc.cloudist.acplibrary.ACProgressConstant;
+import cc.cloudist.acplibrary.ACProgressFlower;
+
 public class Secondsignupactivity extends AppCompatActivity {
     CustomFonts customFonts;
     RelativeLayout rl_profilePic;
@@ -52,7 +56,7 @@ public class Secondsignupactivity extends AppCompatActivity {
     private TextView text, txtTerm1, txtTerm2;
     private String userChoosenTask;
     private int REQUEST_CAMERA = 0, SELECT_FILE = 1;
-
+    private ACProgressFlower dialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,6 +77,8 @@ public class Secondsignupactivity extends AppCompatActivity {
         llSignup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+
                 validation();
             }
         });
@@ -93,6 +99,13 @@ public class Secondsignupactivity extends AppCompatActivity {
             Toast.makeText(Secondsignupactivity.this, "Please enter passion", Toast.LENGTH_SHORT).show();
 
         } else {
+
+            dialog = new ACProgressFlower.Builder(Secondsignupactivity.this)
+                    .direction(ACProgressConstant.DIRECT_CLOCKWISE)
+                    .themeColor(Color.WHITE)
+
+                    .fadeColor(Color.DKGRAY).build();
+            dialog.show();
             if (bitmap != null) {
                 setImage(bitmap);
             } else {
@@ -153,7 +166,6 @@ public class Secondsignupactivity extends AppCompatActivity {
 
     private void callparse(final ParseUser user) {
 
-        final ProgressDialog dialog = AppConstants.showProgressDialog(Secondsignupactivity.this, "Loading...");
         user.signUpInBackground(new SignUpCallback() {
             public void done(ParseException e) {
                 if (e == null) {

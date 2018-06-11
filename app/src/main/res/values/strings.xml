@@ -1,18 +1,31 @@
 <resources>
     <string name="app_name">Papr.ai</string>
     <!--//=====Autho-->
-    <string name="com_auth0_client_id">IbQhkWZRKepbgpxUdaYAbTH21Lu8jIMM</string>
+    <!--<string name="com_auth0_client_id">IbQhkWZRKepbgpxUdaYAbTH21Lu8jIMM</string>-->
+    <string name="com_auth0_client_id">b163d55505ec4800b388de20fbb6af76</string>
     <string name="com_auth0_domain">papr.auth0.com</string>
     <string name="com_auth0_applicatioinid">601c7d2e-2ce5-4f60-9426-790cfd0ff00b</string>
 
     <!--parse/main-->
     <!--<string name="parse_server_url">https://parseservert.azurewebsites.net/parse</string>-->
     <!--<string name="parse_app_id">601c7d2e-2ce5-4f60-9426-790cfd0ff00b</string>-->
-    <!--<string name="parse_clientKey">077ac866-640d-4a71-ad60-9d3a2c086ef9</string>-->
+    <string name="parse_clientKey">077ac866-640d-4a71-ad60-9d3a2c086ef9</string>
 
-    <!--parse/demo-->
+    <!--parse Main URL-->
     <string name="parse_server_url">https://parseserverdev.azurewebsites.net/parse</string>
     <string name="parse_app_id">671e705a-f735-4ec0-8474-15899a475440</string>
+
+    <!--parse TEst URL-->
+    <!--<string name="parse_server_url">https://parseservert.azurewebsites.net/parse-dashboard</string>-->
+    <!--<string name="parse_app_id">601c7d2e-2ce5-4f60-9426-790cfd0ff00b</string>-->
+
+
+<string name="slackToken">pf8PIOdOoi8govpRd5jrD2eY</string>
+<string name="clientIdDemo">42826205351.370562596304</string>
+
+
+
+
     <string name="title_activity_home_feed">Paprfeed</string>
     <string name="modelDefault">en-US_BroadbandModel</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -55,7 +68,7 @@
     <string name="title_advanced_freeangle">Advanced: Free angle</string>
     <string name="title_advanced_tumblr">Advanced: Like a Tumblr</string>
     <string name="title_advanced_path">Advanced: Like a Path</string>
-
+    <string name="image_play_pause">Play Pause Button</string>
     <string name="note_center"><![CDATA[app:arc_origin=&quot;<b>center</b>&quot;<br/>Full arc of from 270 degrees]]></string>
     <string name="note_left"><![CDATA[app:arc_origin=&quot;<b>left</b>&quot;<br/>Semi arc of from 270 degrees]]></string>
     <string name="note_right"><![CDATA[app:arc_origin=&quot;<b>right</b>&quot;<br/>Semi arc of from 90 degrees]]></string>

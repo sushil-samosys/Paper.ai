@@ -3,12 +3,12 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Paper.ai.iml" filepath="$PROJECT_DIR$/Paper.ai.iml" />
+      <module fileurl="file://$PROJECT_DIR$/annca/annca.iml" filepath="$PROJECT_DIR$/annca/annca.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/audiovisualizer/audiovisualizer.iml" filepath="$PROJECT_DIR$/audiovisualizer/audiovisualizer.iml" />
       <module fileurl="file://$PROJECT_DIR$/library/library.iml" filepath="$PROJECT_DIR$/library/library.iml" />
       <module fileurl="file://$PROJECT_DIR$/material-viewpagerindicator/material-viewpagerindicator.iml" filepath="$PROJECT_DIR$/material-viewpagerindicator/material-viewpagerindicator.iml" />
-      <module fileurl="file://$PROJECT_DIR$/sandriosCamera/sandriosCamera.iml" filepath="$PROJECT_DIR$/sandriosCamera/sandriosCamera.iml" />
       <module fileurl="file://$PROJECT_DIR$/speech-android-wrapper/speech-android-wrapper.iml" filepath="$PROJECT_DIR$/speech-android-wrapper/speech-android-wrapper.iml" />
-      <module fileurl="file://$PROJECT_DIR$/ucrop/ucrop.iml" filepath="$PROJECT_DIR$/ucrop/ucrop.iml" />
     </modules>
   </component>
 </project>

@@ -65,7 +65,7 @@ public class CreateCategoryActivity extends AppCompatActivity {
                 String name = edt_catname.getText().toString();
                 if (name.equals("")) {
                     Toast.makeText(CreateCategoryActivity.this, "Please enter category name", Toast.LENGTH_SHORT).show();
-                } else {
+                } else if (proList.size()<=0){
                     saveCategory();
                 }
             }

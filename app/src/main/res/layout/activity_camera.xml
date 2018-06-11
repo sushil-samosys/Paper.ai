@@ -100,7 +100,7 @@
             android:layout_centerInParent="true">
 
             <com.samosys.paperai.activity.utils.CircularProgressBar
-                android:id="@+id/circularProgressbar"
+                android:id="@+id/circularProgressbar_vid"
                 android:layout_width="60dp"
                 android:layout_height="wrap_content"
 

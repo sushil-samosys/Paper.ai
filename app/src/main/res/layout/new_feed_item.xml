@@ -96,27 +96,57 @@
 
         <RelativeLayout
             android:id="@+id/RL_imagefeed"
-            android:visibility="visible"
             android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:background="@color/lightGrey"
-            android:layout_height="match_parent">
+            android:visibility="visible">
 
+
+            <ImageView
+                android:id="@+id/feed_image"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scaleType="centerCrop"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/ll_visual"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_100sdp"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                android:weightSum="1">
+
+
+                <ImageButton
+                    android:id="@+id/ib_play_pause_feed"
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/_30sdp"
+                    android:layout_weight="0.1"
+                    android:background="@android:color/transparent"
+                    android:contentDescription="@string/image_play_pause"
+                    android:onClick="playPause"
+
+                    android:src="@drawable/ic_play_red_48dp" />
+
+                <com.samosys.paperai.activity.AudioVisualizer.LineBarVisualizer
+                    android:id="@+id/visualizer_feed"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/_5sdp"
+                    android:layout_weight="0.9" />
+
+
+            </LinearLayout>
 
             <ProgressBar
                 android:id="@+id/img_progrss"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true" />
-            <ImageView
-                android:id="@+id/feed_image"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:scaleType="centerCrop" />
-
-
-
         </RelativeLayout>
-
 
 
         <ImageView
@@ -129,10 +159,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
+            android:layout_marginLeft="@dimen/_15sdp"
             android:layout_marginTop="@dimen/_2sdp"
             android:gravity="left"
             android:maxLines="2"
-            android:layout_marginLeft="@dimen/_15sdp"
             android:text="cgbgb"
             android:textColor="@color/black"
             android:textSize="@dimen/_13sdp" />
@@ -141,8 +171,8 @@
             android:id="@+id/post_time"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/_3sdp"
             android:layout_marginLeft="@dimen/_15sdp"
+            android:layout_marginTop="@dimen/_3sdp"
             android:text="cgbgb"
             android:textColor="@color/txt_dark"
             android:textSize="@dimen/_11sdp"
@@ -152,7 +182,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingLeft="8dp"
+            android:paddingLeft="10dp"
             android:paddingRight="8dp">
 
             <ImageButton
@@ -182,7 +212,7 @@
                     android:id="@+id/img_bookmark"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-
+                    android:padding="@dimen/_5sdp"
 
                     android:src="@mipmap/home_bookmark" />
             </LinearLayout>

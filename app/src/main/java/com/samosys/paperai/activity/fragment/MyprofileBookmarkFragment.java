@@ -141,6 +141,7 @@ public class MyprofileBookmarkFragment extends Fragment {
                         Log.e("mybookmark_image", image + "");
                         String tagUserId = parseObject.getString("tagUserId");
                         String post_file_url = parseObject.getString("post_file_url");
+                        String post_file = parseObject.getString("post_file");
                         String userTag = parseObject.getString("userTag");
                         int CommentCount = parseObject.getInt("CommentCount");
                         int likesCount = parseObject.getInt("likesCount");
@@ -152,7 +153,7 @@ public class MyprofileBookmarkFragment extends Fragment {
                         String updatedAt = objects.get(i).getUpdatedAt().toString();
                         String createdAt = objects.get(i).getCreatedAt().toString();
 
-                        postList.add(new ShowPostBean(username, user_imge, text, objectId, updatedAt, createdAt, post_image, post_type, tagUserId, post_file_url, userTag, CommentCount, likesCount, post_userID));
+                        postList.add(new ShowPostBean(username, user_imge, text, objectId, updatedAt, createdAt, post_image, post_type, tagUserId, post_file_url, userTag, CommentCount, likesCount, post_userID, post_file));
 
                     }
 

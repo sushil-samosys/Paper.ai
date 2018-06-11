@@ -1,1 +1,1 @@
-include ':app', ':material-viewpagerindicator', ':speech-android-wrapper', ':sandriosCamera', ':library', ':ucrop'
+include ':app', ':material-viewpagerindicator', ':speech-android-wrapper', ':library', ':audiovisualizer', ':annca'

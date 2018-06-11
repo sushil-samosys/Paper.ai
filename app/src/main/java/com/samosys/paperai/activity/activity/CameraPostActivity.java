@@ -17,6 +17,7 @@
 package com.samosys.paperai.activity.activity;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -45,8 +46,10 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -69,15 +72,22 @@ import com.parse.SaveCallback;
 import com.samosys.paperai.R;
 import com.samosys.paperai.activity.utils.AppConstants;
 import com.samosys.paperai.activity.utils.AspectRatioFragment;
+import com.samosys.paperai.activity.utils.CircularProgressBar;
 import com.samosys.paperai.activity.utils.MarshMallowPermission;
 import com.samosys.paperai.activity.utils.SquaredFrameLayout;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import io.github.memfis19.annca.Annca;
+import io.github.memfis19.annca.internal.configuration.AnncaConfiguration;
 
 
 /**
@@ -95,7 +105,7 @@ public class CameraPostActivity extends AppCompatActivity implements
             CameraView.FLASH_OFF,
             CameraView.FLASH_ON,
     };
-    MarshMallowPermission marshMallowPermission;
+    private static final int REQUEST_CAMERA_PERMISSIONS = 931;
     private static final int[] FLASH_ICONS = {
             R.mipmap.home_camera,
             R.mipmap.home_camera,
@@ -106,19 +116,23 @@ public class CameraPostActivity extends AppCompatActivity implements
             R.string.flash_off,
             R.string.flash_on,
     };
+    public static int prog = 0;
+    private static final int CAPTURE_MEDIA = 368;
+    MarshMallowPermission marshMallowPermission;
     AQuery aq;
     TextView txtNext;
     SquaredFrameLayout squareImage;
-    File imageFile=new File("");
+    File imageFile = new File("");
     int REQUEST_CAMERA = 0, SELECT_FILE = 1, SELECT_VIDEO = 3;
     ImageView capturedImage, imgback_camera;
     RelativeLayout rl_bottom_capture;
+    private CircularProgressBar circularProgressBar;
+    private Timer timer;
     private Uri picUri;
     private int mCurrentFlash;
     private ImageView take_picture, img_switchcam, img_gallary;
     private CameraView mCameraView;
     private Handler mBackgroundHandler;
-
     private View.OnClickListener mOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -241,8 +255,6 @@ public class CameraPostActivity extends AppCompatActivity implements
 
     };
 
-
-
     public static Bitmap rotate(Bitmap bitmap, float degrees) {
         Matrix matrix = new Matrix();
         matrix.postRotate(degrees);
@@ -280,7 +292,6 @@ public class CameraPostActivity extends AppCompatActivity implements
         }
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -290,13 +301,12 @@ public class CameraPostActivity extends AppCompatActivity implements
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_camera);
+        circularProgressBar = (CircularProgressBar) findViewById(R.id.circularProgressbar_vid);
         aq = new AQuery(CameraPostActivity.this);
-        marshMallowPermission=new MarshMallowPermission(CameraPostActivity.this);
+        marshMallowPermission = new MarshMallowPermission(CameraPostActivity.this);
         capturedImage = (ImageView) findViewById(R.id.capturedImage);
         mCameraView = (CameraView) findViewById(R.id.camera);
-        if (mCameraView != null) {
-            mCameraView.addCallback(mCallback);
-        }
+
         txtNext = (TextView) findViewById(R.id.txtNext);
         rl_bottom_capture = (RelativeLayout) findViewById(R.id.rl_bottom_capture);
         // squareImage = (SquaredFrameLayout) findViewById(R.id.squareImage);
@@ -331,13 +341,28 @@ public class CameraPostActivity extends AppCompatActivity implements
                 askForCameraPermission();
             }
         });
+
+
+//        public boolean onTouchEvent(MotionEvent event) {
+//            return gestureDetector.onTouchEvent(event);
+//        };
+
+
         take_picture.setOnLongClickListener(new View.OnLongClickListener() {
+            @SuppressLint("MissingPermission")
             @Override
             public boolean onLongClick(View v) {
-                Toast.makeText(CameraPostActivity.this, "lonmg", Toast.LENGTH_SHORT).show();
+                AnncaConfiguration.Builder videoLimited = new AnncaConfiguration.Builder(CameraPostActivity.this, CAPTURE_MEDIA);
+                videoLimited.setMediaAction(AnncaConfiguration.MEDIA_ACTION_VIDEO);
+                videoLimited.setMediaQuality(AnncaConfiguration.MEDIA_QUALITY_AUTO);
+                videoLimited.setVideoFileSize(5 * 1024 * 1024);
+                videoLimited.setMinimumVideoDuration(60000);
+
+                new Annca(videoLimited.build()).launchCamera();
                 return true;
             }
         });
+
         imgback_camera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -357,17 +382,42 @@ public class CameraPostActivity extends AppCompatActivity implements
             @Override
             public void onClick(View v) {
                 Log.e("imageFile", "imageFile==" + imageFile);
-                if (imageFile.exists()){
-                Intent intent = new Intent(CameraPostActivity.this, RecordAudioActivity.class);
-                intent.putExtra("file", imageFile.toString());
-                startActivity(intent);}
-                else {
+                if (imageFile.exists()) {
+                    Intent intent = new Intent(CameraPostActivity.this, RecordAudioActivity.class);
+
+                    intent.putExtra("file", imageFile.toString());
+
+                    startActivity(intent);
+                } else {
                     Toast.makeText(CameraPostActivity.this, "Please capture photo", Toast.LENGTH_SHORT).show();
                 }
 
             }
         });
+
+        if (Build.VERSION.SDK_INT > 15) {
+            askForPermissions(new String[]{
+                            android.Manifest.permission.CAMERA,
+                            android.Manifest.permission.RECORD_AUDIO,
+                            android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                            android.Manifest.permission.READ_EXTERNAL_STORAGE},
+                    REQUEST_CAMERA_PERMISSIONS);
+        }
     }
+        protected final void askForPermissions(String[] permissions, int requestCode) {
+            List<String> permissionsToRequest = new ArrayList<>();
+            for (String permission : permissions) {
+                if (ActivityCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                    permissionsToRequest.add(permission);
+                }
+            }
+            if (!permissionsToRequest.isEmpty()) {
+                ActivityCompat.requestPermissions(this, permissionsToRequest.toArray(new String[permissionsToRequest.size()]), requestCode);
+            }
+        }
+
+
+
 
     public void askForCameraPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -402,6 +452,12 @@ public class CameraPostActivity extends AppCompatActivity implements
                 // This method is call for getting image from gallary
                 onSelectFromGalleryResult(data);
                 //    getdata(data);
+            }else if (requestCode == CAPTURE_MEDIA && resultCode == RESULT_OK) {
+                Toast.makeText(this, "Media captured.", Toast.LENGTH_SHORT).show();
+
+                Uri uri = data.getData();
+
+                Log.e("selectedImagePath", "" + uri+"");
             }
         }
     }
@@ -423,10 +479,10 @@ public class CameraPostActivity extends AppCompatActivity implements
         Log.e("MEW_BITMAP12", "" + selectedImagePath);
 
 
-            File file=new File(selectedImagePath);
-            mCameraView.setVisibility(View.GONE);
-            rl_bottom_capture.setVisibility(View.GONE);
-            capturedImage.setVisibility(View.GONE);
+        File file = new File(selectedImagePath);
+        mCameraView.setVisibility(View.GONE);
+        rl_bottom_capture.setVisibility(View.GONE);
+        capturedImage.setVisibility(View.GONE);
         if (file.exists()) {
             BitmapAjaxCallback cb = new BitmapAjaxCallback();
             cb.targetWidth(500).rotate(true);
@@ -486,7 +542,7 @@ public class CameraPostActivity extends AppCompatActivity implements
         gameScore.put("user", ParseObject.createWithoutData("_User", ParseUser.getCurrentUser().getObjectId()));
 //
         gameScore.put("text", "android post test");
-        gameScore.put("worksapce", ParseObject.createWithoutData("WorkSpace", AppConstants.loadPreferences(CameraPostActivity.this, "workid")));
+        gameScore.put("workspace", ParseObject.createWithoutData("WorkSpace", AppConstants.loadPreferences(CameraPostActivity.this, "workid")));
 
         gameScore.put("postImage", parseFile);
 
@@ -514,6 +570,9 @@ public class CameraPostActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
+        if (mCameraView != null) {
+            mCameraView.addCallback(mCallback);
+        }
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_GRANTED) {
             mCameraView.start();
@@ -622,6 +681,8 @@ public class CameraPostActivity extends AppCompatActivity implements
         return mBackgroundHandler;
     }
 
+
+
     public static class ConfirmationDialogFragment extends DialogFragment {
 
         private static final String ARG_MESSAGE = "message";
@@ -673,4 +734,9 @@ public class CameraPostActivity extends AppCompatActivity implements
 
     }
 
+    final GestureDetector gestureDetector = new GestureDetector(new GestureDetector.SimpleOnGestureListener() {
+        public void onLongPress(MotionEvent e) {
+            Log.e("", "Longpress detected");
+        }
+    });
 }

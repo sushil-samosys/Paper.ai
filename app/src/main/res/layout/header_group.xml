@@ -5,8 +5,15 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
 
-    android:padding="@dimen/_5sdp"
+
     android:orientation="horizontal">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/_5sdp"
+
+        android:orientation="horizontal"
+        >
 
     <ImageView
         android:id="@+id/img_expand"
@@ -16,7 +23,7 @@
         android:layout_gravity="center"
 
         android:src="@mipmap/ic_launcher_foreground"
-        android:visibility="invisible" />
+        android:visibility="visible" />
 
     <TextView
         android:id="@+id/listTitle"
@@ -29,5 +36,5 @@
         android:textColor="@color/white"
         android:textSize="@dimen/_13sdp" />
 
-
+    </LinearLayout>
 </LinearLayout>

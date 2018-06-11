@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -38,6 +39,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import cc.cloudist.acplibrary.ACProgressConstant;
+import cc.cloudist.acplibrary.ACProgressFlower;
+
 public class NewProjctActivity extends AppCompatActivity {
     EditText edt_workspace, edt_mission;
     LinearLayout llcreate;
@@ -51,6 +55,7 @@ public class NewProjctActivity extends AppCompatActivity {
     Bitmap bitmap = null;
     ParseFile file = null;
     String togg="1";
+    private ACProgressFlower dialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,15 +72,20 @@ public class NewProjctActivity extends AppCompatActivity {
         llcreate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                dialog = new ACProgressFlower.Builder(NewProjctActivity.this)
+                        .direction(ACProgressConstant.DIRECT_CLOCKWISE)
+                        .themeColor(Color.WHITE)
 
-                  ProgressDialog dialog = AppConstants.showProgressDialog(NewProjctActivity.this, "Please wait...");
+                        .fadeColor(Color.DKGRAY).build();
+                dialog.show();
+                  //ProgressDialog dialog = AppConstants.showProgressDialog(NewProjctActivity.this, "Please wait...");
                   String workspace = edt_workspace.getText().toString();
                   String mission = edt_mission.getText().toString();
 
                 if (workspace.equals("")){
                     Toast.makeText(NewProjctActivity.this, "Please enter project name", Toast.LENGTH_SHORT).show();
                 }else {
-                validation(dialog,workspace,mission);}
+                validation(workspace,mission);}
             }
         });
         awesomeToggle.setChecked(true);
@@ -236,7 +246,7 @@ public class NewProjctActivity extends AppCompatActivity {
     }
 
 
-    private void validation(final ProgressDialog dialog, final String workspace, final String mission) {
+    private void validation( final String workspace, final String mission) {
 
 
 
@@ -270,7 +280,9 @@ public class NewProjctActivity extends AppCompatActivity {
                                     dialog.dismiss();
                                 }
                                 if (e == null) {
+                                    AppConstants.savePreferences(NewProjctActivity.this, "workid",id);
                                     Intent intent = new Intent(NewProjctActivity.this, HomeFeedActivity.class);
+                                    intent.putExtra("id", "");
                                     startActivity(intent);
                                     finish();
                                 } else {

@@ -12,13 +12,23 @@ public class ParentBean {
     private String categoryName;
     private String parentType;
     private String strdefault;
+    private String image;
 
-    public ParentBean(String objectId, String name, String type, String strdefault, ArrayList<ChildBean> childBeans) {
+    public ParentBean(String objectId, String name, String type, String strdefault, String image, ArrayList<ChildBean> childBeans) {
         this.categoryId = objectId;
         this.categoryName = name;
         this.childBeans = childBeans;
         this.parentType = type;
+        this.image=image;
         this.strdefault = strdefault;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 
     public String getStrdefault() {

@@ -20,16 +20,16 @@
             <RelativeLayout
                 android:id="@+id/rl_profilePic"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="@dimen/_180sdp">
 
                 <ImageView
                     android:id="@+id/user_image"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:adjustViewBounds="true"
 
 
-                    android:scaleType="fitCenter"
+                    android:scaleType="fitXY"
                     android:src="@mipmap/sign_up_img" />
 
                 <TextView

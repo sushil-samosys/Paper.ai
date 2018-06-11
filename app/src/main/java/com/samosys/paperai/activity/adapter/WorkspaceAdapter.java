@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.samosys.paperai.R;
 import com.samosys.paperai.activity.Bean.WorkspaceBean;
@@ -37,7 +36,6 @@ public class WorkspaceAdapter extends RecyclerView.Adapter<WorkspaceAdapter.Hold
     private int mSelectedItem = 0;
 
 
-
     public WorkspaceAdapter(Context context, ArrayList<WorkspaceBean> listitem, TextView workspace_name) {
         this.context = context;
         this.listitem = listitem;
@@ -45,12 +43,12 @@ public class WorkspaceAdapter extends RecyclerView.Adapter<WorkspaceAdapter.Hold
         this.workspace_name = workspace_name;
 
 
-
     }
 
     public void setSelectedItem(int selectedItem) {
         mSelectedItem = selectedItem;
         AppConstants.savePreferences(context, "position", "" + selectedItem);
+        AppConstants.workPOS = selectedItem;
     }
 
     @Override
@@ -63,21 +61,19 @@ public class WorkspaceAdapter extends RecyclerView.Adapter<WorkspaceAdapter.Hold
     @Override
     public void onBindViewHolder(final Holder holder, final int position) {
 
-        Picasso.with(context).load(listitem.get(position).getWs_image())             .error(R.mipmap.sign_up_workspace)
-                .into(holder.imgwork, new Callback(){
-            @Override
-            public void onSuccess() {
-                holder.img_progrss.setVisibility(View.GONE);
+        Picasso.with(context).load(listitem.get(position).getWs_image()).error(R.mipmap.sign_up_workspace)
+                .into(holder.imgwork, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        holder.img_progrss.setVisibility(View.GONE);
 
-            }
+                    }
 
-            @Override
-            public void onError() {
-                holder.img_progrss.setVisibility(View.GONE);
-            }
-        });
-
-
+                    @Override
+                    public void onError() {
+                        holder.img_progrss.setVisibility(View.GONE);
+                    }
+                });
 
 
         int pos = Integer.parseInt(AppConstants.loadPreferences(context, "position"));
@@ -90,13 +86,13 @@ public class WorkspaceAdapter extends RecyclerView.Adapter<WorkspaceAdapter.Hold
                 AppConstants.savePreferences(context, "workname", listitem.get(position).getWorkspace_url());
                 workspace_name.setText(First_Char_Capital.capitalizeString(listitem.get(position).getWorkspace_name()));
                 holder.txtSelect.setVisibility(View.VISIBLE);
-                if(context instanceof HomeFeedActivity){
+                if (context instanceof HomeFeedActivity) {
 //                    ((HomeFeedActivity)context).getworkspace("");
-                     ((HomeFeedActivity)context).getprojectlist();
+                    ((HomeFeedActivity) context).getprojectlist();
 //                    ((HomeFeedActivity)context).getfeedpost();
 
 //                    ((HomeFeedActivity)context).getuncatproject();
-//                    ((HomeFeedActivity)context).getcatogory();
+                    // ((HomeFeedActivity)context).getcatogory();
 
 
                 }
@@ -111,12 +107,12 @@ public class WorkspaceAdapter extends RecyclerView.Adapter<WorkspaceAdapter.Hold
                 AppConstants.savePreferences(context, "workid", listitem.get(pos).getObjectId());
                 AppConstants.savePreferences(context, "workname", listitem.get(pos).getWorkspace_url());
                 holder.txtSelect.setVisibility(View.VISIBLE);
-                if(context instanceof HomeFeedActivity){
+                if (context instanceof HomeFeedActivity) {
 //                    getuncatproject();
 //                    getcatogory();
 //                    ((HomeFeedActivity)context).getworkspace("1");
-                    ((HomeFeedActivity)context).getprojectlist();
-//                    ((HomeFeedActivity)context).getcatogory();
+                    ((HomeFeedActivity) context).getprojectlist();
+                    // ((HomeFeedActivity)context).getcatogory();
 //                    ((HomeFeedActivity)context).getuncatproject();
                 }
             } else {

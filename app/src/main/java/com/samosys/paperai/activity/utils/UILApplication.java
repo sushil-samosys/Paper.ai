@@ -8,6 +8,7 @@ import android.support.multidex.MultiDexApplication;
 
 
 import com.parse.Parse;
+import com.samosys.paperai.R;
 
 
 /**
@@ -26,11 +27,12 @@ public class UILApplication extends MultiDexApplication {
         mContext = getApplicationContext();
 
 
-
+//        MultiDex.install(this);
 
         Parse.initialize(new Parse.Configuration.Builder(this)
-                .applicationId("671e705a-f735-4ec0-8474-15899a475440")
-                .server("https://parseserverdev.azurewebsites.net/parse")
+                .applicationId(getResources().getString(R.string.parse_app_id))
+                .clientKey(getResources().getString(R.string.parse_clientKey))
+                .server(getResources().getString(R.string.parse_server_url))
                 .build()
         );
        // sAnalytics = GoogleAnalytics.getInstance(this);

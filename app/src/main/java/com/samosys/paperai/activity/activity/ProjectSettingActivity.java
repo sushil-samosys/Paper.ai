@@ -1,6 +1,7 @@
 package com.samosys.paperai.activity.activity;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -27,6 +28,9 @@ import com.samosys.paperai.activity.utils.NetworkAvailablity;
 import java.util.ArrayList;
 import java.util.List;
 
+import cc.cloudist.acplibrary.ACProgressConstant;
+import cc.cloudist.acplibrary.ACProgressFlower;
+
 public class ProjectSettingActivity extends AppCompatActivity {
     CustomFonts customFonts;
     private String name = "", workID;
@@ -36,7 +40,7 @@ public class ProjectSettingActivity extends AppCompatActivity {
     private ArrayList<ProjctBean> projectList;
     private ProjectAdapter adapter;
     private RecyclerView recycleProject;
-
+    private ACProgressFlower dialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,6 +65,8 @@ public class ProjectSettingActivity extends AppCompatActivity {
                 onBackPressed();
             }
         });
+
+
     }
 
     @Override
@@ -74,9 +80,14 @@ public class ProjectSettingActivity extends AppCompatActivity {
         }
     }
 
-    private void getprojectlist() {
+    public void getprojectlist() {
 
+        dialog = new ACProgressFlower.Builder(this)
+                .direction(ACProgressConstant.DIRECT_CLOCKWISE)
+                .themeColor(Color.WHITE)
 
+                .fadeColor(Color.DKGRAY).build();
+        dialog.show();
         // load data here
         projectList.clear();
 
@@ -119,6 +130,9 @@ public class ProjectSettingActivity extends AppCompatActivity {
 
                     Log.e("lse", e.getMessage());
                     // error
+                }
+                if (dialog.isShowing()){
+                    dialog.dismiss();
                 }
 
             }

@@ -4,37 +4,36 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.app.Activity;
-import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaRecorder;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
+import android.support.annotation.RequiresApi;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.view.animation.AnticipateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -48,6 +47,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.samosys.paperai.R;
+import com.samosys.paperai.activity.AudioRecord.RecordingService;
 import com.samosys.paperai.activity.Bean.CategoriesProjectbeanclass;
 import com.samosys.paperai.activity.Bean.ChildBean;
 import com.samosys.paperai.activity.Bean.ParentBean;
@@ -63,6 +63,7 @@ import com.samosys.paperai.activity.utils.ArcLayout;
 import com.samosys.paperai.activity.utils.CircularProgressBar;
 import com.samosys.paperai.activity.utils.CustomFonts;
 import com.samosys.paperai.activity.utils.First_Char_Capital;
+import com.samosys.paperai.activity.utils.MarshMallowPermission;
 import com.samosys.paperai.activity.utils.NetworkAvailablity;
 import com.samosys.paperai.activity.utils.RecyclerTouchListener;
 import com.samosys.paperai.activity.utils.SimpleDividerItemDecoration;
@@ -72,6 +73,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -79,28 +82,35 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import cc.cloudist.acplibrary.ACProgressConstant;
+import cc.cloudist.acplibrary.ACProgressFlower;
+import cn.zjy.actionsheet.ActionSheet;
 import de.hdodenhof.circleimageview.CircleImageView;
 
+//amirkabbara@jadwalak.com, amir@papr.ai
 public class HomeFeedActivity extends AppCompatActivity implements View.OnClickListener {
-    private static final String KEY_DEMO = "demo";
-    private static final int RESULT_OK = 011;
-    private ArrayList<String> childList;
+
+    private static final String AUDIO_RECORDER_FILE_EXT_3GP = ".3gp";
+    private static final String AUDIO_RECORDER_FILE_EXT_MP4 = ".mp4";
+
+    public static File file = null;
+    public static int prog = 0;
     public ArrayList<CategoriesProjectbeanclass> categoriesProjectbeanclasses;
+    public ImageView work_space_img, imgWorkSpaceSetting;
+    MarshMallowPermission marshMallowPermission;
+    NestedScrollView scrollView;
+    private ArrayList<String> childList;
     private ImageView img_wrokspace, mypic, img_addpost, img_log, img_mic;
     private RecyclerView listView;
     private CircleImageView imgMenuIcon;
-    private RelativeLayout rl_main;
-    private String id = "";
+    private boolean mStartRecording = true;
     private ImageView btn_addworkspace;
     private ProgressBar img_progrss_projct;
-    private int prog = 0;
     private Timer timer;
     private ExpandableListView project_expandableList;
     private View menuLayout;
     private ArcLayout arcLayout;
-    private MediaRecorder recorder;
-    private ImageView work_space_img, imgWorkSpaceSetting;
-    private TextView work_name, work_txt, workspace_name, txt_all;
+    private TextView work_txt, workspace_name, txt_all, work_title;
     private CustomFonts customFonts;
     private RecyclerView Rv_feed_post;
     private ArrayList<ShowPostBean> postList;
@@ -115,7 +125,14 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
     private HashMap<String, List<String>> expandableListDetail;
     private ArrayList<ParentBean> parentBeans = new ArrayList<>();
     private ArrayList<ChildBean> childBeans;
+    private MediaRecorder mRecorder = null;
 
+    private RelativeLayout rl_audioRecord;
+    private String file_exts[] = {AUDIO_RECORDER_FILE_EXT_MP4, AUDIO_RECORDER_FILE_EXT_3GP};
+
+    private ACProgressFlower dialog;
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -157,6 +174,7 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                 Toast.makeText(HomeFeedActivity.this, "Temporary logout", Toast.LENGTH_SHORT).show();
                 ParseUser.logOut();
                 ParseUser currentUser = ParseUser.getCurrentUser();
+
                 AppConstants.ClearPreferences(HomeFeedActivity.this);
                 Intent intent = new Intent(HomeFeedActivity.this, LoginSignupActivity.class);
                 startActivity(intent);
@@ -171,14 +189,15 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                 drawerLayout.closeDrawers();
                 postList.clear();
                 AppConstants.ALL = false;
+
                 Log.e("FileAMAN", "" + childBeans.get(childPosition).getChildObjectId());
                 AppConstants.savePreferences(HomeFeedActivity.this, "workid", workList.get(AppConstants.workPOS).getObjectId());
                 AppConstants.savePreferences(HomeFeedActivity.this, "workname", workList.get(AppConstants.workPOS).getWorkspace_url());
                 AppConstants.savePreferences(HomeFeedActivity.this, "projectID", childBeans.get(childPosition).getChildObjectId());
 
                 workspace_name.setText(First_Char_Capital.capitalizeString(workList.get(AppConstants.workPOS).getWorkspace_name()));
-                work_txt.setText(First_Char_Capital.capitalizeString(workList.get(AppConstants.workPOS).getMission()));
-                work_name.setText(First_Char_Capital.capitalizeString(workList.get(AppConstants.workPOS).getWorkspace_name()));
+                work_txt.setText(First_Char_Capital.capitalizeString(workList.get(AppConstants.workPOS).getWorkspace_name()));
+                //  work_name.setText(First_Char_Capital.capitalizeString(workList.get(AppConstants.workPOS).getWorkspace_name()));
                 ParseFile parseFile = workList.get(AppConstants.workPOS).getImage();
                 String a = parseFile.getUrl();
                 if (workList.get(AppConstants.workPOS).getImage() != null) {
@@ -199,7 +218,7 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                 work_space_img.getLayoutParams().height = img_height;
 
 
-                getfeedpost();
+                //  getfeedpost();
                 adapter.setSelectedItem(AppConstants.workPOS);
                 projectAdapter.setSelectedItem(groupPosition);
                 projectAdapter.notifyDataSetChanged();
@@ -207,67 +226,118 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                 return false;
             }
         });
-        project_expandableList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
-            @Override
-            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+        try {
+            project_expandableList.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+                @Override
+                public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
 
 
-                int a = parentBeans.get(groupPosition).getChildBeans().size();
-                if (a == 0) {
-                    Log.e("FileAMAN", "" + parentBeans.get(groupPosition).getCategoryId());
-
-                    AppConstants.savePreferences(HomeFeedActivity.this, "workid", workList.get(AppConstants.workPOS).getObjectId());
-                    AppConstants.savePreferences(HomeFeedActivity.this, "workname", workList.get(AppConstants.workPOS).getWorkspace_url());
-                    AppConstants.savePreferences(HomeFeedActivity.this, "projectID", parentBeans.get(groupPosition).getCategoryId());
-
-                    drawerLayout.closeDrawers();
-                    postList.clear();
-                    //parentBeans.clear();
-                    //  childBeans.clear();
-                    project_expandableList.setVisibility(View.GONE);
-                    img_progrss_projct.setVisibility(View.VISIBLE);
-                    AppConstants.ALL = false;
+                    int a = parentBeans.get(groupPosition).getChildBeans().size();
+                    if (a == 0) {
 
 
-                    workspace_name.setText(First_Char_Capital.capitalizeString(workList.get(AppConstants.workPOS).getWorkspace_name()));
-                    work_txt.setText(First_Char_Capital.capitalizeString(workList.get(AppConstants.workPOS).getMission()));
-                    work_name.setText(First_Char_Capital.capitalizeString(workList.get(AppConstants.workPOS).getWorkspace_name()));
-                    ParseFile parseFile = workList.get(AppConstants.workPOS).getImage();
-                    String img = parseFile.getUrl();
-                    if (workList.get(AppConstants.workPOS).getImage() != null) {
+                        Log.e("FileAMAN", "" + parentBeans.get(groupPosition).getCategoryName());
 
-                        Picasso.with(HomeFeedActivity.this)
-                                .load(img)
-                                .fit()
-                                .centerCrop()
+                        AppConstants.savePreferences(HomeFeedActivity.this, "workid", workList.get(AppConstants.workPOS).getObjectId());
+                        AppConstants.savePreferences(HomeFeedActivity.this, "workname", workList.get(AppConstants.workPOS).getWorkspace_url());
+                        AppConstants.savePreferences(HomeFeedActivity.this, "projectID", parentBeans.get(groupPosition).getCategoryId());
 
-                                .into(work_space_img);
-                        Picasso.with(HomeFeedActivity.this)
-                                .load(img)
-                                .fit()
-                                .centerCrop()
+                        drawerLayout.closeDrawers();
+                        postList.clear();
+                        //parentBeans.clear();
+                        //  childBeans.clear();
+                        project_expandableList.setVisibility(View.GONE);
+                        img_progrss_projct.setVisibility(View.VISIBLE);
+                        AppConstants.ALL = false;
 
-                                .into(imgMenuIcon);
+
+                        workspace_name.setText(First_Char_Capital.capitalizeString(parentBeans.get(groupPosition).getCategoryName()));
+                        work_txt.setText(First_Char_Capital.capitalizeString(parentBeans.get(groupPosition).getCategoryName()));
+                        work_title.setText(First_Char_Capital.capitalizeString(workList.get(AppConstants.workPOS).getWorkspace_name()));
+
+                        String img = parentBeans.get(groupPosition).getImage();
+                        Log.e("FileAMAN", "" + img);
+                        if (parentBeans.get(groupPosition).getImage() != null) {
+
+                            Picasso.with(HomeFeedActivity.this)
+                                    .load(img)
+                                    .fit()
+                                    .centerCrop()
+
+                                    .into(work_space_img);
+                            Picasso.with(HomeFeedActivity.this)
+                                    .load(img)
+                                    .fit()
+                                    .centerCrop()
+
+                                    .into(imgMenuIcon);
+                        }
+                        work_space_img.getLayoutParams().height = img_height;
+
+
+                        getfeedpost();
+                        adapter.setSelectedItem(AppConstants.workPOS);
+                        projectAdapter.setSelectedItem(groupPosition);
+                        projectAdapter.notifyDataSetChanged();
+                        adapter.notifyDataSetChanged();
+
+                        //                    AppConstants.savePreferences(HomeFeedActivity.this, "projectID", childBeans.get(Integer.parseInt(AppConstants.loadPreferences(HomeFeedActivity.this, "proPosition"))).getChildObjectId());
+
                     }
-                    work_space_img.getLayoutParams().height = img_height;
-
-
-                    getfeedpost();
-                    adapter.setSelectedItem(AppConstants.workPOS);
-                    projectAdapter.setSelectedItem(groupPosition);
-                    projectAdapter.notifyDataSetChanged();
-                    adapter.notifyDataSetChanged();
-
-//                    AppConstants.savePreferences(HomeFeedActivity.this, "projectID", childBeans.get(Integer.parseInt(AppConstants.loadPreferences(HomeFeedActivity.this, "proPosition"))).getChildObjectId());
-
+                    return false;
                 }
-                return false;
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+//        scrollView.setOnScrollChangeListener(new View.OnScrollChangeListener() {
+//            @Override
+//            public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+//                Log.e("scrollX",scrollX+"");
+//                Log.e("scrollY",scrollY+"");
+//                Log.e("oldScrollX",oldScrollX+"");
+//                Log.e("oldScrollY",oldScrollY+"");
+//            }
+//        });
+
+        scrollView.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
+            @Override
+            public void onScrollChanged() {
+                if (scrollView != null) {
+                    //if (scrollView.getChildAt(0).getBottom() <= (scrollView.getHeight() + scrollView.getScrollY())) {
+                    img_addpost.setVisibility(View.VISIBLE);
+                } else {
+                    img_addpost.setVisibility(View.INVISIBLE);
+                }
             }
+
         });
+
+
         txt_all.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 //txt_all.setBackgroundColor(getResources().getColor(R.color.black));
+
+                String img = parentBeans.get(AppConstants.workPOS).getImage();
+                Log.e("FileAMAN", "" + img);
+                if (parentBeans.get(AppConstants.workPOS).getImage() != null) {
+
+                    Picasso.with(HomeFeedActivity.this)
+                            .load(img)
+                            .fit()
+                            .centerCrop()
+
+                            .into(work_space_img);
+                    Picasso.with(HomeFeedActivity.this)
+                            .load(img)
+                            .fit()
+                            .centerCrop()
+
+                            .into(imgMenuIcon);
+                }
+                work_space_img.getLayoutParams().height = img_height;
                 AppConstants.ALL = true;
                 postList.clear();
                 getfeedpost();
@@ -315,8 +385,19 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
 ////                                Toast.makeText(getApplicationContext(), "Media captured.", Toast.LENGTH_SHORT).show();
 //                            }
 //                        });
-                Intent intent = new Intent(HomeFeedActivity.this, CameraPostActivity.class);
-                startActivity(intent);
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                    if (!marshMallowPermission.checkPermissionForCamera()) {
+                        marshMallowPermission.checkPermissionForCamera();
+                    } else {
+                        Intent intent = new Intent(HomeFeedActivity.this, CameraPostActivity.class);
+                        startActivity(intent);
+                    }
+                } else {
+                    Intent intent = new Intent(HomeFeedActivity.this, CameraPostActivity.class);
+                    startActivity(intent);
+                }
 
                 hideMenu();
             }
@@ -325,6 +406,8 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
             @Override
             public void onClick(View v) {
                 opensettingbottomshet();
+                drawerLayout.closeDrawers();
+
             }
         });
         btn_text.setOnClickListener(new View.OnClickListener() {
@@ -332,6 +415,7 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
             public void onClick(View v) {
                 Intent intent = new Intent(HomeFeedActivity.this, PostfeedActivity.class);
                 intent.putExtra("file", "");
+                intent.putExtra("post_type", "0");
                 startActivity(intent);
             }
         });
@@ -339,59 +423,138 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
         btn_recordVoice.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Intent recordIntent = new Intent(MediaStore.Audio.Media.RECORD_SOUND_ACTION);
-//                startActivityForResult(recordIntent, RESULT_OK);
-//                start();
-
-
-//                circularProgressBar.setVisibility(View.VISIBLE);
-//                img_mic.setVisibility(View.VISIBLE);
-
+                //startRecording();
                 hideMenu();
+
+
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        img_addpost.setVisibility(View.GONE);
+                        rl_audioRecord.setVisibility(View.VISIBLE);
+                    }
+                }, 1000);
+
+
             }
         });
-        img_mic.setOnTouchListener(new View.OnTouchListener() {
+        rl_audioRecord.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
 
-                        prog = 0;
 
-                        timer = new Timer();
-                        timer.schedule(new TimerTask() {
-                            public void run() {
-                                runOnUiThread(new Runnable() {
-                                    @Override
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                    if (!marshMallowPermission.checkPermissionForRecord()) {
+                        marshMallowPermission.requestPermissionForRecord();
+                    } else {
+                        //  showDialog();
+                        switch (event.getAction()) {
+                            case MotionEvent.ACTION_DOWN:
+
+
+                                prog = 0;
+                                //  if (prog == 1) {
+
+                                onRecord(mStartRecording);
+                                mStartRecording = !mStartRecording;
+                                //}
+                                timer = new Timer();
+                                timer.schedule(new TimerTask() {
                                     public void run() {
-                                        // Your code
+                                        runOnUiThread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                // Your code
 
-                                        prog++;
-                                        if (prog <= 60) {
-                                            circularProgressBar.setProgress(prog);
-                                            Log.e("PROGRESS22", prog + "");
+                                                prog++;
+                                                if (prog <= 60) {
+                                                    circularProgressBar.setProgress(prog);
+                                                    Log.e("PROGRESS22", prog + "");
 
-                                        } else {
-                                            circularProgressBar.setProgress(0);
+                                                } else {
+                                                    img_addpost.setVisibility(View.VISIBLE);
+                                                    rl_audioRecord.setVisibility(View.INVISIBLE);
 
-                                            timer.cancel();
-                                        }
+                                                    circularProgressBar.setProgress(0);
+                                                    stopRecording();
+
+                                                    timer.cancel();
+                                                }
+                                            }
+                                        });
                                     }
-                                });
-                            }
-                        }, 1000, 1000);
+                                }, 1000, 1000);
 
 
-                        return true; // if you want to handle the touch event
-                    case MotionEvent.ACTION_UP:
-                        prog = 0;
-                        timer.cancel();
-                        Log.e("PROGRESS11", prog + "");
-                        circularProgressBar.setProgress(prog);
-                        // RELEASED
-                        return true; // if you want to handle the touch event
+                                return true; // if you want to handle the touch event
+                            case MotionEvent.ACTION_UP:
+                                //    prog = 0;
+                                timer.cancel();
+                                img_addpost.setVisibility(View.VISIBLE);
+                                rl_audioRecord.setVisibility(View.INVISIBLE);
+                                Log.e("PROGRESS11", prog + "");
+                                circularProgressBar.setProgress(prog);
+                                stopRecording();
+                                // RELEASED
+                                return true; // if you want to handle the touch event
 
+                        }
+                    }
+                } else {
+                    switch (event.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+
+
+                            prog = 0;
+                            // if (prog == 1) {
+
+                            onRecord(mStartRecording);
+                            mStartRecording = !mStartRecording;
+                            // }
+                            timer = new Timer();
+                            timer.schedule(new TimerTask() {
+                                public void run() {
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            // Your code
+
+                                            prog++;
+                                            if (prog <= 60) {
+                                                circularProgressBar.setProgress(prog);
+                                                Log.e("PROGRESS22", prog + "");
+
+                                            } else {
+                                                img_addpost.setVisibility(View.VISIBLE);
+                                                rl_audioRecord.setVisibility(View.INVISIBLE);
+
+                                                circularProgressBar.setProgress(0);
+                                                stopRecording();
+                                                timer.cancel();
+                                            }
+                                        }
+                                    });
+                                }
+                            }, 1000, 1000);
+
+
+                            return true; // if you want to handle the touch event
+                        case MotionEvent.ACTION_UP:
+                            //+  prog = 0;
+                            timer.cancel();
+                            img_addpost.setVisibility(View.VISIBLE);
+                            rl_audioRecord.setVisibility(View.INVISIBLE);
+                            Log.e("PROGRESS11", prog + "");
+                            circularProgressBar.setProgress(prog);
+                            stopRecording();
+                            // RELEASED
+                            return true; // if you want to handle the touch event
+
+                    }
                 }
+
 
                 return false;
 
@@ -414,12 +577,9 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
             public void onClick(View v) {
 
 
-
-
-
-
-                openworkspaceSheet();
-
+                //openworkspaceSheet();
+                createnBrowseworkspace();
+                drawerLayout.closeDrawers();
             }
         });
 
@@ -427,7 +587,7 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
             @Override
             public void onClick(View view, final int position) {
 
-                AppConstants.workPOS = position;
+//                AppConstants.workPOS = position;
                 parentBeans.clear();
                 childBeans.clear();
                 project_expandableList.setVisibility(View.GONE);
@@ -437,7 +597,7 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                 expandableListDetail.clear();
 
 
-                //                AppConstants.savePreferences(HomeFeedActivity.this, "workid", workList.get(position).getObjectId());
+//                                AppConstants.savePreferences(HomeFeedActivity.this, "workid", workList.get(position).getObjectId());
 
 //                if (NetworkAvailablity.chkStatus(HomeFeedActivity.this)) {
 //                    getworkspace("1");
@@ -459,124 +619,273 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
         }));
     }
 
-    private void openworkspaceSheet() {
-        final String workid = AppConstants.loadPreferences(HomeFeedActivity.this, "workid");
-        final String workname = AppConstants.loadPreferences(HomeFeedActivity.this, "workname");
-        ViewGroup nullParent = null;
-        LayoutInflater lInflater = (LayoutInflater) HomeFeedActivity.this.getSystemService(
-                Activity.LAYOUT_INFLATER_SERVICE);
-        View view = lInflater.inflate(R.layout.create_work_space_bottomsheet, null);
-        // view.getBackground().setAlpha(51);
-        final Dialog mBottomSheetDialog = new Dialog(HomeFeedActivity.this, R.style.MaterialDialogSheet);
-        mBottomSheetDialog.setContentView(view);
-        mBottomSheetDialog.setCancelable(true);
-        DisplayMetrics metrics = HomeFeedActivity.this.getResources().getDisplayMetrics();
-        int height = metrics.heightPixels;
-        mBottomSheetDialog.getWindow().setLayout(LinearLayout.LayoutParams.MATCH_PARENT, (height)/3);
-        mBottomSheetDialog.getWindow().setGravity(Gravity.BOTTOM);
-        mBottomSheetDialog.show();
+    private void createnBrowseworkspace() {
+        ActionSheet actionSheet = new ActionSheet.Builder()
+                // .setTitle("Title", Color.BLUE)
+                //.setTitleTextSize(20)
+                .setOtherBtn(new String[]{"Create Workspace", "Browse Other Workspace"}, new int[]{Color.parseColor("#2dc8bc"), Color.parseColor("#2dc8bc")})
 
-         TextView txt_cancel = (TextView) mBottomSheetDialog.findViewById(R.id.txt_cancel);
-        TextView txtworkspace = (TextView) mBottomSheetDialog.findViewById(R.id.txtworkspace);
-        TextView txtBrowseWS = (TextView) mBottomSheetDialog.findViewById(R.id.txtBrowseWS);
+                //.setOtherBtnSubTextSize(20)
+                .setCancelBtn("Cancel", Color.parseColor("#2dc8bc"))
+                //.setCancelBtnTextSize(30)
+                .setCancelableOnTouchOutside(true)
+                .setActionSheetListener(new ActionSheet.ActionSheetListener() {
+                    @Override
+                    public void onDismiss(ActionSheet actionSheet, boolean isByBtn) {
+                        // Toast.makeText(HomeFeedActivity.this, "onDismiss: " + isByBtn, Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onButtonClicked(ActionSheet actionSheet, int index) {
+                        if (index == 0) {
+                            Intent intent = new Intent(HomeFeedActivity.this, NewWorkspaceActivity.class);
+                            startActivity(intent);
+                        }
+                        if (index == 1) {
+
+                            Intent intent = new Intent(HomeFeedActivity.this, BrowesWorkspace.class);
+
+                            startActivity(intent);
+                        }
 
 
+                        //  Toast.makeText(HomeFeedActivity.this, "onButtonClicked: " + index, Toast.LENGTH_SHORT).show();
+                    }
+                }).build();
 
-        txt_cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mBottomSheetDialog.dismiss();
-            }
-        });
-        txtworkspace.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(HomeFeedActivity.this, NewWorkspaceActivity.class);
-                startActivity(intent);
-                mBottomSheetDialog.dismiss();
-            }
-        });
-        txtBrowseWS.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(HomeFeedActivity.this, BrowesWorkspace.class);
+        actionSheet.show(getFragmentManager());
+    }
 
-                startActivity(intent);
-
-                mBottomSheetDialog.dismiss();
-            }
-        });
+    private void stopRecording() {
+        Log.e("FILANMEEeee", ">>>>>" + file);
+        // if (file != null) {
+        Intent intent = new Intent(HomeFeedActivity.this, RecordingService.class);
+        stopService(intent);
 
     }
 
+    private void onRecord(boolean mStartRecording) {
+
+        Intent intent = new Intent(HomeFeedActivity.this, RecordingService.class);
+
+        if (mStartRecording) {
+            // start recording
+
+            File ff = new File(Environment.getExternalStorageDirectory() + "/SoundRecorder");
+            if (!ff.exists()) {
+                //folder /SoundRecorder doesn't exist, create the folder
+                ff.mkdir();
+            }
+
+            //start Chronometer
+
+
+            //start RecordingService
+            startService(intent);
+            //keep screen on while recording
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+
+        } else {
+//            //stop recording
+//            mRecordButton.setImageResource(R.drawable.ic_mic_white_36dp);
+//            //mPauseButton.setVisibility(View.GONE);
+//            mChronometer.stop();
+//            mChronometer.setBase(SystemClock.elapsedRealtime());
+//            timeWhenPaused = 0;
+//            mRecordingPrompt.setText(getString(R.string.record_prompt));
+
+            // stopService(intent);
+            //allow the screen to turn off again once recording is finished
+            //getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
+    }
+
+//    private void openworkspaceSheet() {
+//        final String workid = AppConstants.loadPreferences(HomeFeedActivity.this, "workid");
+//        final String workname = AppConstants.loadPreferences(HomeFeedActivity.this, "workname");
+//        ViewGroup nullParent = null;
+//        LayoutInflater lInflater = (LayoutInflater) HomeFeedActivity.this.getSystemService(
+//                Activity.LAYOUT_INFLATER_SERVICE);
+//        View view = lInflater.inflate(R.layout.create_work_space_bottomsheet, null);
+//        // view.getBackground().setAlpha(51);
+//        final Dialog mBottomSheetDialog = new Dialog(HomeFeedActivity.this, R.style.MaterialDialogSheet);
+//        mBottomSheetDialog.setContentView(view);
+//        mBottomSheetDialog.setCancelable(true);
+//        DisplayMetrics metrics = HomeFeedActivity.this.getResources().getDisplayMetrics();
+//        int height = metrics.heightPixels;
+//        mBottomSheetDialog.getWindow().setLayout(LinearLayout.LayoutParams.MATCH_PARENT, (height) / 3);
+//        mBottomSheetDialog.getWindow().setGravity(Gravity.BOTTOM);
+//        mBottomSheetDialog.show();
+//
+//        TextView txt_cancel = (TextView) mBottomSheetDialog.findViewById(R.id.txt_cancel);
+//        TextView txtworkspace = (TextView) mBottomSheetDialog.findViewById(R.id.txtworkspace);
+//        TextView txtBrowseWS = (TextView) mBottomSheetDialog.findViewById(R.id.txtBrowseWS);
+//
+//
+//        txt_cancel.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                mBottomSheetDialog.dismiss();
+//            }
+//        });
+//        txtworkspace.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(HomeFeedActivity.this, NewWorkspaceActivity.class);
+//                startActivity(intent);
+//                mBottomSheetDialog.dismiss();
+//            }
+//        });
+//        txtBrowseWS.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(HomeFeedActivity.this, BrowesWorkspace.class);
+//
+//                startActivity(intent);
+//
+//                mBottomSheetDialog.dismiss();
+//            }
+//        });
+//
+//    }
+
+    //    private void opensettingbottomshet() {
+//        final String workid = AppConstants.loadPreferences(HomeFeedActivity.this, "workid");
+//        final String workname = AppConstants.loadPreferences(HomeFeedActivity.this, "workname");
+//        ViewGroup nullParent = null;
+//        LayoutInflater lInflater = (LayoutInflater) HomeFeedActivity.this.getSystemService(
+//                Activity.LAYOUT_INFLATER_SERVICE);
+//        View view = lInflater.inflate(R.layout.fragment_modal_bottomsheet, null);
+//        // view.getBackground().setAlpha(51);
+//        final Dialog mBottomSheetDialog = new Dialog(HomeFeedActivity.this, R.style.MaterialDialogSheet);
+//        mBottomSheetDialog.setContentView(view);
+//        mBottomSheetDialog.setCancelable(true);
+//        DisplayMetrics metrics = HomeFeedActivity.this.getResources().getDisplayMetrics();
+//        int height = metrics.heightPixels;
+//        mBottomSheetDialog.getWindow().setLayout(LinearLayout.LayoutParams.MATCH_PARENT, (height * 3) / 4);
+//        mBottomSheetDialog.getWindow().setGravity(Gravity.BOTTOM);
+//        mBottomSheetDialog.show();
+//
+//
+//        TextView txt_cancel = (TextView) mBottomSheetDialog.findViewById(R.id.txt_cancel);
+//        TextView txt_createproject = (TextView) mBottomSheetDialog.findViewById(R.id.txt_createproject);
+//        TextView txtworkSetting = (TextView) mBottomSheetDialog.findViewById(R.id.txtworkSetting);
+//        TextView createCategory = (TextView) mBottomSheetDialog.findViewById(R.id.createCategory);
+////        TextView txtlocation = (TextView) mBottomSheetDialog.findViewById(R.id.txtlocation);
+//        createCategory.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(HomeFeedActivity.this, CategoryListingActivity.class);
+//                intent.putExtra("id", workid);
+//                intent.putExtra("name", workname);
+//                startActivity(intent);
+//                mBottomSheetDialog.dismiss();
+//            }
+//        });
+//
+//        txt_cancel.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                mBottomSheetDialog.dismiss();
+//            }
+//        });
+//        txt_createproject.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(HomeFeedActivity.this, ProjectSettingActivity.class);
+//                intent.putExtra("id", workid);
+//                startActivity(intent);
+//                mBottomSheetDialog.dismiss();
+//            }
+//        });
+//        txtworkSetting.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(HomeFeedActivity.this, WorkspaceSettingActivity.class);
+//
+//                startActivity(intent);
+//
+//                mBottomSheetDialog.dismiss();
+//            }
+//        });
+//
+//    }
     private void opensettingbottomshet() {
         final String workid = AppConstants.loadPreferences(HomeFeedActivity.this, "workid");
         final String workname = AppConstants.loadPreferences(HomeFeedActivity.this, "workname");
-        ViewGroup nullParent = null;
-        LayoutInflater lInflater = (LayoutInflater) HomeFeedActivity.this.getSystemService(
-                Activity.LAYOUT_INFLATER_SERVICE);
-        View view = lInflater.inflate(R.layout.fragment_modal_bottomsheet, null);
-        // view.getBackground().setAlpha(51);
-        final Dialog mBottomSheetDialog = new Dialog(HomeFeedActivity.this, R.style.MaterialDialogSheet);
-        mBottomSheetDialog.setContentView(view);
-        mBottomSheetDialog.setCancelable(true);
-        DisplayMetrics metrics = HomeFeedActivity.this.getResources().getDisplayMetrics();
-        int height = metrics.heightPixels;
-        mBottomSheetDialog.getWindow().setLayout(LinearLayout.LayoutParams.MATCH_PARENT, (height * 3) / 4);
-        mBottomSheetDialog.getWindow().setGravity(Gravity.BOTTOM);
-        mBottomSheetDialog.show();
+        ActionSheet actionSheet = new ActionSheet.Builder()
+                // .setTitle("Title", Color.BLUE)
+                //.setTitleTextSize(20)
+                .setOtherBtn(new String[]{"Workspace Settings", "Category Settings", "Project Settings", "Notification Settings"}, new int[]{Color.parseColor("#2dc8bc"), Color.parseColor("#2dc8bc"),
+                        Color.parseColor("#2dc8bc"),
+                        Color.parseColor("#2dc8bc")})
+
+                //.setOtherBtnSubTextSize(20)
+                .setCancelBtn("Cancel", Color.parseColor("#2dc8bc"))
+                //.setCancelBtnTextSize(30)
+                .setCancelableOnTouchOutside(true)
+                .setActionSheetListener(new ActionSheet.ActionSheetListener() {
+                    @Override
+                    public void onDismiss(ActionSheet actionSheet, boolean isByBtn) {
+                        // Toast.makeText(HomeFeedActivity.this, "onDismiss: " + isByBtn, Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onButtonClicked(ActionSheet actionSheet, int index) {
+                        if (index == 0) {
+                            Intent intent = new Intent(HomeFeedActivity.this, WorkspaceSettingActivity.class);
+                            startActivity(intent);
+                        }
+                        if (index == 1) {
+
+                            Intent intent = new Intent(HomeFeedActivity.this, CategoryListingActivity.class);
+                            intent.putExtra("id", workid);
+                            intent.putExtra("name", workname);
+                            startActivity(intent);
+                        }
+                        if (index == 2) {
+
+                            Intent intent = new Intent(HomeFeedActivity.this, ProjectSettingActivity.class);
+                            intent.putExtra("id", workid);
+                            startActivity(intent);
+                        }
 
 
-        TextView txt_cancel = (TextView) mBottomSheetDialog.findViewById(R.id.txt_cancel);
-        TextView txt_createproject = (TextView) mBottomSheetDialog.findViewById(R.id.txt_createproject);
-        TextView txtworkSetting = (TextView) mBottomSheetDialog.findViewById(R.id.txtworkSetting);
-        TextView createCategory = (TextView) mBottomSheetDialog.findViewById(R.id.createCategory);
-//        TextView txtlocation = (TextView) mBottomSheetDialog.findViewById(R.id.txtlocation);
-        createCategory.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(HomeFeedActivity.this, CategoryListingActivity.class);
-                intent.putExtra("id", workid);
-                intent.putExtra("name", workname);
-                startActivity(intent);
-                mBottomSheetDialog.dismiss();
-            }
-        });
+                        //  Toast.makeText(HomeFeedActivity.this, "onButtonClicked: " + index, Toast.LENGTH_SHORT).show();
+                    }
+                }).build();
 
-        txt_cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mBottomSheetDialog.dismiss();
-            }
-        });
-        txt_createproject.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(HomeFeedActivity.this, ProjectSettingActivity.class);
-                intent.putExtra("id", workid);
-                startActivity(intent);
-                mBottomSheetDialog.dismiss();
-            }
-        });
-        txtworkSetting.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(HomeFeedActivity.this, WorkspaceSettingActivity.class);
-
-                startActivity(intent);
-
-                mBottomSheetDialog.dismiss();
-            }
-        });
-
+        actionSheet.show(getFragmentManager());
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK) {
-            String theFilePath = data.getData().toString();
-            Log.e("theFilePath", theFilePath + "");
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 1111) {
+            File folder = new File(Environment.getExternalStorageDirectory(), "/Sounds");
+            long folderModi = folder.lastModified();
+
+            FilenameFilter filter = new FilenameFilter() {
+                public boolean accept(File dir, String name) {
+                    return (name.endsWith("3gp"));
+                }
+            };
+
+            File[] folderList = folder.listFiles(filter);
+
+            String recentName = "";
+
+            for (int i = 0; i < folderList.length; i++) {
+                long fileModi = folderList[i].lastModified();
+
+                if (folderModi == fileModi) {
+                    recentName = folderList[i].getName();
+                }
+            }
+
+            Log.e("FILANMEEeee", recentName);
         }
     }
 
@@ -633,7 +942,7 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                                 String type = objects.get(i).getString("type");
 
                                 Log.e("CATEGRORY", "d>>>>>" + objectId);
-                              //  parentBeans.add(new ParentBean(objectId, name, type, strdefault, childBeans));
+                                //  parentBeans.add(new ParentBean(objectId, name, type, strdefault, childBeans));
                             }
 //
                         }
@@ -678,7 +987,7 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                             String cat_name = objects.get(i).getString("name");
                             String cat_id = objects.get(i).getObjectId();
                             JSONArray jsonArray = objects.get(i).getJSONArray("Projects");
-                            Log.e("CategoryAMANANA", "d>>>>>" + jsonArray.length());
+//                            Log.e("CategoryAMANANA", "d>>>>>" + jsonArray.length());
                             for (int a = 0; a < jsonArray.length(); a++) {
                                 //Log.e("CategoryAMANANA", "d>>>>>" + jsonArray.toString());
                                 childBeans = new ArrayList<>();
@@ -695,19 +1004,19 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                                     String updatedAt = jsonObject1.getString("updatedAt");
 
                                     String type = jsonObject1.getString("type");
-                                    //Log.e("Project_IDDSs_12", catProjectobjectId);
+                                    Log.e("Project_IDDSs_12", catProjectobjectId);
                                     childList.add(catProjectobjectId);
 
                                     if (objects.get(i).has("default")) {
                                         strdefault = objects.get(i).getString("default");
 
 
-                                         categoriesProjectbeanclasses.add(new CategoriesProjectbeanclass(name, objective, createdAt, updatedAt, catProjectobjectId, type));
+                                        //  categoriesProjectbeanclasses.add(new CategoriesProjectbeanclass(name, objective, createdAt, updatedAt, catProjectobjectId, type));
 
                                         childBeans.add(new ChildBean(catProjectobjectId, name, updatedAt,
                                                 objective, createdAt, type, strdefault));
                                     } else {
-                                        categoriesProjectbeanclasses.add(new CategoriesProjectbeanclass(name, objective, createdAt, updatedAt, catProjectobjectId, type));
+                                        //  categoriesProjectbeanclasses.add(new CategoriesProjectbeanclass(name, objective, createdAt, updatedAt, catProjectobjectId, type));
 
 
                                         childBeans.add(new ChildBean(catProjectobjectId, name, updatedAt,
@@ -720,9 +1029,8 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
 
 //                            getprojectlist(objectId,cat_name,cat_id);
 
-                            parentBeans.add(new ParentBean(cat_id, cat_name, "", "", childBeans));
+                            parentBeans.add(new ParentBean(cat_id, cat_name, "", "", "", childBeans));
                         }
-
 
 
                     } catch (NullPointerException ea) {
@@ -744,7 +1052,7 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                 Log.e("parentBeansHHH", childBeans.size() + "");
                 Log.e("childListAAAA", childList.size() + "");
 
-                for (int a = 0; a < childBeans.size(); a++) {
+                for (int a = 0; a < childList.size(); a++) {
 
                     if (childList.contains(parentBeans.get(a).getCategoryId())) {
 
@@ -770,17 +1078,21 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void getworkspaceList() {
+        dialog = new ACProgressFlower.Builder(this)
+                .direction(ACProgressConstant.DIRECT_CLOCKWISE)
+                .themeColor(Color.WHITE)
+
+                .fadeColor(Color.DKGRAY).build();
+        dialog.show();
         workList = new ArrayList<>();
         workList.clear();
         //demolist.clear();
-        final ProgressDialog dialog = AppConstants.showProgressDialog(HomeFeedActivity.this, "Loading...");
+
         ParseQuery<ParseObject> query = ParseQuery.getQuery("WorkSpace");
         query.whereEqualTo("user", ParseObject.createWithoutData("_User", ParseUser.getCurrentUser().getObjectId()));
         query.findInBackground(new FindCallback<ParseObject>() {
             public void done(List<ParseObject> objects, ParseException e) {
-                if (dialog.isShowing()) {
-                    dialog.dismiss();
-                }
+
 
                 if (e == null) {
 
@@ -813,7 +1125,7 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                     }
                     String w_id = AppConstants.loadPreferences(HomeFeedActivity.this, "workid");
 
-
+                    Log.e("MYWORKID", w_id + "");
                     for (int a = 0; a < workList.size(); a++) {
                         if (w_id.equals("00")) {
 
@@ -821,8 +1133,10 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
 
 
                                 workspace_name.setText(First_Char_Capital.capitalizeString(workList.get(a).getWorkspace_name()));
-                                work_txt.setText(First_Char_Capital.capitalizeString(workList.get(a).getMission()));
-                                work_name.setText(First_Char_Capital.capitalizeString(workList.get(a).getWorkspace_name()));
+                                work_txt.setText(First_Char_Capital.capitalizeString(workList.get(a).getWorkspace_name()));
+                                work_title.setText(First_Char_Capital.capitalizeString(workList.get(a).getWorkspace_name()));
+
+                                //  work_name.setText(First_Char_Capital.capitalizeString(workList.get(a).getWorkspace_name()));
                                 ParseFile parseFile = workList.get(a).getImage();
                                 String newimage = parseFile.getUrl();
                                 if (newimage != null) {
@@ -848,12 +1162,17 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                             AppConstants.savePreferences(HomeFeedActivity.this, "workname", workList.get(a).getWorkspace_url());
 
                         } else if (workList.get(a).getObjectId().equals(w_id)) {
-                            //Toast.makeText(HomeFeedActivity.this, w_id, Toast.LENGTH_SHORT).show();
-                            int pos = Integer.parseInt(AppConstants.loadPreferences(HomeFeedActivity.this, "position"));
-                            workspace_name.setText(First_Char_Capital.capitalizeString(workList.get(pos).getWorkspace_name()));
-                            work_txt.setText(First_Char_Capital.capitalizeString(workList.get(pos).getMission()));
-                            work_name.setText(First_Char_Capital.capitalizeString(workList.get(pos).getWorkspace_name()));
-                            ParseFile parseFile = workList.get(pos).getImage();
+//                            AppConstants.savePreferences(HomeFeedActivity.this, "workid", workList.get(a).getObjectId());
+//                            AppConstants.savePreferences(HomeFeedActivity.this, "workname", workList.get(a).getWorkspace_url());
+
+
+                            AppConstants.savePreferences(HomeFeedActivity.this, "position", "" + a);
+                            //     int pos = Integer.parseInt(AppConstants.loadPreferences(HomeFeedActivity.this, "position"));
+                            Log.e("MYWORKIDPOSTIO", a + "");
+                            workspace_name.setText(First_Char_Capital.capitalizeString(workList.get(a).getWorkspace_name()));
+                            work_txt.setText(First_Char_Capital.capitalizeString(workList.get(a).getWorkspace_name()));
+                            work_title.setText(First_Char_Capital.capitalizeString(workList.get(a).getWorkspace_name()));
+                            ParseFile parseFile = workList.get(a).getImage();
                             String newimage = parseFile.getUrl();
                             if (newimage != null) {
 
@@ -876,8 +1195,8 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
 
 //                    ArrayList<WorkspaceBean> tempElements = new ArrayList<WorkspaceBean>(workList);
 //                    Collections.reverse(tempElements);
-
                     adapter = new WorkspaceAdapter(HomeFeedActivity.this, workList, workspace_name);
+
                     listView.setHasFixedSize(true);
                     RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(HomeFeedActivity.this);
                     listView.setLayoutManager(layoutManager);
@@ -1018,19 +1337,30 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                             String workspaceID = objects.get(i).getString("workspaceID");
                             String objective = objects.get(i).getString("objective");
                             String createdAt = objects.get(i).getString("createdAt");
-                            String image = objects.get(i).getString("image");
+                            ParseFile ws_image = (ParseFile) objects.get(i).get("image");
+                            String image = ws_image.getUrl();
+//                            String image = objects.get(i).getString("image");
                             String type = objects.get(i).getString("type");
                             if (objects.get(i).has("default")) {
                                 strdefault = objects.get(i).getString("default");
                             }
 
-                            Log.e("Project_IDDSs", objectId);
+                            Log.e("Project_IDDSs", name + ">>>>>>>>>" + objectId);
 
 //                            if (!childList.contains(objectId)) {
-                            parentBeans.add(new ParentBean(objectId, name, type, strdefault, childBeans));
+                            parentBeans.add(new ParentBean(objectId, name, type, strdefault, image, childBeans));
 //                            }
 
                         }
+
+                        projectAdapter = new MenuProjectAdapter(HomeFeedActivity.this,
+                                projectList, expandableListDetail, parentBeans, project_expandableList);
+                        project_expandableList.setAdapter(projectAdapter);
+                        projectAdapter.notifyDataSetChanged();
+
+
+                        project_expandableList.setVisibility(View.VISIBLE);
+                        img_progrss_projct.setVisibility(View.GONE);
 
 
                     } catch (NullPointerException ea) {
@@ -1042,7 +1372,7 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                     Log.e("lse", e.getMessage());
                     // error
                 }
-                getcatogory();
+//                getcatogory();
 
             }
         });
@@ -1050,14 +1380,16 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
     }
 
     public void getfeedpost() {
+        postList.clear();
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Post");
         if (!AppConstants.ALL) {
             query.whereEqualTo("project", ParseObject.createWithoutData("Project", AppConstants.loadPreferences(HomeFeedActivity.this, "projectID")));
-
-            Log.e("worksapceID", AppConstants.loadPreferences(HomeFeedActivity.this, "projectID"));
+            //Toast.makeText(this, "project", Toast.LENGTH_SHORT).show();
+            Log.e("worksap_projectID", AppConstants.loadPreferences(HomeFeedActivity.this, "projectID"));
         } else {
-            query.whereEqualTo("worksapce", ParseObject.createWithoutData("WorkSpace", AppConstants.loadPreferences(HomeFeedActivity.this, "workid")));
-            Log.e("worksapceID12", AppConstants.loadPreferences(HomeFeedActivity.this, "workid"));
+            //  Toast.makeText(this, "work", Toast.LENGTH_SHORT).show();
+            query.whereEqualTo("workspace", ParseObject.createWithoutData("WorkSpace", AppConstants.loadPreferences(HomeFeedActivity.this, "workid")));
+            Log.e("worksapc_WORKSPACe", AppConstants.loadPreferences(HomeFeedActivity.this, "workid"));
 
         }
         query.orderByAscending("createdAt");
@@ -1067,7 +1399,9 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
             public void done(List<ParseObject> objects, ParseException e) {
 
                 if (e == null) {
+
                     Log.e("FEEDPOST", objects.toString() + "");
+
                     postList.clear();
                     for (int i = 0; i < objects.size(); i++) {
                         String post_image = "no_image";
@@ -1092,10 +1426,15 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
 
                         String tagUserId = objects.get(i).getString("tagUserId");
                         String post_file_url = objects.get(i).getString("post_file_url");
+                        String post_file = "";
+                        if (objects.get(i).has("post_file")) {
+                            ParseFile file = (ParseFile) objects.get(i).get("post_file");
+                            post_file = file.getUrl();
+                        }
                         String userTag = objects.get(i).getString("userTag");
                         int CommentCount = objects.get(i).getInt("CommentCount");
                         int likesCount = objects.get(i).getInt("likesCount");
-                        postList.add(new ShowPostBean(username, user_imge, text, objectId, updatedAt, createdAt, post_image, post_type, tagUserId, post_file_url, userTag, CommentCount, likesCount, post_userID));
+                        postList.add(new ShowPostBean(username, user_imge, text, objectId, updatedAt, createdAt, post_image, post_type, tagUserId, post_file_url, userTag, CommentCount, likesCount, post_userID, post_file));
 
                     }
                     Collections.reverse(postList);
@@ -1109,8 +1448,14 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                     Rv_feed_post.setAdapter(adapter);
                     Rv_feed_post.invalidate();
                     adapter.notifyDataSetChanged();
+                    if (dialog.isShowing()) {
+                        dialog.dismiss();
+                    }
 
                 } else {
+                    if (dialog.isShowing()) {
+                        dialog.dismiss();
+                    }
                     postList.clear();
                     Toast.makeText(HomeFeedActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
 
@@ -1122,6 +1467,7 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void findview() {
+        mRecorder = new MediaRecorder();
         postList = new ArrayList<>();
         projectList = new ArrayList<>();
         expandableListDetail = new HashMap<>();
@@ -1129,12 +1475,14 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
         childList = new ArrayList<>();
         childList.clear();
         projectList.clear();
-
+        scrollView = (NestedScrollView) findViewById(R.id.scrollView_feed);
+        marshMallowPermission = new MarshMallowPermission(HomeFeedActivity.this);
+        rl_audioRecord = (RelativeLayout) findViewById(R.id.Rl_audioRecord);
         categoriesProjectbeanclasses = new ArrayList<>();
         postList.clear();
         customFonts = new CustomFonts(HomeFeedActivity.this);
         circularProgressBar = (CircularProgressBar) findViewById(R.id.circularProgressBar);
-        btn_recordVoice = (Button) findViewById(R.id.btn_recordVoice);
+        btn_recordVoice = (Button) findViewById(R.id.btn_RecorVoice);
         btn_camera = (Button) findViewById(R.id.btn_camera);
         workList = new ArrayList<>();
         workList.clear();
@@ -1150,7 +1498,7 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
         work_space_img = (ImageView) findViewById(R.id.work_space_img);
         imgWorkSpaceSetting = (ImageView) findViewById(R.id.imgWorkSpaceSetting);
         Rv_feed_post = (RecyclerView) findViewById(R.id.Rv_feed_post);
-        work_name = (TextView) findViewById(R.id.work_name);
+        work_title = (TextView) findViewById(R.id.work_title);
         work_txt = (TextView) findViewById(R.id.work_txt);
         txt_all = (TextView) findViewById(R.id.txt_all);
         workspace_name = (TextView) findViewById(R.id.workspace_name);
@@ -1162,8 +1510,9 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
         img_addpost = (ImageView) findViewById(R.id.img_addpost);
         arcLayout = (ArcLayout) findViewById(R.id.arc_layout);
         menuLayout = findViewById(R.id.menu_layout);
-        work_name.setTypeface(customFonts.CabinBold);
+        // work_name.setTypeface(customFonts.CabinBold);
         workspace_name.setTypeface(customFonts.CabinBold);
+        work_title.setTypeface(customFonts.CabinBold);
         work_txt.setTypeface(customFonts.CabinRegular);
 
     }

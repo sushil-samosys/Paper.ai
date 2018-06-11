@@ -112,7 +112,7 @@ public class CommentActivity extends AppCompatActivity {
         query.include("user_id");
         query.findInBackground(new FindCallback<ParseObject>() {
             public void done(List<ParseObject> objects, ParseException e) {
-                Log.e("commentList", objects.size() + "");
+
                 if (e == null) {
 
 

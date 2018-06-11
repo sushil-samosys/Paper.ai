@@ -22,7 +22,6 @@ import com.parse.ParseQuery;
 import com.samosys.paperai.R;
 import com.samosys.paperai.activity.Bean.ProjctBean;
 import com.samosys.paperai.activity.activity.NewProjctActivity;
-import com.samosys.paperai.activity.adapter.MenuPr0jectAdapter;
 import com.samosys.paperai.activity.utils.AppConstants;
 import com.samosys.paperai.activity.utils.CustomFonts;
 
@@ -44,7 +43,7 @@ public class Menusecondfragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
     TextView txtSpceName,txtNoVisible,txt_allprct;
     RecyclerView RV_projct;
-    MenuPr0jectAdapter adapter;
+
     ImageView img_addprojet;
     ArrayList<ProjctBean> mylist;
     EditText edt_menuproject;

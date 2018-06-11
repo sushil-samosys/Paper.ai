@@ -9,6 +9,7 @@
         android:id="@+id/sc_scroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="@dimen/_20sdp"
         android:layout_above="@+id/llcreate">
 
         <LinearLayout
@@ -20,16 +21,18 @@
             <RelativeLayout
                 android:id="@+id/rl_profilePic"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="@dimen/_200sdp">
 
                 <ImageView
                     android:id="@+id/img_work_space"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_centerHorizontal="true"
+
+                    android:layout_centerInParent="true"
+                    android:layout_centerVertical="true"
                     android:adjustViewBounds="true"
-
-
-                    android:scaleType="fitCenter"
+                    android:scaleType="fitXY"
                     android:src="@mipmap/sign_up_img" />
 
                 <TextView
@@ -72,9 +75,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="WORKSPACE NAME"
-android:maxLength="20"
                         android:imeOptions="actionNext"
                         android:inputType="textCapWords"
+                        android:maxLength="20"
                         android:paddingBottom="@dimen/_10sdp"
                         android:paddingTop="@dimen/_5sdp"
                         android:textColor="@color/txt_dark"
@@ -100,7 +103,7 @@ android:maxLength="20"
                         app:hintTextAppearance="@style/TextAppearence.App.TextInputLayout">
 
                         <EditText
-                            android:id="@+id/edt_workspace_url"
+                            android:id="@+id/edt_workspacurl"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="WORKSPACE URL"
@@ -123,15 +126,16 @@ android:maxLength="20"
                         android:textColor="#000"
                         android:textSize="@dimen/_15sdp" />
                 </LinearLayout>
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center|left"
-                    android:paddingTop="@dimen/_10sdp"
-                    android:paddingRight="@dimen/_10sdp"
-                    android:paddingLeft="@dimen/_10sdp"
-
                     android:gravity="right"
+                    android:paddingLeft="@dimen/_10sdp"
+                    android:paddingRight="@dimen/_10sdp"
+
+                    android:paddingTop="@dimen/_10sdp"
                     android:text="MISSION(optional)"
                     android:textColor="@color/txt_light"
                     android:textSize="@dimen/_12sdp" />
@@ -141,14 +145,14 @@ android:maxLength="20"
                     android:id="@+id/edt_mission"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/_5sdp"
+                    android:layout_marginRight="@dimen/_5sdp"
+                    android:background="@drawable/light_border"
                     android:gravity="top|left"
                     android:hint="your mission"
                     android:inputType="textMultiLine"
-                    android:background="@drawable/light_border"
                     android:lines="8"
                     android:maxLines="10"
-                    android:layout_marginRight="@dimen/_5sdp"
-                    android:layout_marginLeft="@dimen/_5sdp"
                     android:minLines="6"
                     android:padding="@dimen/_10sdp"
                     android:scrollbars="vertical"

@@ -80,6 +80,7 @@ public class RecordAudioActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(RecordAudioActivity.this, PostfeedActivity.class);
                 intent.putExtra("file", strFile);
+                intent.putExtra("post_type","1");;
                 startActivity(intent);
             }
         });

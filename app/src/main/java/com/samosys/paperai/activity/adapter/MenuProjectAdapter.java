@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.samosys.paperai.R;
@@ -33,8 +34,8 @@ public class MenuProjectAdapter extends BaseExpandableListAdapter {
     HashMap<String, List<String>> expandableListDetail;
     CustomFonts customFonts;
     ExpandableListView project_expandableList;
+    int SELECTEDPOSITION = 0;
     private Context context;
-    private int mSelectedItem = -1;
     private ArrayList<ParentBean> parentBeans;
 
     public MenuProjectAdapter(HomeFeedActivity homeFeedActivity, ArrayList<ProjctBean> projectList,
@@ -50,10 +51,10 @@ public class MenuProjectAdapter extends BaseExpandableListAdapter {
     }
 
     public void setSelectedItem(int selectedItem) {
-        mSelectedItem = selectedItem;
+
         AppConstants.savePreferences(context, "proPosition", "" + selectedItem);
 
-
+        SELECTEDPOSITION = selectedItem;
     }
 
     @Override
@@ -71,9 +72,9 @@ public class MenuProjectAdapter extends BaseExpandableListAdapter {
 
     @Override
     public Object getGroup(int groupPosition) {
-        if (parentBeans.size()>0){
-        return this.parentBeans.get(groupPosition);}
-        else {
+        if (parentBeans.size() > 0) {
+            return this.parentBeans.get(groupPosition);
+        } else {
             return 0;
         }
     }
@@ -103,69 +104,68 @@ public class MenuProjectAdapter extends BaseExpandableListAdapter {
     @SuppressLint("ResourceAsColor")
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
-        //  String listTitle = (String) getGroup(groupPosition);
 
         ParentBean group = (ParentBean) getGroup(groupPosition);
-//        Log.e("parentBeans_adapter", group.getChildBeans().get(groupPosition).getChildName()+"");
         if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) this.context.
                     getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = layoutInflater.inflate(R.layout.header_group, null);
         }
-        //  Log.e("CHILDSIAXE",getChildrenCount(groupPosition)+"");
-        ImageView img_expand=(ImageView)convertView.findViewById(R.id.img_expand);
 
+        ImageView img_expand = (ImageView) convertView.findViewById(R.id.img_expand);
+        LinearLayout ll_project_item = (LinearLayout) convertView.findViewById(R.id.ll_project_item);
         if (groupPosition == 0) {
 
             project_expandableList.setGroupIndicator(null);
 
         }
-//        if (child.getChildType().equals("2")) {
-//            img_proLock.setVisibility(View.VISIBLE);
-//        } else {
-//            img_proLock.setVisibility(View.GONE);
-//        }
 
-        if (group.getCategoryName().equals("My Notes")){
+
+        if (group.getCategoryName().equals("My Notes")) {
             img_expand.setImageResource(R.mipmap.home_lock);
         }
 
-//        for (int a=0;a<parentBeans.get(groupPosition).getChildBeans().size();a++)
-//        {
-//            if (parentBeans.get(groupPosition).getChildBeans().get(a).getChildType().equals("2")){
-//            img_expand.setImageResource(R.mipmap.home_lock);
-//        }else {
-//                //img_expand.setVisibility(View.GONE);
 //
-//        }
-//
-//        }
 
-        if (parentBeans.get(groupPosition).getParentType().equals("2")){
+        if (parentBeans.get(groupPosition).getParentType().equals("2")) {
             img_expand.setVisibility(View.VISIBLE);
             img_expand.setImageResource(R.mipmap.home_lock);
-        }else {
+        } else {
             img_expand.setVisibility(View.INVISIBLE);
 
         }
 
-//        if (AppConstants.loadPreferences(context, "projectID").equals("00")) {
-//
-//            AppConstants.savePreferences(context, "projectID", parentBeans.get(2).getCategoryId());
-//            ((HomeFeedActivity) context).getfeedpost();
-//
-//        } else {
-//            ((HomeFeedActivity) context).getfeedpost();
-//            // Toast.makeText(context, "else", Toast.LENGTH_SHORT).show();
-//        }
+        if (AppConstants.loadPreferences(context, "projectID").equals("00")) {
+//            if (parentBeans.size() >= 3) {
+            AppConstants.savePreferences(context, "projectID", parentBeans.get(2).getCategoryId());
+//            }
+            Log.e("childView IF", "==> " + parentBeans.get(2).getCategoryId());
 
-//
 
+            ((HomeFeedActivity) context).getfeedpost();
+
+        } else {
+
+            //if (SELECTEDPOSITION == groupPosition) {
+                AppConstants.savePreferences(context, "projectID", parentBeans.get(groupPosition).getCategoryId());
+                Log.e("childView ELSe", "==> " + parentBeans.get(SELECTEDPOSITION).getCategoryId());
+                ((HomeFeedActivity) context).getfeedpost();
+//            }
+            //
+
+        }
+
+
+        if (groupPosition == 2) {
+
+            project_expandableList.setGroupIndicator(null);
+//            ll_project_item.setBackgroundColor(context.getResources().getColor(R.color.black));
+        }
 
         TextView listTitleTextView = (TextView) convertView
                 .findViewById(R.id.listTitle);
         listTitleTextView.setText(First_Char_Capital.capitalizeString(group.getCategoryName()));
-        Log.e("ParentView", "==> " + group.getCategoryName());
+
 
         return convertView;
     }
@@ -199,11 +199,10 @@ public class MenuProjectAdapter extends BaseExpandableListAdapter {
         }
 
 
-
         TextView txtChildTitle = (TextView) convertView.findViewById(R.id.txtChildTitle);
         txtChildTitle.setText(child.getChildName());
         txtChildTitle.setTypeface(customFonts.CabinRegular);
-        Log.e("childView", "==> " + child.getChildName());
+
 
         return convertView;
     }

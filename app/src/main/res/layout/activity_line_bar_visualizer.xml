@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+
+    android:layout_height="match_parent">
+    <RelativeLayout
+        android:layout_width="match_parent"
+
+        android:layout_margin="@dimen/_20sdp"
+        android:layout_height="wrap_content">
+
+    <com.samosys.paperai.activity.AudioVisualizer.LineBarVisualizer
+        android:id="@+id/visualizer"
+        android:layout_width="match_parent"
+
+       android:layout_height="wrap_content"
+
+
+         />
+    </RelativeLayout>
+    <!--<include layout="@layout/layout_audio_buttons" />-->
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="16dp"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/reply"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:background="@android:color/transparent"
+
+
+            android:src="@drawable/ic_replay_red_48dp" />
+
+        <ImageButton
+            android:id="@+id/ib_play_pause"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/image_play_pause"
+            android:onClick="playPause"
+            android:src="@drawable/ic_play_red_48dp" />
+    </LinearLayout>
+</RelativeLayout>

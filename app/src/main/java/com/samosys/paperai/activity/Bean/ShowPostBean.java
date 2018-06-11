@@ -22,6 +22,7 @@ public class ShowPostBean {
     int CommentCount;
     int likesCount;
     String post_userID;
+    String post_file;
 
     public ParseFile getUser_imge() {
         return user_imge;
@@ -31,7 +32,15 @@ public class ShowPostBean {
         this.user_imge = user_imge;
     }
 
-    public ShowPostBean(String username, ParseFile user_imge, String text, String objectId, String updatedAt, String createdAt, String image, String post_type, String tagUserId, String post_file_url, String userTag, int commentCount, int likesCount, String post_userID) {
+    public String getPost_file() {
+        return post_file;
+    }
+
+    public void setPost_file(String post_file) {
+        this.post_file = post_file;
+    }
+
+    public ShowPostBean(String username, ParseFile user_imge, String text, String objectId, String updatedAt, String createdAt, String image, String post_type, String tagUserId, String post_file_url, String userTag, int commentCount, int likesCount, String post_userID, String post_file) {
 
         this.username = username;
         this.user_imge = user_imge;
@@ -48,6 +57,8 @@ public class ShowPostBean {
         this.CommentCount = commentCount;
         this.likesCount = likesCount;
         this.post_userID = post_userID;
+this.post_file=post_file;
+
 
 
     }

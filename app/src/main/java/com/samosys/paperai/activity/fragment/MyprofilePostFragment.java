@@ -20,7 +20,6 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.samosys.paperai.R;
 import com.samosys.paperai.activity.Bean.ShowPostBean;
-import com.samosys.paperai.activity.adapter.FeedPostAdapter;
 import com.samosys.paperai.activity.adapter.MypostAdapter;
 import com.samosys.paperai.activity.utils.SimpleDividerItemDecoration;
 
@@ -134,10 +133,11 @@ public class MyprofilePostFragment extends Fragment {
 
                         String tagUserId = objects.get(i).getString("tagUserId");
                         String post_file_url = objects.get(i).getString("post_file_url");
+                        String post_file = objects.get(i).getString("post_file");
                         String userTag = objects.get(i).getString("userTag");
                         int CommentCount = objects.get(i).getInt("CommentCount");
                         int likesCount = objects.get(i).getInt("likesCount");
-                        postList.add(new ShowPostBean(ParseUser.getCurrentUser().get("fullname") + "",user_imge, text, objectId, updatedAt, createdAt, post_image, post_type, tagUserId, post_file_url, userTag, CommentCount, likesCount, ParseUser.getCurrentUser().getObjectId()));
+                        postList.add(new ShowPostBean(ParseUser.getCurrentUser().get("fullname") + "",user_imge, text, objectId, updatedAt, createdAt, post_image, post_type, tagUserId, post_file_url, userTag, CommentCount, likesCount, ParseUser.getCurrentUser().getObjectId(), post_file));
 
                         //  postList.add(new ShowPostBean(username, text, objectId, updatedAt, createdAt, image, post_type, tagUserId, post_file_url, userTag, CommentCount, likesCount,post_userID));
 

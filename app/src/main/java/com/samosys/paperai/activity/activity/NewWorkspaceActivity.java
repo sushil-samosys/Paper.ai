@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -30,6 +31,7 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.samosys.paperai.R;
 import com.samosys.paperai.activity.utils.AppConstants;
+import com.samosys.paperai.activity.utils.NetworkAvailablity;
 import com.samosys.paperai.activity.utils.Utility;
 
 import java.io.ByteArrayOutputStream;
@@ -39,6 +41,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import cc.cloudist.acplibrary.ACProgressConstant;
+import cc.cloudist.acplibrary.ACProgressFlower;
 
 public class NewWorkspaceActivity extends AppCompatActivity {
     EditText edt_workspace, edt_mission, edt_workspace_url;
@@ -50,7 +55,7 @@ public class NewWorkspaceActivity extends AppCompatActivity {
     Bitmap bitmap = null;
     ParseFile file = null;
     private String userChoosenTask;
-
+    private  ACProgressFlower dialogProgred;
     private int REQUEST_CAMERA = 0, SELECT_FILE = 1;
 
     @Override
@@ -61,7 +66,7 @@ public class NewWorkspaceActivity extends AppCompatActivity {
         img_work_space = (ImageView) findViewById(R.id.img_work_space);
         edt_workspace = (EditText) findViewById(R.id.edt_workspace);
         edt_mission = (EditText) findViewById(R.id.edt_mission);
-        edt_workspace_url = (EditText) findViewById(R.id.edt_workspace_url);
+        edt_workspace_url = (EditText) findViewById(R.id.edt_workspacurl);
 //        edt_mission.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS | InputType.TYPE_CLASS_TEXT);
         edt_workspace.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS | InputType.TYPE_CLASS_TEXT);
         llcreate = (LinearLayout) findViewById(R.id.llcreate);
@@ -69,8 +74,15 @@ public class NewWorkspaceActivity extends AppCompatActivity {
         llcreate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final ProgressDialog dialog = AppConstants.showProgressDialog(NewWorkspaceActivity.this, "Please wait...");
-                validation(dialog);
+                dialogProgred = new ACProgressFlower.Builder(NewWorkspaceActivity.this)
+                        .direction(ACProgressConstant.DIRECT_CLOCKWISE)
+                        .themeColor(Color.WHITE)
+
+                        .fadeColor(Color.DKGRAY).build();
+                dialogProgred.show();
+
+
+                 validation();
             }
         });
 
@@ -89,8 +101,10 @@ public class NewWorkspaceActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
                 if (s.length() > 0) {
 
-                    edt_workspace_url.setText(edt_workspace.getText().toString().toLowerCase().trim() + "workspace");
-                    mainurl = edt_workspace.getText().toString().toLowerCase().trim() + "workspace.papr.ai";
+                    String url = edt_workspace.getText().toString().toLowerCase().trim() + "workspace";
+                    url = url.replaceAll(" ", "");
+                    edt_workspace_url.setText(url);
+                    mainurl = url.toLowerCase() + ".papr.ai";
 
 
                 }
@@ -108,7 +122,13 @@ public class NewWorkspaceActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        getworkspacelist();
+        if (NetworkAvailablity.chkStatus(NewWorkspaceActivity.this)) {
+            getworkspacelist();
+        } else {
+            Toast.makeText(NewWorkspaceActivity.this, "Please Check Your Internet Connection", Toast.LENGTH_SHORT).show();
+        }
+
+
     }
 
     private void selectImage() {
@@ -139,7 +159,7 @@ public class NewWorkspaceActivity extends AppCompatActivity {
                     }
 
                 } else if (items[item].equals("Cancel")) {
-                    dialog.dismiss();
+                    dialogProgred.dismiss();
                 }
             }
         });
@@ -232,15 +252,13 @@ public class NewWorkspaceActivity extends AppCompatActivity {
 
     private void getworkspacelist() {
 
-        final ProgressDialog dialog = AppConstants.showProgressDialog(NewWorkspaceActivity.this, "Loading...");
+      //  final ProgressDialog dialog = AppConstants.showProgressDialog(NewWorkspaceActivity.this, "Loading...");
         ParseQuery<ParseObject> query = ParseQuery.getQuery("WorkSpace");
         //  query.whereNotEqualTo("wokspace_url", url );
         // query.whereNotEqualTo("user", ParseUser.getCurrentUser().getObjectId());
         query.findInBackground(new FindCallback<ParseObject>() {
             public void done(List<ParseObject> objects, ParseException e) {
-                if (dialog.isShowing()) {
-                    dialog.dismiss();
-                }
+
                 if (e == null) {
                     for (int i = 0; i < objects.size(); i++) {
                         String url = objects.get(i).getString("workspace_url");
@@ -249,7 +267,10 @@ public class NewWorkspaceActivity extends AppCompatActivity {
 
                     Log.e("MYLIST", mylist.toString());
                 } else {
-                    Toast.makeText(NewWorkspaceActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    if (dialogProgred.isShowing()) {
+                        dialogProgred.dismiss();
+                    }
+                    //Toast.makeText(NewWorkspaceActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
 
                     Log.e("else", e.getMessage());
                     Toast.makeText(NewWorkspaceActivity.this, "Wrokspace url already exist", Toast.LENGTH_SHORT).show();
@@ -259,7 +280,7 @@ public class NewWorkspaceActivity extends AppCompatActivity {
         });
     }
 
-    private void validation(final ProgressDialog dialog) {
+    private void validation( ) {
 
         final String workspace = edt_workspace.getText().toString();
         final String mission = edt_mission.getText().toString();
@@ -283,7 +304,9 @@ public class NewWorkspaceActivity extends AppCompatActivity {
                 public void done(ParseException e) {
                     // If successful add file to user and signUpInBackground
                     if (null == e) {
-                        createworkspace(workspace, mission,dialog);
+                        createworkspace(workspace, mission);
+                    }else {
+                        Log.e("ImageERROR", "" + e.getMessage());
                     }
                 }
             });
@@ -291,8 +314,7 @@ public class NewWorkspaceActivity extends AppCompatActivity {
         }
     }
 
-    private void createworkspace(String workspace, String mission, final ProgressDialog dialog) {
-
+    private void createworkspace(String workspace, String mission) {
 
 
         final ParseObject gameScore = new ParseObject("WorkSpace");
@@ -310,8 +332,12 @@ public class NewWorkspaceActivity extends AppCompatActivity {
 
                 if (e == null) {
                     Log.e("MYOBJECT", "" + gameScore.getObjectId());
+                    Log.e("MYOBJECT11", "" + gameScore.getString("workspace_url"));
+                    Log.e("MYOBJECT22", "" + gameScore.getString("workspace_name"));
+                    AppConstants.savePreferences(NewWorkspaceActivity.this, "workid", gameScore.getObjectId());
+                    AppConstants.savePreferences(NewWorkspaceActivity.this, "workname", gameScore.getString("workspace_url"));
 
-                    creategeneral(gameScore.getObjectId(),dialog);
+                    creategeneral(gameScore.getObjectId());
 
 
 //                    Intent intent = new Intent(NewWorkspaceActivity.this, InviteMemberActivity.class);
@@ -326,7 +352,7 @@ public class NewWorkspaceActivity extends AppCompatActivity {
 
     }
 
-    private void createmynotes(final String objectId, final ProgressDialog dialog) {
+    private void createmynotes(final String objectId) {
         ParseObject gameScore = new ParseObject("Project");
         //gameScore.put("user", ParseUser.getCurrentUser().getObjectId());
         gameScore.put("user", ParseObject.createWithoutData("_User", ParseUser.getCurrentUser().getObjectId()));
@@ -339,23 +365,25 @@ public class NewWorkspaceActivity extends AppCompatActivity {
         gameScore.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
-                if (dialog.isShowing()) {
-                    dialog.dismiss();
-                }
+
                 if (e == null) {
                     Intent intent = new Intent(NewWorkspaceActivity.this, InviteMemberActivity.class);
                     intent.putExtra("id", objectId);
                     startActivity(intent);
                     finish();
                 } else {
-                    Log.e("ERRROr",e.getMessage());
+                    Log.e("ERRROr", e.getMessage());
                     Toast.makeText(NewWorkspaceActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+
+                if (dialogProgred.isShowing()) {
+                    dialogProgred.dismiss();
                 }
             }
         });
     }
 
-    private void creategeneral(final String objectId, final ProgressDialog dialog) {
+    private void creategeneral(final String objectId) {
         final ParseObject gameScore = new ParseObject("Project");
         //gameScore.put("user", ParseUser.getCurrentUser().getObjectId());
         gameScore.put("user", ParseObject.createWithoutData("_User", ParseUser.getCurrentUser().getObjectId()));
@@ -375,9 +403,9 @@ public class NewWorkspaceActivity extends AppCompatActivity {
 //                    Intent intent = new Intent(NewWorkspaceActivity.this, HomeFeedActivity.class);
 //                    startActivity(intent);
 //                    finish();
-                    createmynotes(objectId,dialog);
+                    createmynotes(objectId);
                 } else {
-                    Log.e("ERRROr",e.getMessage());
+                    Log.e("ERRROr", e.getMessage());
                     Toast.makeText(NewWorkspaceActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }

@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
+
     android:layout_height="match_parent">
+
     <RelativeLayout
         android:id="@+id/rlHomeSearch"
         android:layout_width="match_parent"
@@ -73,114 +75,161 @@
 
     </RelativeLayout>
 
-
-    <RelativeLayout
-        android:id="@+id/rl_workname"
+    <ImageView
+        android:id="@+id/btn_fullscren"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
         android:layout_below="@+id/rlHomeSearch"
-        android:layout_centerHorizontal="true">
-
-        <TextView
-            android:id="@+id/work_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginLeft="@dimen/_5sdp"
-            android:background="@mipmap/home_rchain"
-            android:gravity="center"
-            android:padding="@dimen/_5sdp"
-            android:textColor="@color/black"
-            android:textSize="@dimen/_15sdp"
-            android:textStyle="bold" />
+        android:layout_gravity="right"
+        android:padding="@dimen/_5sdp"
+        android:src="@mipmap/myprofile_post"
+        android:visibility="gone" />
 
 
-    </RelativeLayout>
     <ScrollView
         android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/ll_mainsend"
         android:layout_below="@+id/rlHomeSearch"
-        android:layout_height="match_parent">
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+
             android:orientation="vertical">
 
 
+            <RelativeLayout
 
-
-
-    <RelativeLayout
-        android:id="@+id/RL_imagefeed"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/rlHomeSearch"
-        android:visibility="visible">
-
-
-        <ImageView
-            android:id="@+id/imagesPost"
-            android:layout_width="match_parent"
-            android:layout_height="250dp"
-            android:scaleType="centerCrop" />
-
-    </RelativeLayout>
-
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-
-        android:layout_margin="@dimen/_8sdp"
-        android:orientation="vertical">
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:id="@+id/txt_text"
+                android:id="@+id/RL_imagefeed"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:text="This is a summary of tour action:"
-                android:textColor="@color/black"
-                android:textSize="@dimen/_15sdp"
-                android:textStyle="bold" />
+                android:layout_height="@dimen/_210sdp"
 
-            <ImageView
-                android:id="@+id/btn_fullscren"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@mipmap/myprofile_post"
-                android:padding="@dimen/_5sdp"
-                android:layout_alignParentRight="true" />
-        </RelativeLayout>
+                android:clickable="true"
 
-        <EditText
-            android:id="@+id/caption_txt"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/ll_mainsend"
-            android:layout_below="@+id/txt_text"
-            android:background="@drawable/light_border"
-            android:gravity="top|left"
-            android:hint="add caption."
-            android:inputType="textMultiLine"
-            android:maxLines="10"
-            android:minLines="6"
-            android:paddingLeft="@dimen/_5sdp"
-            android:scrollbars="vertical"
+                android:visibility="visible">
 
-            />
+                <RelativeLayout
+                    android:id="@+id/include_visual"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="gone">
 
 
-    </LinearLayout>
+                    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                        android:layout_width="match_parent"
 
+                        android:layout_height="match_parent">
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+
+                            android:layout_margin="@dimen/_20sdp"
+                            android:layout_height="wrap_content">
+
+                            <com.samosys.paperai.activity.AudioVisualizer.LineBarVisualizer
+                                android:id="@+id/visualizer"
+                                android:layout_width="match_parent"
+
+                                android:layout_height="wrap_content"
+
+
+                                />
+                        </RelativeLayout>
+                        <!--<include layout="@layout/layout_audio_buttons" />-->
+                        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                            android:layout_width="wrap_content"
+                            android:layout_height="48dp"
+                            android:layout_alignParentBottom="true"
+                            android:layout_centerHorizontal="true"
+                            android:layout_marginBottom="16dp"
+                            android:orientation="horizontal">
+
+                            <ImageButton
+                                android:id="@+id/reply"
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:layout_marginEnd="8dp"
+                                android:layout_marginRight="8dp"
+                                android:background="@android:color/transparent"
+
+
+                                android:src="@drawable/ic_replay_red_48dp" />
+
+                            <ImageButton
+                                android:id="@+id/ib_play_pause"
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:background="@android:color/transparent"
+                                android:contentDescription="@string/image_play_pause"
+                                android:onClick="playPause"
+                                android:src="@drawable/ic_play_red_48dp" />
+                        </LinearLayout>
+                    </RelativeLayout>
+
+                </RelativeLayout>
+
+                <ImageView
+                    android:id="@+id/imagesPost"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:visibility="gone" />
+
+
+            </RelativeLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+
+                android:layout_margin="@dimen/_8sdp"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/txt_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:text="This is a summary of your action:"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/_15sdp"
+                        android:textStyle="bold" />
+
+
+                </RelativeLayout>
+
+                <EditText
+                    android:id="@+id/caption_txt"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@+id/ll_mainsend"
+                    android:layout_below="@+id/txt_text"
+                    android:background="@null"
+                    android:gravity="top|left"
+                    android:hint="add caption."
+                    android:inputType="textMultiLine"
+                    android:maxLines="10"
+                    android:minLines="6"
+                    android:paddingLeft="@dimen/_5sdp"
+                    android:scrollbars="vertical"
+
+                    />
+
+
+            </LinearLayout>
 
 
         </LinearLayout>
     </ScrollView>
+
     <LinearLayout
         android:id="@+id/ll_mainsend"
         android:layout_width="match_parent"
@@ -199,7 +248,7 @@
             android:background="@drawable/light_border"
             android:padding="@dimen/_10sdp"
             android:textColor="@color/black"
-            android:textSize="@dimen/_15sdp"
+            android:textSize="@dimen/_12sdp"
             android:textStyle="bold" />
 
         <TextView
@@ -214,7 +263,7 @@
             android:padding="@dimen/_10sdp"
             android:text="SEND"
             android:textColor="@color/black"
-            android:textSize="@dimen/_15sdp"
+            android:textSize="@dimen/_12sdp"
             android:textStyle="bold" />
 
 

@@ -1,281 +1,102 @@
 package com.samosys.paperai.activity.activity;
 
-import android.Manifest;
 import android.app.Activity;
-import android.app.Dialog;
-import android.content.DialogInterface;
-import android.content.pm.PackageManager;
-import android.os.Build;
+import android.content.pm.ActivityInfo;
+import android.media.CamcorderProfile;
+import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.Toast;
+import android.view.Window;
+import android.view.WindowManager;
 
-import com.google.android.cameraview.AspectRatio;
-import com.google.android.cameraview.CameraView;
 import com.samosys.paperai.R;
-import com.samosys.paperai.activity.utils.AspectRatioFragment;
-import com.sandrios.sandriosCamera.internal.SandriosCamera;
-import com.sandrios.sandriosCamera.internal.configuration.CameraConfiguration;
-import com.sandrios.sandriosCamera.internal.manager.CameraOutputModel;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 
-public class CameraActivity extends AppCompatActivity  implements
-        ActivityCompat.OnRequestPermissionsResultCallback,
-        AspectRatioFragment.Listener{
-
-
-    private static final String TAG = "MainActivity";
-
-    private static final int REQUEST_CAMERA_PERMISSION = 1;
-
-    private static final String FRAGMENT_DIALOG = "dialog";
-
-    private static final int[] FLASH_OPTIONS = {
-            CameraView.FLASH_AUTO,
-            CameraView.FLASH_OFF,
-            CameraView.FLASH_ON,
-    };
-ImageView take_picture;
-//    private static final int[] FLASH_ICONS = {
-//            R.drawable.ic_flash_auto,
-//            R.drawable.ic_flash_off,
-//            R.drawable.ic_flash_on,
-//    };
-
-    private static final int[] FLASH_TITLES = {
-            R.string.flash_auto,
-            R.string.flash_off,
-            R.string.flash_on,
-    };
-
-    private int mCurrentFlash;
-
-    private CameraView mCameraView;
-
-    private Handler mBackgroundHandler;
-
-    private View.OnClickListener mOnClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            switch (v.getId()) {
-                case R.id.take_picture:
-                    if (mCameraView != null) {
-                        mCameraView.takePicture();
-                    }
-                    break;
-            }
-        }
-    };
-
+public class CameraActivity extends Activity implements View.OnClickListener, SurfaceHolder.Callback {
+    MediaRecorder recorder;
+    SurfaceHolder holder;
+    boolean recording = false;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_camera);
-        findview();
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
+        recorder = new MediaRecorder();
+        initRecorder();
+        setContentView(R.layout.activity_surface);
+
+        SurfaceView cameraView = (SurfaceView) findViewById(R.id.CameraView);
+        holder = cameraView.getHolder();
+        holder.addCallback(this);
+        holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+
+        cameraView.setClickable(true);
+        cameraView.setOnClickListener(this);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-                == PackageManager.PERMISSION_GRANTED) {
-            mCameraView.start();
-        } else if (ActivityCompat.shouldShowRequestPermissionRationale(this,
-                Manifest.permission.CAMERA)) {
-            ConfirmationDialogFragment
-                    .newInstance(R.string.camera_permission_confirmation,
-                            new String[]{Manifest.permission.CAMERA},
-                            REQUEST_CAMERA_PERMISSION,
-                            R.string.camera_permission_not_granted)
-                    .show(getSupportFragmentManager(), FRAGMENT_DIALOG);
+    private void initRecorder() {
+        recorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
+        recorder.setVideoSource(MediaRecorder.VideoSource.DEFAULT);
+
+        CamcorderProfile cpHigh = CamcorderProfile
+                .get(CamcorderProfile.QUALITY_HIGH);
+        recorder.setProfile(cpHigh);
+        recorder.setOutputFile("/sdcard/videocapture_example.mp4");
+        recorder.setMaxDuration(50000); // 50 seconds
+        recorder.setMaxFileSize(5000000); // Approximately 5 megabytes
+    }
+
+    private void prepareRecorder() {
+        recorder.setPreviewDisplay(holder.getSurface());
+
+        try {
+            recorder.prepare();
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+            finish();
+        } catch (IOException e) {
+            e.printStackTrace();
+            finish();
+        }
+    }
+
+    public void onClick(View v) {
+        if (recording) {
+            recorder.stop();
+            recording = false;
+
+            // Let's initRecorder so we can record again
+            initRecorder();
+            prepareRecorder();
         } else {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},
-                    REQUEST_CAMERA_PERMISSION);
+            recording = true;
+            recorder.start();
         }
     }
 
-    @Override
-    protected void onPause() {
-        mCameraView.stop();
-        super.onPause();
+    public void surfaceCreated(SurfaceHolder holder) {
+        prepareRecorder();
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (mBackgroundHandler != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                mBackgroundHandler.getLooper().quitSafely();
-            } else {
-                mBackgroundHandler.getLooper().quit();
-            }
-            mBackgroundHandler = null;
-        }
+    public void surfaceChanged(SurfaceHolder holder, int format, int width,
+                               int height) {
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_CAMERA_PERMISSION:
-                if (permissions.length != 1 || grantResults.length != 1) {
-                    throw new RuntimeException("Error on requesting camera permission.");
-                }
-                if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(this, R.string.camera_permission_not_granted,
-                            Toast.LENGTH_SHORT).show();
-                }
-                // No need to start camera here; it is handled by onResume
-                break;
+    public void surfaceDestroyed(SurfaceHolder holder) {
+        if (recording) {
+            recorder.stop();
+            recording = false;
         }
-    }
-
-
-    private void findview() {
-        mCameraView=(CameraView)findViewById(R.id.camera);
-        take_picture=(ImageView)findViewById(R.id.take_picture);
-        take_picture.setOnClickListener(mOnClickListener);
-        if (mCameraView != null) {
-            mCameraView.addCallback(mCallback);
-        }
-    }
-
-
-    private Handler getBackgroundHandler() {
-        if (mBackgroundHandler == null) {
-            HandlerThread thread = new HandlerThread("background");
-            thread.start();
-            mBackgroundHandler = new Handler(thread.getLooper());
-        }
-        return mBackgroundHandler;
-    }
-
-    private CameraView.Callback mCallback
-            = new CameraView.Callback() {
-
-        @Override
-        public void onCameraOpened(CameraView cameraView) {
-            Log.d(TAG, "onCameraOpened");
-        }
-
-        @Override
-        public void onCameraClosed(CameraView cameraView) {
-            Log.d(TAG, "onCameraClosed");
-        }
-
-        @Override
-        public void onPictureTaken(CameraView cameraView, final byte[] data) {
-            Log.d(TAG, "onPictureTaken " + data.length);
-            Toast.makeText(cameraView.getContext(), R.string.picture_taken, Toast.LENGTH_SHORT)
-                    .show();
-            getBackgroundHandler().post(new Runnable() {
-                @Override
-                public void run() {
-                    File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES),
-                            "picture.jpg");
-                    Log.e("MYIMAHE",file+"");
-                    OutputStream os = null;
-                    try {
-                        os = new FileOutputStream(file);
-                        os.write(data);
-                        os.close();
-                    } catch (IOException e) {
-                        Log.w(TAG, "Cannot write to " + file, e);
-                    } finally {
-                        if (os != null) {
-                            try {
-                                os.close();
-                            } catch (IOException e) {
-                                // Ignore
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-    };
-
-    @Override
-    public void onAspectRatioSelected(@NonNull AspectRatio ratio) {
-        if (mCameraView != null) {
-            Toast.makeText(this, ratio.toString(), Toast.LENGTH_SHORT).show();
-            mCameraView.setAspectRatio(ratio);
-        }
-    }
-
-    @Override
-    public void onPointerCaptureChanged(boolean hasCapture) {
-
-    }
-
-    public static class ConfirmationDialogFragment extends DialogFragment {
-
-        private static final String ARG_MESSAGE = "message";
-        private static final String ARG_PERMISSIONS = "permissions";
-        private static final String ARG_REQUEST_CODE = "request_code";
-        private static final String ARG_NOT_GRANTED_MESSAGE = "not_granted_message";
-
-        public static ConfirmationDialogFragment newInstance(@StringRes int message,
-                                                             String[] permissions, int requestCode, @StringRes int notGrantedMessage) {
-            ConfirmationDialogFragment fragment = new ConfirmationDialogFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_MESSAGE, message);
-            args.putStringArray(ARG_PERMISSIONS, permissions);
-            args.putInt(ARG_REQUEST_CODE, requestCode);
-            args.putInt(ARG_NOT_GRANTED_MESSAGE, notGrantedMessage);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        @NonNull
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            final Bundle args = getArguments();
-            return new AlertDialog.Builder(getActivity())
-                    .setMessage(args.getInt(ARG_MESSAGE))
-                    .setPositiveButton(android.R.string.ok,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    String[] permissions = args.getStringArray(ARG_PERMISSIONS);
-                                    if (permissions == null) {
-                                        throw new IllegalArgumentException();
-                                    }
-                                    ActivityCompat.requestPermissions(getActivity(),
-                                            permissions, args.getInt(ARG_REQUEST_CODE));
-                                }
-                            })
-                    .setNegativeButton(android.R.string.cancel,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    Toast.makeText(getActivity(),
-                                            args.getInt(ARG_NOT_GRANTED_MESSAGE),
-                                            Toast.LENGTH_SHORT).show();
-                                }
-                            })
-                    .create();
-        }
-
+        recorder.release();
+        finish();
     }
 }
+
