@@ -106,10 +106,10 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.Holder> 
         ActionSheet actionSheet = new ActionSheet.Builder()
                 // .setTitle("Title", Color.BLUE)
                 //.setTitleTextSize(20)
-                .setOtherBtn(new String[]{"View Project", "Delete Project"}, new int[]{Color.parseColor("#2dc8bc"),Color.parseColor("#2dc8bc")})
+                .setOtherBtn(new String[]{"View Project", "Delete Project"}, new int[]{Color.parseColor("#4C4C4C"),Color.parseColor("#4C4C4C")})
 
                 //.setOtherBtnSubTextSize(20)
-                .setCancelBtn("Cancel", Color.parseColor("#2dc8bc"))
+                .setCancelBtn("Cancel", Color.parseColor("#4C4C4C"))
                 //.setCancelBtnTextSize(30)
                 .setCancelableOnTouchOutside(true)
                 .setActionSheetListener(new ActionSheet.ActionSheetListener() {

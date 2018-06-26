@@ -23,7 +23,6 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 
 
-
 /**
  * Custom view that creates a Line and Bar visualizer effect for
  * the android {@link android.media.MediaPlayer}

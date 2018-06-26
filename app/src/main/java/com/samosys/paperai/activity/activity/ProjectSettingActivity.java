@@ -41,6 +41,7 @@ public class ProjectSettingActivity extends AppCompatActivity {
     private ProjectAdapter adapter;
     private RecyclerView recycleProject;
     private ACProgressFlower dialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,9 +112,16 @@ public class ProjectSettingActivity extends AppCompatActivity {
                         ParseFile image = (ParseFile) objects.get(i).get("image");
                         String proImage = image.getUrl();
                         String type = objects.get(i).getString("type");
+                        String archive = objects.get(i).getString("archive");
                         //childList.add("")
-                        if (!name.equals("General") && !name.equals("My Notes")) {
-                            projectList.add(new ProjctBean(objectId, name, updatedAt, workspaceID, objective, createdAt, proImage, type, objects.get(i)));
+                        if (objects.get(i).has("default")) {
+                            String state = objects.get(i).getString("default");
+
+                            // projectList.add(new ProjctBean(objectId, name, updatedAt, workspaceID, objective, createdAt, proImage, type, objects.get(i), archive));
+                        } else {
+                            if (archive.equals("0")) {
+                                projectList.add(new ProjctBean(objectId, name, updatedAt, workspaceID, objective, createdAt, proImage, type, objects.get(i), archive));
+                            }
                         }
                     }
 
@@ -131,7 +139,7 @@ public class ProjectSettingActivity extends AppCompatActivity {
                     Log.e("lse", e.getMessage());
                     // error
                 }
-                if (dialog.isShowing()){
+                if (dialog.isShowing()) {
                     dialog.dismiss();
                 }
 

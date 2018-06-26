@@ -21,8 +21,9 @@ public class WorkspaceBean {
     String user_name;
     String workspace_url;
     String ws_image;
+    String archive;
 
-    public WorkspaceBean(String objectId, ParseObject user, String mission, String updatedAt, String workspace_name, String createdAt, ParseFile image, String ws_image, String user_name, String workspace_url) {
+    public WorkspaceBean(String objectId, ParseObject user, String mission, String updatedAt, String workspace_name, String createdAt, ParseFile image, String ws_image, String user_name, String workspace_url, String archive) {
 
 
         this.objectId = objectId;
@@ -36,6 +37,16 @@ public class WorkspaceBean {
         this.user_name = user_name;
         this.workspace_url = workspace_url;
         this.ws_image=ws_image;
+        this.archive=archive;
+
+    }
+
+    public String getArchive() {
+        return archive;
+    }
+
+    public void setArchive(String archive) {
+        this.archive = archive;
     }
 
     public String getWs_image() {

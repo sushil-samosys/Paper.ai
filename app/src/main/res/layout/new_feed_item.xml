@@ -16,9 +16,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/_5sdp"
-            android:layout_marginRight="@dimen/_5sdp"
-            android:layout_marginTop="@dimen/_10sdp"
+            android:layout_margin="@dimen/_5sdp"
             android:padding="@dimen/_3sdp">
 
             <de.hdodenhof.circleimageview.CircleImageView
@@ -46,6 +44,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
+
                 android:orientation="horizontal">
 
                 <ImageView
@@ -55,7 +54,8 @@
                     android:layout_gravity="center"
                     android:padding="@dimen/_3sdp"
                     android:scaleType="fitXY"
-                    android:src="@mipmap/home_user" />
+                    android:src="@mipmap/home_user"
+                    android:visibility="gone" />
 
                 <ImageView
                     android:id="@+id/img_public"
@@ -64,7 +64,8 @@
                     android:layout_gravity="center"
                     android:padding="@dimen/_3sdp"
                     android:scaleType="fitXY"
-                    android:src="@mipmap/home_double_user" />
+                    android:src="@mipmap/home_double_user"
+                    android:visibility="gone" />
 
                 <ImageView
                     android:id="@+id/img_mycontct"
@@ -73,7 +74,8 @@
                     android:layout_gravity="center"
                     android:padding="@dimen/_3sdp"
                     android:scaleType="fitXY"
-                    android:src="@mipmap/home_id_card" />
+                    android:src="@mipmap/home_id_card"
+                    android:visibility="gone" />
 
                 <ImageView
                     android:id="@+id/img_member"
@@ -82,7 +84,8 @@
                     android:layout_gravity="center"
                     android:padding="@dimen/_3sdp"
                     android:scaleType="fitXY"
-                    android:src="@mipmap/home_binocular" />
+                    android:src="@mipmap/home_binocular"
+                    android:visibility="gone" />
 
                 <ImageView
                     android:id="@+id/img_more"
@@ -97,7 +100,7 @@
         <RelativeLayout
             android:id="@+id/RL_imagefeed"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:background="@color/lightGrey"
             android:visibility="visible">
 
@@ -105,17 +108,20 @@
             <ImageView
                 android:id="@+id/feed_image"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/_230sdp"
                 android:scaleType="centerCrop"
                 android:visibility="gone" />
 
             <LinearLayout
                 android:id="@+id/ll_visual"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_100sdp"
+                android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
+                android:layout_marginLeft="@dimen/_5sdp"
                 android:gravity="center"
                 android:orientation="horizontal"
+                android:paddingBottom="@dimen/_15sdp"
+                android:paddingTop="@dimen/_15sdp"
                 android:visibility="gone"
                 android:weightSum="1">
 
@@ -127,19 +133,69 @@
                     android:layout_weight="0.1"
                     android:background="@android:color/transparent"
                     android:contentDescription="@string/image_play_pause"
-                    android:onClick="playPause"
+
 
                     android:src="@drawable/ic_play_red_48dp" />
 
-                <com.samosys.paperai.activity.AudioVisualizer.LineBarVisualizer
+                <com.chibde.visualizer.LineBarVisualizer
                     android:id="@+id/visualizer_feed"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/_100sdp"
                     android:layout_marginLeft="@dimen/_5sdp"
-                    android:layout_weight="0.9" />
+                    android:layout_weight="0.9"
+                    android:visibility="visible" />
 
 
             </LinearLayout>
+
+
+            <RelativeLayout
+                android:id="@+id/rl_vidio"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_230sdp"
+                android:visibility="gone">
+
+                <android.support.v7.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <VideoView
+                        android:id="@+id/videoView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+
+                        android:layout_margin="2dp" />
+
+
+                    <!--<com.samosys.paperai.activity.video_view.AAH_VideoImage-->
+                    <!--android:id="@+id/video_view"-->
+                    <!--android:layout_width="fill_parent"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:layout_alignParentLeft="true"-->
+                    <!--android:layout_alignParentRight="true" />-->
+
+                    <ImageView
+                        android:id="@+id/img_playback"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|right"
+                        android:layout_margin="8dp"
+                        android:src="@drawable/ic_pause"
+                        android:visibility="visible" />
+
+
+                    <ImageView
+                        android:id="@+id/img_vol"
+                        android:layout_width="@dimen/_40sdp"
+                        android:layout_height="@dimen/_40sdp"
+                        android:layout_alignParentBottom="true"
+                        android:layout_gravity="bottom"
+                        android:padding="@dimen/_10sdp"
+                        android:src="@mipmap/mute_button"
+                        android:visibility="visible" />
+                </android.support.v7.widget.CardView>
+            </RelativeLayout>
 
             <ProgressBar
                 android:id="@+id/img_progrss"
@@ -149,29 +205,38 @@
         </RelativeLayout>
 
 
-        <ImageView
-            android:id="@+id/ivFeedBottom"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
         <TextView
-            android:id="@+id/post_text"
+
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="left"
-            android:layout_marginLeft="@dimen/_15sdp"
-            android:layout_marginTop="@dimen/_2sdp"
+            android:layout_marginLeft="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_5sdp"
             android:gravity="left"
             android:maxLines="2"
+            android:visibility="gone"
             android:text="cgbgb"
             android:textColor="@color/black"
             android:textSize="@dimen/_13sdp" />
+
+        <com.luseen.autolinklibrary.AutoLinkTextView
+            android:id="@+id/post_text"
+            android:textSize="@dimen/_13sdp"
+            android:gravity="left"
+            android:maxLines="2"
+            android:layout_marginLeft="@dimen/_10sdp"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:textColor="@color/black"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+
 
         <TextView
             android:id="@+id/post_time"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/_15sdp"
+            android:layout_marginLeft="@dimen/_10sdp"
             android:layout_marginTop="@dimen/_3sdp"
             android:text="cgbgb"
             android:textColor="@color/txt_dark"
@@ -182,21 +247,21 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingLeft="10dp"
-            android:paddingRight="8dp">
+
+            android:layout_marginRight="8dp">
 
             <ImageButton
                 android:id="@+id/img_like"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-
+                android:layout_width="@dimen/_30sdp"
+                android:layout_height="@dimen/_30sdp"
+                android:layout_gravity="center"
                 android:background="@android:color/transparent"
                 android:src="@mipmap/home_like" />
 
             <ImageButton
                 android:id="@+id/btnComments"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="@dimen/_30sdp"
+                android:layout_height="@dimen/_30sdp"
                 android:background="@drawable/btn_feed_action"
                 android:src="@mipmap/home_share" />
 
@@ -220,10 +285,11 @@
         </LinearLayout>
 
         <LinearLayout
+
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_10sdp"
             android:orientation="horizontal"
-            android:paddingLeft="@dimen/_10sdp"
             android:weightSum="1">
 
             <LinearLayout
@@ -261,10 +327,9 @@
             android:id="@+id/rl_commnet"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/_10sdp"
-            android:layout_marginRight="@dimen/_5sdp"
-            android:padding="@dimen/_5sdp"
-            android:paddingLeft="@dimen/_10sdp">
+            android:layout_marginLeft="@dimen/_5sdp"
+            android:layout_margin="@dimen/_5sdp"
+            >
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/poster_image_comment"

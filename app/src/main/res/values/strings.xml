@@ -20,10 +20,8 @@
     <!--<string name="parse_app_id">601c7d2e-2ce5-4f60-9426-790cfd0ff00b</string>-->
 
 
-<string name="slackToken">pf8PIOdOoi8govpRd5jrD2eY</string>
-<string name="clientIdDemo">42826205351.370562596304</string>
-
-
+    <string name="slackToken">pf8PIOdOoi8govpRd5jrD2eY</string>
+    <string name="clientIdDemo">42826205351.370562596304</string>
 
 
     <string name="title_activity_home_feed">Paprfeed</string>

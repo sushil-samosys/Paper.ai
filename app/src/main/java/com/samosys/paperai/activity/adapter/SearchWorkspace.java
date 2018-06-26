@@ -12,7 +12,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
 import com.samosys.paperai.R;
 import com.samosys.paperai.activity.Bean.WorkspaceBean;
 import com.samosys.paperai.activity.utils.CustomFonts;
@@ -53,7 +58,7 @@ public class SearchWorkspace extends RecyclerView.Adapter<SearchWorkspace.Holder
 
 //
         holder.txt_workspace.setText(filterlist.get(position).getWorkspace_name());
-        holder.txt_workspace_value.setText(filterlist.get(position).getMission());
+//        holder.txt_workspace_value.setText(filterlist.get(position).getMission());
         Log.e("IAMGEW", filterlist.get(position).getWs_image());
         Picasso.with(context).load(filterlist.get(position).getWs_image()).error(R.mipmap.sign_up_workspace)
                 .into(holder.imgProject, new Callback() {
@@ -69,26 +74,27 @@ public class SearchWorkspace extends RecyclerView.Adapter<SearchWorkspace.Holder
                     }
                 });
 
-//        holder.txt_follow.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                ParseObject message = new ParseObject("workspace_follower");
-//                message.put("user", ParseObject.createWithoutData("_User", ParseUser.getCurrentUser().getObjectId()));
-//                message.put("workspace", ParseObject.createWithoutData("WorkSpace", filterlist.get(position).getObjectId()));
-//                message.saveInBackground(new SaveCallback() {
-//                    @Override
-//                    public void done(ParseException e) {
-//                        if (e == null) {
+        holder.txtfollow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ParseObject message = new ParseObject("workspace_follower");
+                message.put("user", ParseObject.createWithoutData("_User", ParseUser.getCurrentUser().getObjectId()));
+                message.put("workspace", ParseObject.createWithoutData("WorkSpace", filterlist.get(position).getObjectId()));
+                message.saveInBackground(new SaveCallback() {
+                    @Override
+                    public void done(ParseException e) {
+                        if (e == null) {
+                            Toast.makeText(context, "follow successfully", Toast.LENGTH_SHORT).show();
 //                            Intent intent = new Intent(context, HomeFeedActivity.class);
 //                            context.startActivity(intent);
-//                        } else {
-//                            e.printStackTrace();
-//                            Log.e("DATAAA", e.getMessage());
-//                        }
-//                    }
-//                });
-//            }
-//        });
+                        } else {
+                            e.printStackTrace();
+                            Log.e("DATAAA", e.getMessage());
+                        }
+                    }
+                });
+            }
+        });
 
     }
 
@@ -106,7 +112,7 @@ public class SearchWorkspace extends RecyclerView.Adapter<SearchWorkspace.Holder
     }
 
     public class Holder extends RecyclerView.ViewHolder {
-        TextView txt_workspace, txt_workspace_value, txt_follow;
+        TextView txt_workspace, txt_workspace_value, txtfollow;
         LinearLayout rl_item;
         ImageView imgProject;
         ProgressBar img_progrss;
@@ -115,16 +121,16 @@ public class SearchWorkspace extends RecyclerView.Adapter<SearchWorkspace.Holder
             super(itemView);
 
 
-            //  txtworkurl = (TextView) itemView.findViewById(R.id.txtworkurl);
+            txtfollow = (TextView) itemView.findViewById(R.id.txtfollow);
             txt_workspace = (TextView) itemView.findViewById(R.id.txt_workspace);
-            txt_workspace_value = (TextView) itemView.findViewById(R.id.txt_workspace_value);
+
             imgProject = (ImageView) itemView.findViewById(R.id.imgProject);
 //            rl_item = (LinearLayout) itemView.findViewById(R.id.rl_item);
             img_progrss = (ProgressBar) itemView.findViewById(R.id.img_progrss);
 
-            txt_workspace_value.setTypeface(customFonts.calibri);
+            //  txt_workspace_value.setTypeface(customFonts.calibri);
 //            txt_follow.setTypeface(customFonts.HelveticaNeue);
-            //   txtworkurl.setTypeface(customFonts.HelveticaNeue);
+            txtfollow.setTypeface(customFonts.HelveticaNeue);
             txt_workspace.setTypeface(customFonts.CabinBold);
         }
     }

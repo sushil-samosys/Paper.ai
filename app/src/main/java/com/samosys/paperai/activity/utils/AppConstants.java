@@ -17,6 +17,9 @@ import com.samosys.paperai.R;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import cc.cloudist.acplibrary.ACProgressConstant;
+import cc.cloudist.acplibrary.ACProgressFlower;
+
 /**
  * Created by samosys on 6/7/17.
  */
@@ -98,6 +101,14 @@ public static  int workPOS=00;
 //
 //        m_Dialog.setCanceledOnTouchOutside(false);
         m_Dialog.show();
+        return m_Dialog;
+    }
+    public static ACProgressFlower CustomshowProgressDialog(Context context, String message){
+       ACProgressFlower m_Dialog = new ACProgressFlower.Builder(context)
+                .direction(ACProgressConstant.DIRECT_CLOCKWISE)
+                .themeColor(Color.WHITE)
+
+                .fadeColor(Color.DKGRAY).build();
         return m_Dialog;
     }
     public static boolean isAppInstalled(Context context, String packageName) {

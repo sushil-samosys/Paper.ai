@@ -2,12 +2,12 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
 
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <RelativeLayout
         android:id="@+id/rlHomeSearch"
         android:layout_width="match_parent"
-
         android:layout_height="wrap_content"
         android:background="#e5e5e5">
 
@@ -96,7 +96,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
 
             android:orientation="vertical">
 
@@ -106,10 +106,7 @@
                 android:id="@+id/RL_imagefeed"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_210sdp"
-
-                android:clickable="true"
-
-                android:visibility="visible">
+                android:visibility="gone">
 
                 <RelativeLayout
                     android:id="@+id/include_visual"
@@ -120,22 +117,15 @@
 
                     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                         android:layout_width="match_parent"
-
                         android:layout_height="match_parent">
                         <RelativeLayout
                             android:layout_width="match_parent"
-
-                            android:layout_margin="@dimen/_20sdp"
-                            android:layout_height="wrap_content">
-
+                            android:layout_height="wrap_content"
+                            android:layout_margin="@dimen/_20sdp">
                             <com.samosys.paperai.activity.AudioVisualizer.LineBarVisualizer
                                 android:id="@+id/visualizer"
                                 android:layout_width="match_parent"
-
-                                android:layout_height="wrap_content"
-
-
-                                />
+                                android:layout_height="wrap_content" />
                         </RelativeLayout>
                         <!--<include layout="@layout/layout_audio_buttons" />-->
                         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -154,8 +144,8 @@
                                 android:layout_marginRight="8dp"
                                 android:background="@android:color/transparent"
 
-
-                                android:src="@drawable/ic_replay_red_48dp" />
+                                android:src="@drawable/ic_replay_red_48dp"
+                                android:visibility="gone" />
 
                             <ImageButton
                                 android:id="@+id/ib_play_pause"
@@ -177,22 +167,43 @@
                     android:scaleType="centerCrop"
                     android:visibility="gone" />
 
+                <RelativeLayout
+                    android:id="@+id/rl_vidio"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerInParent="true"
+                    android:layout_centerVertical="true"
+                    android:gravity="center"
+                    android:visibility="gone">
 
+                    <VideoView
+                        android:id="@+id/video_view"
+                        android:layout_width="fill_parent"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_height="wrap_content" />
+
+                    <ImageView
+                        android:id="@+id/btnVolume"
+                        android:layout_width="@dimen/_40sdp"
+                        android:layout_height="@dimen/_40sdp"
+                        android:padding="@dimen/_10sdp"
+                        android:layout_alignParentBottom="true"
+                        android:src="@mipmap/mute_button"/>
+                </RelativeLayout>
             </RelativeLayout>
 
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-
                 android:layout_margin="@dimen/_8sdp"
                 android:orientation="vertical">
-
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:visibility="gone">
-
                     <TextView
                         android:id="@+id/txt_text"
                         android:layout_width="match_parent"
@@ -202,10 +213,7 @@
                         android:textColor="@color/black"
                         android:textSize="@dimen/_15sdp"
                         android:textStyle="bold" />
-
-
                 </RelativeLayout>
-
                 <EditText
                     android:id="@+id/caption_txt"
                     android:layout_width="match_parent"
@@ -214,16 +222,13 @@
                     android:layout_below="@+id/txt_text"
                     android:background="@null"
                     android:gravity="top|left"
-                    android:hint="add caption."
+                    android:hint="What's on your mind?"
                     android:inputType="textMultiLine"
                     android:maxLines="10"
+                    android:visibility="visible"
                     android:minLines="6"
                     android:paddingLeft="@dimen/_5sdp"
-                    android:scrollbars="vertical"
-
-                    />
-
-
+                    android:scrollbars="vertical" />
             </LinearLayout>
 
 

@@ -14,7 +14,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
-import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
@@ -162,11 +161,12 @@ public class CreateCategoryActivity extends AppCompatActivity {
                             ParseFile proImage = (ParseFile) objects.get(i).get("image");
                             String image = proImage.getUrl();
                             String type = objects.get(i).getString("type");
+                            String archive = objects.get(i).getString("archive");
                            // String type = objects.get(i).getString("type");
 //                        String type = objects.get(i).getString("category");
                             //childList.add("")
                             //if (!name.equals("General") && !name.equals("My Notes")) {
-                                projectList.add(new ProjctBean(objectId, name, updatedAt, workspaceID, objective, createdAt, image, type,objects.get(i)));
+                                projectList.add(new ProjctBean(objectId, name, updatedAt, workspaceID, objective, createdAt, image, type,objects.get(i), archive));
 //                            }
 
                         }

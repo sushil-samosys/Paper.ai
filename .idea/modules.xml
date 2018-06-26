@@ -6,9 +6,11 @@
       <module fileurl="file://$PROJECT_DIR$/annca/annca.iml" filepath="$PROJECT_DIR$/annca/annca.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/audiovisualizer/audiovisualizer.iml" filepath="$PROJECT_DIR$/audiovisualizer/audiovisualizer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/autolinklibrary/autolinklibrary.iml" filepath="$PROJECT_DIR$/autolinklibrary/autolinklibrary.iml" />
+      <module fileurl="file://$PROJECT_DIR$/autoplayvideorecyclerview/autoplayvideorecyclerview.iml" filepath="$PROJECT_DIR$/autoplayvideorecyclerview/autoplayvideorecyclerview.iml" />
       <module fileurl="file://$PROJECT_DIR$/library/library.iml" filepath="$PROJECT_DIR$/library/library.iml" />
       <module fileurl="file://$PROJECT_DIR$/material-viewpagerindicator/material-viewpagerindicator.iml" filepath="$PROJECT_DIR$/material-viewpagerindicator/material-viewpagerindicator.iml" />
-      <module fileurl="file://$PROJECT_DIR$/speech-android-wrapper/speech-android-wrapper.iml" filepath="$PROJECT_DIR$/speech-android-wrapper/speech-android-wrapper.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mentions/mentions.iml" filepath="$PROJECT_DIR$/mentions/mentions.iml" />
     </modules>
   </component>
 </project>

@@ -72,8 +72,9 @@
                     android:padding="@dimen/_5sdp">
 
                     <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="@dimen/_25sdp"
+                        android:layout_height="@dimen/_25sdp"
+
                         android:layout_gravity="center"
                         android:padding="@dimen/_5sdp"
                         android:scaleType="fitXY"
@@ -81,25 +82,26 @@
 
                     <de.hdodenhof.circleimageview.CircleImageView
                         android:id="@+id/mypic"
-                        android:layout_width="@dimen/_20sdp"
-                        android:layout_height="@dimen/_20sdp"
+                        android:layout_width="@dimen/_25sdp"
+                        android:layout_height="@dimen/_25sdp"
 
                         />
 
                     <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_width="@dimen/_25sdp"
+                        android:layout_height="@dimen/_25sdp"
+
                         android:padding="@dimen/_5sdp"
-                        android:scaleType="fitXY"
+
                         android:src="@mipmap/home_notification" />
 
                     <ImageView
                         android:id="@+id/img_log"
-                        android:layout_width="wrap_content"
+                        android:layout_width="@dimen/_25sdp"
+                        android:layout_height="@dimen/_25sdp"
 
-                        android:layout_height="wrap_content"
                         android:padding="@dimen/_5sdp"
-                        android:scaleType="fitXY"
+
                         android:src="@mipmap/home_chat" />
                 </LinearLayout>
 
@@ -149,6 +151,7 @@
                             android:orientation="horizontal"
                             android:paddingBottom="@dimen/_10sdp"
                             android:paddingLeft="@dimen/_10sdp"
+                            android:visibility="gone"
                             android:weightSum="1">
 
                             <LinearLayout
@@ -194,10 +197,11 @@
 
 
                         <android.support.v7.widget.RecyclerView
-                            android:id="@+id/Rv_feed_post"
+                            android:id="@+id/feed_post"
+                            android:focusableInTouchMode="true"
                             android:layout_width="match_parent"
-
-                            android:layout_height="wrap_content" />
+                            android:layout_height="match_parent"
+                            android:visibility="visible" />
 
 
                     </LinearLayout>

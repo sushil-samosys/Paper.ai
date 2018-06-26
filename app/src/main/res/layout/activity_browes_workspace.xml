@@ -71,7 +71,7 @@
         android:hint="Search by workspace url..."
         android:imeOptions="actionDone"
         android:inputType="text"
-        android:padding="@dimen/_8sdp"
+        android:padding="@dimen/_5sdp"
 
         android:textColor="@color/txt_dark"
         android:textColorHint="@color/txt_light" />

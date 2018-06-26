@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -30,6 +31,7 @@ import com.parse.SaveCallback;
 import com.samosys.paperai.R;
 import com.samosys.paperai.activity.utils.AppConstants;
 import com.samosys.paperai.activity.utils.AwesomeToggle;
+import com.samosys.paperai.activity.utils.MarshMallowPermission;
 import com.samosys.paperai.activity.utils.SwitchButton;
 import com.samosys.paperai.activity.utils.Utility;
 
@@ -54,13 +56,14 @@ public class NewProjctActivity extends AppCompatActivity {
     private String userChoosenTask;
     Bitmap bitmap = null;
     ParseFile file = null;
+    MarshMallowPermission marshMallowPermission;
     String togg="1";
     private ACProgressFlower dialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_projct);
-
+        marshMallowPermission=new MarshMallowPermission(NewProjctActivity.this);
         AppConstants.getTranparentstatusbar(NewProjctActivity.this);
         edt_workspace = (EditText) findViewById(R.id.edt_projectname);
         edt_mission = (EditText) findViewById(R.id.edt_objective);
@@ -126,7 +129,18 @@ public class NewProjctActivity extends AppCompatActivity {
         img_project.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                selectImage();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                    if (!marshMallowPermission.checkPermissionForExternalStorage()) {
+                        marshMallowPermission.requestPermissionForExternalStorage();
+                    } else {
+
+                        selectImage();
+                    }
+                } else {
+
+                    selectImage();
+                }
             }
         });
 
@@ -272,6 +286,7 @@ public class NewProjctActivity extends AppCompatActivity {
                         gameScore.put("workspace", ParseObject.createWithoutData("WorkSpace", id));
                         gameScore.put("objective", mission);
                         gameScore.put("type", togg);
+                        gameScore.put("archive", "0");
                         gameScore.put("image", file);
                         gameScore.saveInBackground(new SaveCallback() {
                             @Override

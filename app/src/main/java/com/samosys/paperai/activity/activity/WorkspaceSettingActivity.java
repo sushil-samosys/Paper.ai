@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,6 +17,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,17 +46,17 @@ import java.util.List;
 
 public class WorkspaceSettingActivity extends AppCompatActivity {
     MarshMallowPermission marshMallowPermission;
+    RelativeLayout rlArchive;
     private TextView txt_workname_header, txt_workName,
-            txt_mission,  txt_missionurl, txt_missionurl_value, txt_followrs, txt_member, txt_notification;
+            txt_mission, txt_missionurl, txt_missionurl_value, txt_followrs, txt_member, txt_notification;
     private ImageView img_work_space, img_work_space_back, img_camera;
     private int img_height, img_width;
-    private EditText txt_workName_value,txt_mission_value;
+    private EditText txt_workName_value, txt_mission_value;
     private CustomFonts customFonts;
     private LinearLayout ll_save;
     private int REQUEST_CAMERA = 0, SELECT_FILE = 1, SELECT_VIDEO = 3;
     private Bitmap bitmap = null;
-    private ParseFile file = null,imageFile=null;
-
+    private ParseFile file = null, imageFile = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,7 +91,7 @@ public class WorkspaceSettingActivity extends AppCompatActivity {
 //                    bitmap = BitmapFactory.decodeResource(getResources(),
 //                            R.mipmap.sign_up_workspace);
 //                    setImage(bitmap);
-                    file=imageFile;
+                    file = imageFile;
                 }
 
                 file.saveInBackground(new SaveCallback() {
@@ -104,6 +104,13 @@ public class WorkspaceSettingActivity extends AppCompatActivity {
                 });
 
 
+            }
+        });
+        rlArchive.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(WorkspaceSettingActivity.this, ArchiveWorkspaceActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -342,7 +349,7 @@ public class WorkspaceSettingActivity extends AppCompatActivity {
         img_work_space = (ImageView) findViewById(R.id.img_work_space);
         img_camera = (ImageView) findViewById(R.id.img_camera);
         ll_save = (LinearLayout) findViewById(R.id.ll_save);
-
+        rlArchive = (RelativeLayout) findViewById(R.id.rlArchive);
 
         txt_workname_header.setTypeface(customFonts.CabinBold);
         txt_workName.setTypeface(customFonts.CabinBold);
@@ -387,7 +394,7 @@ public class WorkspaceSettingActivity extends AppCompatActivity {
 
                             String createdAt = objects1.get(i).getCreatedAt().toString();
                             String image = objects1.get(i).getString("image");
-                              imageFile = (ParseFile) objects1.get(i).get("image");
+                            imageFile = (ParseFile) objects1.get(i).get("image");
 
                             String post_image = imageFile.getUrl();
                             String user_name = objects1.get(i).getString("user_name");

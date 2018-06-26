@@ -69,8 +69,9 @@ public class BrowesWorkspace extends AppCompatActivity {
                         String ws_image = image.getUrl();
                         String user_name = objects.get(i).getString("user_name");
                         String workspace_url = objects.get(i).getString("workspace_url");
+                        String archive = objects.get(i).getString("archive");
 
-                         workList.add(new WorkspaceBean(objectId, user, mission, updatedAt, workspace_name, createdAt, image, ws_image, user_name, workspace_url));
+                         workList.add(new WorkspaceBean(objectId, user, mission, updatedAt, workspace_name, createdAt, image, ws_image, user_name, workspace_url, archive));
                     }
                     adapter = new SearchWorkspace(BrowesWorkspace.this, workList);
                     RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(BrowesWorkspace.this);

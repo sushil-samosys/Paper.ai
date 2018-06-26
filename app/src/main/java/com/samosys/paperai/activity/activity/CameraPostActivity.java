@@ -84,7 +84,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.Timer;
-import java.util.TimerTask;
 
 import io.github.memfis19.annca.Annca;
 import io.github.memfis19.annca.internal.configuration.AnncaConfiguration;
@@ -116,8 +115,13 @@ public class CameraPostActivity extends AppCompatActivity implements
             R.string.flash_off,
             R.string.flash_on,
     };
-    public static int prog = 0;
     private static final int CAPTURE_MEDIA = 368;
+    public static int prog = 0;
+    final GestureDetector gestureDetector = new GestureDetector(new GestureDetector.SimpleOnGestureListener() {
+        public void onLongPress(MotionEvent e) {
+            Log.e("", "Longpress detected");
+        }
+    });
     MarshMallowPermission marshMallowPermission;
     AQuery aq;
     TextView txtNext;
@@ -126,7 +130,7 @@ public class CameraPostActivity extends AppCompatActivity implements
     int REQUEST_CAMERA = 0, SELECT_FILE = 1, SELECT_VIDEO = 3;
     ImageView capturedImage, imgback_camera;
     RelativeLayout rl_bottom_capture;
-    private CircularProgressBar circularProgressBar;
+
     private Timer timer;
     private Uri picUri;
     private int mCurrentFlash;
@@ -301,7 +305,7 @@ public class CameraPostActivity extends AppCompatActivity implements
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_camera);
-        circularProgressBar = (CircularProgressBar) findViewById(R.id.circularProgressbar_vid);
+
         aq = new AQuery(CameraPostActivity.this);
         marshMallowPermission = new MarshMallowPermission(CameraPostActivity.this);
         capturedImage = (ImageView) findViewById(R.id.capturedImage);
@@ -326,11 +330,21 @@ public class CameraPostActivity extends AppCompatActivity implements
         img_switchcam.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mCameraView != null) {
-                    int facing = mCameraView.getFacing();
-                    mCameraView.setFacing(facing == CameraView.FACING_FRONT ?
-                            CameraView.FACING_BACK : CameraView.FACING_FRONT);
+
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                    if (!marshMallowPermission.checkPermissionForExternalStorage()) {
+                        marshMallowPermission.requestPermissionForExternalStorage();
+                    } else {
+
+                        selectImage();
+                    }
+                } else {
+
+                    selectImage();
                 }
+
             }
         });
 
@@ -404,20 +418,26 @@ public class CameraPostActivity extends AppCompatActivity implements
                     REQUEST_CAMERA_PERMISSIONS);
         }
     }
-        protected final void askForPermissions(String[] permissions, int requestCode) {
-            List<String> permissionsToRequest = new ArrayList<>();
-            for (String permission : permissions) {
-                if (ActivityCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
-                    permissionsToRequest.add(permission);
-                }
-            }
-            if (!permissionsToRequest.isEmpty()) {
-                ActivityCompat.requestPermissions(this, permissionsToRequest.toArray(new String[permissionsToRequest.size()]), requestCode);
+
+    private void selectImage() {
+        if (mCameraView != null) {
+            int facing = mCameraView.getFacing();
+            mCameraView.setFacing(facing == CameraView.FACING_FRONT ?
+                    CameraView.FACING_BACK : CameraView.FACING_FRONT);
+        }
+    }
+
+    protected final void askForPermissions(String[] permissions, int requestCode) {
+        List<String> permissionsToRequest = new ArrayList<>();
+        for (String permission : permissions) {
+            if (ActivityCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                permissionsToRequest.add(permission);
             }
         }
-
-
-
+        if (!permissionsToRequest.isEmpty()) {
+            ActivityCompat.requestPermissions(this, permissionsToRequest.toArray(new String[permissionsToRequest.size()]), requestCode);
+        }
+    }
 
     public void askForCameraPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -452,12 +472,21 @@ public class CameraPostActivity extends AppCompatActivity implements
                 // This method is call for getting image from gallary
                 onSelectFromGalleryResult(data);
                 //    getdata(data);
-            }else if (requestCode == CAPTURE_MEDIA && resultCode == RESULT_OK) {
-                Toast.makeText(this, "Media captured.", Toast.LENGTH_SHORT).show();
+            } else if (requestCode == CAPTURE_MEDIA ) {
 
-                Uri uri = data.getData();
 
-                Log.e("selectedImagePath", "" + uri+"");
+                String filePath = data.getStringExtra(AnncaConfiguration.Arguments.FILE_PATH);
+                imageFile=new File(filePath);
+                if (imageFile.exists()) {
+                    Intent intent = new Intent(CameraPostActivity.this, PostfeedActivity.class);
+
+                    intent.putExtra("file", filePath);
+                    intent.putExtra("post_type","3");;
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(CameraPostActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
+                }
+                Log.e("selectedImagePath", "" + filePath + "");
             }
         }
     }
@@ -614,13 +643,13 @@ public class CameraPostActivity extends AppCompatActivity implements
                                            @NonNull int[] grantResults) {
         switch (requestCode) {
             case REQUEST_CAMERA_PERMISSION:
-                if (permissions.length != 1 || grantResults.length != 1) {
-                    throw new RuntimeException("Error on requesting camera permission.");
-                }
-                if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    Toast.makeText(this, R.string.camera_permission_not_granted,
-                            Toast.LENGTH_SHORT).show();
-                }
+//                if (permissions.length != 1 || grantResults.length != 1) {
+//                    throw new RuntimeException("Error on requesting camera permission.");
+//                }
+//                if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+//                    Toast.makeText(this, R.string.camera_permission_not_granted,
+//                            Toast.LENGTH_SHORT).show();
+//                }
                 // No need to start camera here; it is handled by onResume
                 break;
         }
@@ -681,8 +710,6 @@ public class CameraPostActivity extends AppCompatActivity implements
         return mBackgroundHandler;
     }
 
-
-
     public static class ConfirmationDialogFragment extends DialogFragment {
 
         private static final String ARG_MESSAGE = "message";
@@ -733,10 +760,4 @@ public class CameraPostActivity extends AppCompatActivity implements
         }
 
     }
-
-    final GestureDetector gestureDetector = new GestureDetector(new GestureDetector.SimpleOnGestureListener() {
-        public void onLongPress(MotionEvent e) {
-            Log.e("", "Longpress detected");
-        }
-    });
 }

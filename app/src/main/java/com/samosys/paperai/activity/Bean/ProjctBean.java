@@ -16,6 +16,7 @@ public class ProjctBean {
     String image;
     String type;
     ParseObject parseObject;
+    String archive;
 
     public ParseObject getParseObject() {
         return parseObject;
@@ -25,7 +26,7 @@ public class ProjctBean {
         this.parseObject = parseObject;
     }
 
-    public ProjctBean(String objectId, String name, String updatedAt, String workspaceID, String objective, String createdAt, String image, String type, ParseObject parseObject) {
+    public ProjctBean(String objectId, String name, String updatedAt, String workspaceID, String objective, String createdAt, String image, String type, ParseObject parseObject, String archive) {
         this.objectId=objectId;
         this.name=name;
         this.updatedAt=updatedAt;
@@ -35,8 +36,15 @@ public class ProjctBean {
         this.image=image;
         this.type=type;
         this.parseObject=parseObject;
+        this.archive=archive;
+    }
 
+    public String getArchive() {
+        return archive;
+    }
 
+    public void setArchive(String archive) {
+        this.archive = archive;
     }
 
     public String getObjectId() {

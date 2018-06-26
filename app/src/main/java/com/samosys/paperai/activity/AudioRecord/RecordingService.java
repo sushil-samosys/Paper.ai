@@ -2,6 +2,7 @@ package com.samosys.paperai.activity.AudioRecord;
 
 import android.app.Service;
 import android.content.Intent;
+import android.media.AudioFormat;
 import android.media.MediaRecorder;
 import android.os.Environment;
 import android.os.IBinder;
@@ -57,10 +58,12 @@ public class RecordingService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+
         if (mRecorder != null) {
 
 
-            stopRecording();
+           // stopRecording();
         }
 
 
@@ -69,17 +72,19 @@ public class RecordingService extends Service {
     public void startRecording() {
         setFileNameAndPath();
 
+
+
+
         mRecorder = new MediaRecorder();
+
         mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-        mRecorder.setOutputFile(mFilePath);
-        mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+        mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
         mRecorder.setAudioChannels(1);
-//        mRecorder.
-        // if (MySharedPreferences.getPrefHighQuality(this)) {
-        mRecorder.setAudioSamplingRate(44100);
-        mRecorder.setAudioEncodingBitRate(192000);
-//        }
+        mRecorder.setAudioEncodingBitRate(32000);
+        mRecorder.setAudioSamplingRate(16000);
+
+        mRecorder.setOutputFile(mFilePath);
 
         try {
             mRecorder.prepare();
@@ -106,7 +111,7 @@ public class RecordingService extends Service {
             count++;
 
             mFileName = getString(R.string.app_name)
-                    + "_" + millisecondOfDay + ".mp4";
+                    + "_" + millisecondOfDay + ".mp3";
             mFilePath = Environment.getExternalStorageDirectory().getAbsolutePath();
             mFilePath += "/SoundRecorder/" + mFileName;
 
@@ -114,9 +119,8 @@ public class RecordingService extends Service {
         } while (HomeFeedActivity.file.exists() && !HomeFeedActivity.file.isDirectory());
     }
 
-    public void stopRecording()  {
-        try {
-            mRecorder.prepare();
+    public void stopRecording() {
+
 
         mRecorder.stop();
         mElapsedMillis = (System.currentTimeMillis() - mStartingTimeMillis);
@@ -126,16 +130,13 @@ public class RecordingService extends Service {
         Intent i = new Intent(this, PostfeedActivity.class);
         i.putExtra("file", HomeFeedActivity.file.toString());
         i.putExtra("post_type", "2");
-        ;
+
         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         this.startActivity(i);
 
         mRecorder = null;
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
+    }
 
 }

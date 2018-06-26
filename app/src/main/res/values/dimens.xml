@@ -6,7 +6,10 @@
     <dimen name="nav_header_height">160dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
 
-
+    <dimen name="activity_padding_horizontal">16dp</dimen>
+    <dimen name="padd_10">10dp</dimen>
+    <dimen name="ic_delete">30dp</dimen>
+    <dimen name="thumbnail">90dp</dimen>
 
     <dimen name="settings_toggle_width">44dp</dimen>
     <dimen name="settings_toggle_height">22dp</dimen>

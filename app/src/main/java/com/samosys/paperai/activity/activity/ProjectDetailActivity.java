@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,7 +46,7 @@ import java.util.List;
 public class ProjectDetailActivity extends AppCompatActivity {
     MarshMallowPermission marshMallowPermission;
     private String proID = "";
-    private ImageView imgProject, img_camera,img_project_back;
+    private ImageView imgProject, img_camera, img_project_back;
     private TextView txtproject_header, txt_followrs, txt_member, txt_notification, txt_public, txt_cat, txt_cat_value, txt_object, txt_project;
     private int img_height, img_width;
     private EditText txt_projct_value, txt_objective_value;
@@ -55,7 +56,9 @@ public class ProjectDetailActivity extends AppCompatActivity {
     private SwitchButton awesomeToggle;
     private LinearLayout ll_save_project;
     private ParseFile file = null, imageFile = null;
-    private String type="";
+    private String type = "";
+    private RelativeLayout rlProjectArchive;
+//ArchiveProjectActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,6 +118,14 @@ public class ProjectDetailActivity extends AppCompatActivity {
                 onBackPressed();
             }
         });
+        rlProjectArchive.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(ProjectDetailActivity.this, ArchiveProjectActivity.class);
+                intent.putExtra("id",proID);
+                startActivity(intent);
+            }
+        });
     }
 
     private void callupdateproject(final ProgressDialog progressDialog) {
@@ -123,8 +134,6 @@ public class ProjectDetailActivity extends AppCompatActivity {
         query.findInBackground(new FindCallback<ParseObject>() {
             public void done(List<ParseObject> list, ParseException e) {
                 if (e == null) {
-
-
 
 
                     ParseObject person = list.get(0);
@@ -328,6 +337,7 @@ public class ProjectDetailActivity extends AppCompatActivity {
         txt_cat_value = (TextView) findViewById(R.id.txt_cat_value);
         awesomeToggle = (SwitchButton) findViewById(R.id.awesomeToggle);
         ll_save_project = (LinearLayout) findViewById(R.id.ll_save_project);
+        rlProjectArchive = (RelativeLayout) findViewById(R.id.rlProjectArchive);
 
 
         txtproject_header.setTypeface(customFonts.CabinBold);
@@ -366,14 +376,14 @@ public class ProjectDetailActivity extends AppCompatActivity {
                         for (int i = 0; i < objects1.size(); i++) {
 
 
-                              type = objects1.get(i).getString("type");
+                            type = objects1.get(i).getString("type");
                             String updatedAt = objects1.get(i).getUpdatedAt().toString();
                             String projectname = objects1.get(i).getString("name");
                             String objective = objects1.get(i).getString("objective");
 
                             String createdAt = objects1.get(i).getCreatedAt().toString();
 
-                              imageFile = (ParseFile) objects1.get(i).get("image");
+                            imageFile = (ParseFile) objects1.get(i).get("image");
 
                             String post_image = imageFile.getUrl();
                             String user_name = objects1.get(i).getString("user_name");

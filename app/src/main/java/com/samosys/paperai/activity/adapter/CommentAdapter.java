@@ -46,8 +46,8 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.Holder> 
 
     @Override
     public void onBindViewHolder(final Holder holder, final int position) {
-        String sourceString = "<b>" +filterlist.get(position).getPost_user_name() + "</b> " + filterlist.get(position).getTxt();
-        //holder.userName.setText(First_Char_Capital.capitalizeString("@" + filterlist.get(position).getPost_user_name()));
+        String sourceString =   "</b> " + filterlist.get(position).getTxt();
+        holder.userName.setText(First_Char_Capital.capitalizeString("@" + filterlist.get(position).getPost_user_name()));
         holder.user_coment.setText(Html.fromHtml(sourceString));
         filterlist.get(position).getUser_imge().getDataInBackground(new GetDataCallback() {
             @Override

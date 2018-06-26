@@ -10,6 +10,7 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -32,6 +33,7 @@ import com.parse.SignUpCallback;
 import com.samosys.paperai.R;
 import com.samosys.paperai.activity.utils.AppConstants;
 import com.samosys.paperai.activity.utils.CustomFonts;
+import com.samosys.paperai.activity.utils.MarshMallowPermission;
 import com.samosys.paperai.activity.utils.Utility;
 
 import java.io.ByteArrayOutputStream;
@@ -56,6 +58,7 @@ public class Secondsignupactivity extends AppCompatActivity {
     private TextView text, txtTerm1, txtTerm2;
     private String userChoosenTask;
     private int REQUEST_CAMERA = 0, SELECT_FILE = 1;
+    MarshMallowPermission marshMallowPermission;
     private ACProgressFlower dialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,12 +67,24 @@ public class Secondsignupactivity extends AppCompatActivity {
         AppConstants.getTranparentstatusbar(Secondsignupactivity.this);
         email = getIntent().getStringExtra("email");
         pwd = getIntent().getStringExtra("pwd");
+        marshMallowPermission=new MarshMallowPermission(Secondsignupactivity.this);
 //        Log.e("email_name",email+">>"+pwd);
         findviews();
         rl_profilePic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                selectImage();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                    if (!marshMallowPermission.checkPermissionForExternalStorage()) {
+                        marshMallowPermission.requestPermissionForExternalStorage();
+                    } else {
+
+                        selectImage();
+                    }
+                } else {
+
+                    selectImage();
+                }
             }
         });
 

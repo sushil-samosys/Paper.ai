@@ -2,12 +2,12 @@ package com.samosys.paperai.activity.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -31,6 +31,7 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.samosys.paperai.R;
 import com.samosys.paperai.activity.utils.AppConstants;
+import com.samosys.paperai.activity.utils.MarshMallowPermission;
 import com.samosys.paperai.activity.utils.NetworkAvailablity;
 import com.samosys.paperai.activity.utils.Utility;
 
@@ -54,8 +55,9 @@ public class NewWorkspaceActivity extends AppCompatActivity {
 
     Bitmap bitmap = null;
     ParseFile file = null;
+    MarshMallowPermission marshMallowPermission;
     private String userChoosenTask;
-    private  ACProgressFlower dialogProgred;
+    private ACProgressFlower dialogProgred;
     private int REQUEST_CAMERA = 0, SELECT_FILE = 1;
 
     @Override
@@ -63,6 +65,7 @@ public class NewWorkspaceActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_workspace);
         AppConstants.getTranparentstatusbar(NewWorkspaceActivity.this);
+        marshMallowPermission = new MarshMallowPermission(NewWorkspaceActivity.this);
         img_work_space = (ImageView) findViewById(R.id.img_work_space);
         edt_workspace = (EditText) findViewById(R.id.edt_workspace);
         edt_mission = (EditText) findViewById(R.id.edt_mission);
@@ -82,7 +85,7 @@ public class NewWorkspaceActivity extends AppCompatActivity {
                 dialogProgred.show();
 
 
-                 validation();
+                validation();
             }
         });
 
@@ -114,7 +117,18 @@ public class NewWorkspaceActivity extends AppCompatActivity {
         img_work_space.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                selectImage();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                    if (!marshMallowPermission.checkPermissionForExternalStorage()) {
+                        marshMallowPermission.requestPermissionForExternalStorage();
+                    } else {
+
+                        selectImage();
+                    }
+                } else {
+
+                    selectImage();
+                }
             }
         });
     }
@@ -252,7 +266,7 @@ public class NewWorkspaceActivity extends AppCompatActivity {
 
     private void getworkspacelist() {
 
-      //  final ProgressDialog dialog = AppConstants.showProgressDialog(NewWorkspaceActivity.this, "Loading...");
+        //  final ProgressDialog dialog = AppConstants.showProgressDialog(NewWorkspaceActivity.this, "Loading...");
         ParseQuery<ParseObject> query = ParseQuery.getQuery("WorkSpace");
         //  query.whereNotEqualTo("wokspace_url", url );
         // query.whereNotEqualTo("user", ParseUser.getCurrentUser().getObjectId());
@@ -280,7 +294,7 @@ public class NewWorkspaceActivity extends AppCompatActivity {
         });
     }
 
-    private void validation( ) {
+    private void validation() {
 
         final String workspace = edt_workspace.getText().toString();
         final String mission = edt_mission.getText().toString();
@@ -305,7 +319,7 @@ public class NewWorkspaceActivity extends AppCompatActivity {
                     // If successful add file to user and signUpInBackground
                     if (null == e) {
                         createworkspace(workspace, mission);
-                    }else {
+                    } else {
                         Log.e("ImageERROR", "" + e.getMessage());
                     }
                 }
@@ -324,6 +338,7 @@ public class NewWorkspaceActivity extends AppCompatActivity {
         gameScore.put("workspace_name", workspace);
         gameScore.put("workspace_url", mainurl);
         gameScore.put("image", file);
+        gameScore.put("archive", "0");
         Log.e("WORKPARAM", "" + gameScore);
 
         gameScore.saveInBackground(new SaveCallback() {

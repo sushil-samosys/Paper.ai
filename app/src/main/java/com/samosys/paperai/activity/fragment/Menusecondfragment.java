@@ -131,9 +131,10 @@ public class Menusecondfragment extends Fragment {
                             String createdAt = objects.get(i).getString("createdAt");
                             String image = objects.get(i).getString("image");
                             String type = objects.get(i).getString("type");
+                            String archive = objects.get(i).getString("archive");
 
 
-                            mylist.add(new ProjctBean(objectId, name, updatedAt, workspaceID, objective, createdAt, image, type, objects.get(i)));
+                            mylist.add(new ProjctBean(objectId, name, updatedAt, workspaceID, objective, createdAt, image, type, objects.get(i), archive));
                         }
 //                        if (mylist.size()>0){
 //                            txtNoVisible.setVisibility(View.GONE);

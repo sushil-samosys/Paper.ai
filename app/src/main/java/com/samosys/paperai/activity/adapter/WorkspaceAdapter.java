@@ -2,6 +2,7 @@ package com.samosys.paperai.activity.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,27 +76,28 @@ public class WorkspaceAdapter extends RecyclerView.Adapter<WorkspaceAdapter.Hold
                     }
                 });
 
-
+        Log.e("workspaceID", ">>>>>" + listitem.get(position).getObjectId());
         int pos = Integer.parseInt(AppConstants.loadPreferences(context, "position"));
         if (pos == 0) {
 
             if (position == mSelectedItem) {
+               // if (AppConstants.loadPreferences(context, "workid").equals("00")) {
 
-
-                AppConstants.savePreferences(context, "workid", listitem.get(position).getObjectId());
-                AppConstants.savePreferences(context, "workname", listitem.get(position).getWorkspace_url());
-                workspace_name.setText(First_Char_Capital.capitalizeString(listitem.get(position).getWorkspace_name()));
-                holder.txtSelect.setVisibility(View.VISIBLE);
-                if (context instanceof HomeFeedActivity) {
+                    AppConstants.savePreferences(context, "workid", listitem.get(position).getObjectId());
+                    AppConstants.savePreferences(context, "workname", listitem.get(position).getWorkspace_url());
+                    workspace_name.setText(First_Char_Capital.capitalizeString(listitem.get(position).getWorkspace_name()));
+                    holder.txtSelect.setVisibility(View.VISIBLE);
+                    if (context instanceof HomeFeedActivity) {
 //                    ((HomeFeedActivity)context).getworkspace("");
-                    ((HomeFeedActivity) context).getprojectlist();
+                        ((HomeFeedActivity) context).getprojectlist();
 //                    ((HomeFeedActivity)context).getfeedpost();
 
 //                    ((HomeFeedActivity)context).getuncatproject();
-                    // ((HomeFeedActivity)context).getcatogory();
+                        // ((HomeFeedActivity)context).getcatogory();
 
 
-                }
+                    }
+                //}
             } else {
                 holder.txtSelect.setVisibility(View.INVISIBLE);
             }
@@ -106,6 +108,7 @@ public class WorkspaceAdapter extends RecyclerView.Adapter<WorkspaceAdapter.Hold
                 workspace_name.setText(First_Char_Capital.capitalizeString(listitem.get(pos).getWorkspace_name()));
                 AppConstants.savePreferences(context, "workid", listitem.get(pos).getObjectId());
                 AppConstants.savePreferences(context, "workname", listitem.get(pos).getWorkspace_url());
+                Log.e("workspaceID", "else>>>>>" + AppConstants.loadPreferences(context, "workid"));
                 holder.txtSelect.setVisibility(View.VISIBLE);
                 if (context instanceof HomeFeedActivity) {
 //                    getuncatproject();

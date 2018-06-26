@@ -54,7 +54,56 @@ public class CommentActivity extends AppCompatActivity {
                 if (comment.equals("") || comment == null) {
                     Toast.makeText(CommentActivity.this, "Pleasse enter comment ", Toast.LENGTH_SHORT).show();
                 } else {
-                    updatecomment(comment);
+                    //  updatecomment(comment);
+
+                    newupdatecomment(comment);
+                }
+            }
+        });
+    }
+
+    private void newupdatecomment(String comment) {
+
+        ParseObject gameScore = new ParseObject("PostSocial");
+        //gameScore.put("user", ParseUser.getCurrentUser().getObjectId());
+        gameScore.put("user", ParseObject.createWithoutData("_User", ParseUser.getCurrentUser().getObjectId()));
+
+        gameScore.put("post", ParseObject.createWithoutData("Post", post_id));
+        gameScore.put("comment", comment);
+        gameScore.put("type", "3");
+
+        gameScore.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+
+                if (e == null) {
+
+                    edt_comment.setText("");
+                    getCommenetList();
+                    ParseQuery<ParseObject> query = ParseQuery.getQuery("Post");
+
+// Retrieve the object by id
+                    query.getInBackground(post_id, new GetCallback<ParseObject>() {
+                        public void done(ParseObject myobject, ParseException e) {
+                            if (e == null) {
+
+                                edt_comment.setText("");
+                                getCommenetList();
+                                myobject.increment("CommentCount", 1);
+                                myobject.saveInBackground();
+
+//                                Toast.makeText(context, ""+count, Toast.LENGTH_SHORT).show();
+                            } else {
+                                Log.e("Count_reroor", e.getMessage());
+
+                            }
+                        }
+                    });
+
+
+                } else {
+                    Log.e("ERRROr", e.getMessage());
+
                 }
             }
         });
@@ -107,9 +156,9 @@ public class CommentActivity extends AppCompatActivity {
     private void getCommenetList() {
 
         Mylist.clear();
-        ParseQuery<ParseObject> query = ParseQuery.getQuery("post_comment");
-        query.whereEqualTo("post_id", ParseObject.createWithoutData("Post", post_id));
-        query.include("user_id");
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("PostSocial");
+        query.whereEqualTo("post", ParseObject.createWithoutData("Post", post_id));
+        query.include("user");
         query.findInBackground(new FindCallback<ParseObject>() {
             public void done(List<ParseObject> objects, ParseException e) {
 
@@ -117,7 +166,7 @@ public class CommentActivity extends AppCompatActivity {
 
 
                     for (int i = 0; i < objects.size(); i++) {
-                        ParseObject parseObject = objects.get(i).getParseObject("user_id");
+                        ParseObject parseObject = objects.get(i).getParseObject("user");
                         String post_user_id = parseObject.getObjectId();
                         String post_user_name = parseObject.getString("fullname");
                         ParseFile user_imge = (ParseFile) parseObject.get("profileimage");
@@ -129,7 +178,7 @@ public class CommentActivity extends AppCompatActivity {
 
                     }
                     adapter = new CommentAdapter(CommentActivity.this, Mylist);
-                   // RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(CommentActivity.this);
+                    // RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(CommentActivity.this);
                     LinearLayoutManager layoutManager = new LinearLayoutManager(CommentActivity.this);
                     rv_comment.setHasFixedSize(true);
                     layoutManager.setReverseLayout(true);

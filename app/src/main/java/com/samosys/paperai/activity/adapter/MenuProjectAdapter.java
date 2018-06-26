@@ -134,8 +134,9 @@ public class MenuProjectAdapter extends BaseExpandableListAdapter {
             img_expand.setVisibility(View.INVISIBLE);
 
         }
+        String PID = AppConstants.loadPreferences(context, "projectID");
 
-        if (AppConstants.loadPreferences(context, "projectID").equals("00")) {
+        if (PID.equals("00")) {
 //            if (parentBeans.size() >= 3) {
             AppConstants.savePreferences(context, "projectID", parentBeans.get(2).getCategoryId());
 //            }
@@ -146,10 +147,13 @@ public class MenuProjectAdapter extends BaseExpandableListAdapter {
 
         } else {
 
-            //if (SELECTEDPOSITION == groupPosition) {
-                AppConstants.savePreferences(context, "projectID", parentBeans.get(groupPosition).getCategoryId());
-                Log.e("childView ELSe", "==> " + parentBeans.get(SELECTEDPOSITION).getCategoryId());
+            if (PID.equals(parentBeans.get(groupPosition).getCategoryId())) {
+                //if (SELECTEDPOSITION == groupPosition) {
+                //AppConstants.savePreferences(context, "projectID", parentBeans.get(groupPosition).getCategoryId());
+
+                Log.e("childView PID_ELSE", "==> " + parentBeans.get(2).getCategoryId());
                 ((HomeFeedActivity) context).getfeedpost();
+            }
 //            }
             //
 
@@ -186,10 +190,10 @@ public class MenuProjectAdapter extends BaseExpandableListAdapter {
         if (AppConstants.loadPreferences(context, "projectID").equals("00")) {
 
             AppConstants.savePreferences(context, "projectID", parentBeans.get(groupPosition).getChildBeans().get(childPosition).getChildObjectId());
-            ((HomeFeedActivity) context).getfeedpost();
+//            ((HomeFeedActivity) context).getfeedpost();
 
         } else {
-            ((HomeFeedActivity) context).getfeedpost();
+//            ((HomeFeedActivity) context).getfeedpost();
             // Toast.makeText(context, "else", Toast.LENGTH_SHORT).show();
         }
         if (child.getChildType().equals("2")) {

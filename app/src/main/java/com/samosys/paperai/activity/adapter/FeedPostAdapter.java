@@ -1,14 +1,17 @@
 package com.samosys.paperai.activity.adapter;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,16 +21,22 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.MediaController;
 import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
 import com.androidquery.callback.BitmapAjaxCallback;
+import com.chibde.visualizer.LineBarVisualizer;
+import com.luseen.autolinklibrary.AutoLinkMode;
+import com.luseen.autolinklibrary.AutoLinkOnClickListener;
+import com.luseen.autolinklibrary.AutoLinkTextView;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.parse.FindCallback;
@@ -39,13 +48,15 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.samosys.paperai.R;
-import com.samosys.paperai.activity.AudioVisualizer.LineBarVisualizer;
 import com.samosys.paperai.activity.Bean.ShowPostBean;
 import com.samosys.paperai.activity.activity.CommentActivity;
+import com.samosys.paperai.activity.activity.FullImageActivity;
 import com.samosys.paperai.activity.activity.MyProfileActivity;
 import com.samosys.paperai.activity.activity.OtherUserProfileActivity;
+import com.samosys.paperai.activity.activity.VideoFullscreenActivity;
 import com.samosys.paperai.activity.utils.CustomFonts;
 import com.samosys.paperai.activity.utils.First_Char_Capital;
+import com.samosys.paperai.activity.video_view.AAH_VideoImage;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -59,18 +70,24 @@ import java.util.List;
  */
 
 public class FeedPostAdapter extends RecyclerView.Adapter<FeedPostAdapter.Holder> {
-    public static final int VIEW_TYPE_DEFAULT = 1;
+
+    public static final int AUDIO_PERMISSION_REQUEST_CODE = 102;
+    public static final String[] WRITE_EXTERNAL_STORAGE_PERMS = {
+            Manifest.permission.RECORD_AUDIO
+    };
+    private static int aux = 0;
     Context context;
     CustomFonts customFonts;
     boolean like = false;
     ArrayList<ShowPostBean> listitem;
     AQuery aq;
-    String objectid = "";
+    private AudioManager mAudioManager;
     private DisplayImageOptions options;
     private ImageLoader imageLoader;
     private int img_height, img_height_pro, img_width, img_width_pro;
+    private MediaController mediaControls;
 
-    public FeedPostAdapter(FragmentActivity activity, ArrayList<ShowPostBean> listitem) {
+    public FeedPostAdapter(Activity activity, ArrayList<ShowPostBean> listitem) {
         this.context = activity;
         this.listitem = listitem;
         customFonts = new CustomFonts(context);
@@ -91,6 +108,12 @@ public class FeedPostAdapter extends RecyclerView.Adapter<FeedPostAdapter.Holder
                 .considerExifParams(true)
                 .bitmapConfig(Bitmap.Config.RGB_565)
                 .build();
+        if (mediaControls == null) {
+
+            mediaControls = new MediaController(context);
+
+
+        }
 
         // ImageLoader.getInstance().init(ImageLoaderConfiguration.createDefault(context));
     }
@@ -106,47 +129,40 @@ public class FeedPostAdapter extends RecyclerView.Adapter<FeedPostAdapter.Holder
     @Override
     public void onBindViewHolder(final Holder holder, final int position) {
 
-//        ParseQuery<ParseObject> query = ParseQuery.getQuery("post_like");
-//        query.whereEqualTo("post_id", ParseObject.createWithoutData("Post", listitem.get(position).getObjectId()));
-//        query.whereEqualTo("user_id", ParseObject.createWithoutData("_User", ParseUser.getCurrentUser().getObjectId()));
 //
-//        query.findInBackground(new FindCallback<ParseObject>() {
-//            public void done(List<ParseObject> objects, ParseException e) {
-//
-//                if (e == null) {
-//
-//
-//                    for (int i = 0; i < objects.size(); i++) {
-//                        ParseObject parseObject = objects.get(i);
-//                        holder.img_like.setImageDrawable(context.getResources().getDrawable(R.mipmap.home_like_active));
-//
-//                    }
-//
-//
-//                } else {
-//
-//
-//                    Log.e("else", e.getMessage());
-//                    // error
-//                }
-//            }
-//        });
 
-     //   selectBookmark(position, holder);
-
-
+        mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         holder.num_likes.setText(listitem.get(position).getLikesCount() + " Likes");
         holder.num_comment.setText(listitem.get(position).getCommentCount() + " Comments");
-        holder.post_text.setText(First_Char_Capital.capitalizeString(listitem.get(position).getText()));
+
         holder.poster_name.setText(First_Char_Capital.capitalizeString(listitem.get(position).getUsername()));
+
         holder.post_time.setText(listitem.get(position).getUpdatedAt());
+
+        holder.post_text.setAutoLinkOnClickListener(new AutoLinkOnClickListener() {
+            @Override
+            public void onAutoLinkTextClick(AutoLinkMode autoLinkMode, String matchedText) {
+                Toast.makeText(context, "xvdfvf", Toast.LENGTH_SHORT).show();
+                Intent i = new Intent(context, OtherUserProfileActivity.class);
+                i.putExtra("id", listitem.get(position).getPost_userID());
+                context.startActivity(i);
+            }
+        });
+
+        holder.post_text.setHashtagModeColor(ContextCompat.getColor(context, R.color.colorAccent));
+        holder.post_text.setPhoneModeColor(ContextCompat.getColor(context, R.color.colorAccent));
+        holder.post_text.setCustomModeColor(ContextCompat.getColor(context, R.color.colorAccent));
+        holder.post_text.setMentionModeColor(ContextCompat.getColor(context, R.color.colorAccent));
+        holder.post_text.setText(First_Char_Capital.capitalizeString(listitem.get(position).getText()));
+
+
 
         if (listitem.get(position).getPost_type().equals("0")) {
             holder.feed_image.setVisibility(View.GONE);
             holder.ll_visual.setVisibility(View.GONE);
             holder.RL_imagefeed.setVisibility(View.GONE);
             holder.img_progrss.setVisibility(View.GONE);
-            //holder.post_text.setText(First_Char_Capital.capitalizeString(listitem.get(position).getText()));
+
             holder.post_text.setTextSize(17);
             holder.post_text.setMaxLines(20);
             holder.post_text.setPadding(10, 0, 0, 0);
@@ -154,22 +170,19 @@ public class FeedPostAdapter extends RecyclerView.Adapter<FeedPostAdapter.Holder
         } else if (listitem.get(position).getPost_type().equals("1")) {
             holder.feed_image.setVisibility(View.VISIBLE);
             holder.ll_visual.setVisibility(View.GONE);
+            holder.rl_vidio.setVisibility(View.GONE);
             if (!listitem.get(position).getPost_image().equals("no_image")) {
-//            holder.RL_imagefeed.setVisibility(View.VISIBLE);
-//            holder.post_text.setText(listitem.get(position).getText());
-//            Picasso.with(context).load(listitem.get(position).getPost_image()).error(R.mipmap.img_feed_center_1)
-//                    .fit().into(holder.feed_image, new Callback() {
-//                @Override
-//                public void onSuccess() {
-//                   holder.img_progrss.setVisibility(View.GONE);
 //
-//                }
-//
-//                @Override
-//                public void onError() {
-//                    holder.img_progrss.setVisibility(View.GONE);
-//                }
-//            });
+                holder.feed_image.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(context, FullImageActivity.class);
+                        intent.putExtra("url", listitem.get(position).getPost_image());
+                        Log.e("POSTURL", listitem.get(position).getPost_image());
+                        context.startActivity(intent);
+                    }
+                });
+
                 File file = new File(listitem.get(position).getPost_image());
                 if (file.exists()) {
                     BitmapAjaxCallback cb = new BitmapAjaxCallback();
@@ -208,50 +221,17 @@ public class FeedPostAdapter extends RecyclerView.Adapter<FeedPostAdapter.Holder
             }
         } else if (listitem.get(position).getPost_type().equals("2")) {
 
-
-            holder.visualizer_feed.setDensity(50);
-            holder.mediaPlayer = new MediaPlayer();
-
-            // Set your media player to the visualizer.
-            holder.visualizer_feed.setPlayer(holder.mediaPlayer.getAudioSessionId());
-            holder.visualizer_feed.setColor(ContextCompat.getColor(context, R.color.colorPrimary));
             holder.feed_image.setVisibility(View.GONE);
             holder.ll_visual.setVisibility(View.VISIBLE);
             holder.img_progrss.setVisibility(View.GONE);
-            holder.RL_imagefeed.setBackgroundColor(context.getResources().getColor(R.color.white));
+            holder.visualizer_feed.setDensity(50);
+            holder.mediaPlayer = new MediaPlayer();
+            holder.ll_visual.setBackgroundColor(Color.WHITE);
+            // Set your media player to the visualizer.
 
-            try {
+            holder.visualizer_feed.setPlayer(holder.mediaPlayer.getAudioSessionId());
 
-                holder.mediaPlayer.setDataSource(listitem.get(position).getPost_file());
-                holder.mediaPlayer.prepare();
-                // holder.   mediaPlayer.start();
-                holder.mediaPlayer.setLooping(false);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-
-//        holder.feed_image.getLayoutParams().width = img_width;
-
-        if (listitem.get(position).getUser_imge() != null) {
-            ParseFile parseFile = listitem.get(position).getUser_imge();
-            String a = parseFile.getUrl();
-
-            Picasso.with(context).load(a).error(R.mipmap.home_user)
-                    .placeholder(R.mipmap.home_user)
-                    .fit().into(holder.poster_image, new Callback() {
-                @Override
-                public void onSuccess() {
-                    // holder.img_progrss.setVisibility(View.GONE);
-
-                }
-
-                @Override
-                public void onError() {
-                    //holder.img_progrss.setVisibility(View.GONE);
-                }
-            });
+            holder.visualizer_feed.setColor(ContextCompat.getColor(context, R.color.colorPrimaryDark));
             holder.ib_play_pause_feed.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -271,22 +251,116 @@ public class FeedPostAdapter extends RecyclerView.Adapter<FeedPostAdapter.Holder
                 }
             });
 
+            try {
 
-//            listitem.get(position).getUser_imge().getDataInBackground(new GetDataCallback() {
-//                @Override
-//                public void done(byte[] data, ParseException e) {
-//                    Bitmap bmp = BitmapFactory
-//                            .decodeByteArray(
-//                                    data, 0,
-//                                    data.length);
+                holder.mediaPlayer.setDataSource(listitem.get(position).getPost_file());
+                holder.mediaPlayer.prepare();
+                // holder.   mediaPlayer.start();
+                holder.mediaPlayer.setLooping(false);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else if (listitem.get(position).getPost_type().equals("3")) {
+            holder.feed_image.setVisibility(View.GONE);
+            holder.ll_visual.setVisibility(View.GONE);
+
+//            holder.rl_vidio.setVisibility(View.VISIBLE);
+            holder.img_progrss.setVisibility(View.GONE);
+            mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 0, 0);
+
+            try {
+
+
+                holder.videoView.setVideoPath(listitem.get(position).getPost_file());
+                holder.videoView.start();
+
+                if (!holder.videoView.isPlaying()) {
+                    holder.videoView.setVideoPath(listitem.get(position).getPost_file());
+                    holder.videoView.start();
+
+                }
+                holder.rl_vidio.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(context, VideoFullscreenActivity.class);
+                        intent.putExtra("url", listitem.get(position).getPost_file());
+                        context.startActivity(intent);
+                    }
+                });
+                holder.img_playback.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (holder.isplay) {
+                            holder.img_playback.setImageResource(R.drawable.ic_pause);
+                            holder.videoView.stopPlayback();
+                            holder.isplay = false;
+                        } else {
+                            holder.isplay = true;
+                            holder.img_playback.setImageResource(R.drawable.ic_play);
+                            holder.videoView.setVideoPath(listitem.get(position).getPost_file());
+                            holder.videoView.start();
+
+                        }
+
+                    }
+                });
+                holder.img_vol.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+
+                        if (aux % 2 == 0) {
+                            holder.img_vol.setImageResource(R.drawable.ic_unmute);
+                            mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 100, 0);
+                            aux++;
+
+
+                        } else {
+                            holder.img_vol.setImageResource(R.drawable.ic_mute);
+                            mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 0, 0);
+                            aux++;
+
+                        }
+
+//                         if (holder.isMuted) {
 //
-//                    // initialize
-//                    holder.poster_image.setImageBitmap(bmp);
-//                    holder.poster_image_comment.setImageBitmap(bmp);
-////                    holder.poster_image.getLayoutParams().height = img_height_pro;
-////                    holder.poster_image.getLayoutParams().width = img_width_pro;
-//                }
-//            });
+//                             holder.img_vol.setImageResource(R.drawable.ic_mute);
+//                         } else {
+//
+//
+//                         }
+                    }
+                });
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+
+
+        if (listitem.get(position).getUser_imge() != null) {
+            ParseFile parseFile = listitem.get(position).getUser_imge();
+            String a = parseFile.getUrl();
+
+            Picasso.with(context).load(a).error(R.mipmap.home_user)
+                    .placeholder(R.mipmap.home_user)
+                    .fit().into(holder.poster_image, new Callback() {
+                @Override
+                public void onSuccess() {
+                    // holder.img_progrss.setVisibility(View.GONE);
+
+                }
+
+                @Override
+                public void onError() {
+                    //holder.img_progrss.setVisibility(View.GONE);
+                }
+            });
+
+
+//
         }
         holder.img_like.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -311,7 +385,7 @@ public class FeedPostAdapter extends RecyclerView.Adapter<FeedPostAdapter.Holder
                     context.startActivity(i);
                 } else {
                     Intent i = new Intent(context, OtherUserProfileActivity.class);
-//                i.putExtra("id", listitem.get(position).getPost_userID());
+                    i.putExtra("id", listitem.get(position).getPost_userID());
                     context.startActivity(i);
                 }
 
@@ -372,6 +446,21 @@ public class FeedPostAdapter extends RecyclerView.Adapter<FeedPostAdapter.Holder
             }
         });
     }
+
+    private void showDialog(String title, String message) {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setMessage(message)
+                .setTitle(title)
+                .setCancelable(false)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+    }
+
 
     private void selectBookmark(int position, final Holder holder) {
         ParseQuery<ParseObject> query = ParseQuery.getQuery("post_bookmarks");
@@ -560,22 +649,33 @@ public class FeedPostAdapter extends RecyclerView.Adapter<FeedPostAdapter.Holder
 
 
     public class Holder extends RecyclerView.ViewHolder {
+
         protected MediaPlayer mediaPlayer;
         ProgressBar img_progrss;
         LineBarVisualizer visualizer_feed;
         LinearLayout ll_visual;
         ImageButton ib_play_pause_feed;
-        private TextView post_time, post_text, num_likes, num_comment, poster_name;
+        AAH_VideoImage video_view;
+        VideoView videoView;
+        ImageView img_playback, img_vol;
+        AutoLinkTextView post_text;
+        boolean isplay = true;
+        private TextView post_time, num_likes, num_comment, poster_name;
         private ImageView poster_image_comment, img_bookmark, poster_image, feed_image, img_like, img_more;
-        private RelativeLayout rl_commnet, RL_imagefeed;
+        private RelativeLayout rl_vidio, rl_commnet, RL_imagefeed;
 
         public Holder(View itemView) {
             super(itemView);
             // customFonts = new CustomFonts(context);
+
             rl_commnet = (RelativeLayout) itemView.findViewById(R.id.rl_commnet);
+            rl_vidio = (RelativeLayout) itemView.findViewById(R.id.rl_vidio);
+            videoView = (VideoView) itemView.findViewById(R.id.videoView);
             visualizer_feed = (LineBarVisualizer) itemView.findViewById(R.id.visualizer_feed);
             RL_imagefeed = (RelativeLayout) itemView.findViewById(R.id.RL_imagefeed);
             img_bookmark = (ImageView) itemView.findViewById(R.id.img_bookmark);
+            img_playback = (ImageView) itemView.findViewById(R.id.img_playback);
+            img_vol = (ImageView) itemView.findViewById(R.id.img_vol);
             poster_image_comment = (ImageView) itemView.findViewById(R.id.poster_image_comment);
             feed_image = (ImageView) itemView.findViewById(R.id.feed_image);
             poster_image = (ImageView) itemView.findViewById(R.id.poster_image);
@@ -584,12 +684,12 @@ public class FeedPostAdapter extends RecyclerView.Adapter<FeedPostAdapter.Holder
             img_like = (ImageView) itemView.findViewById(R.id.img_like);
             post_time = (TextView) itemView.findViewById(R.id.post_time);
             ll_visual = (LinearLayout) itemView.findViewById(R.id.ll_visual);
-            post_text = (TextView) itemView.findViewById(R.id.post_text);
+            post_text = (AutoLinkTextView) itemView.findViewById(R.id.post_text);
             num_likes = (TextView) itemView.findViewById(R.id.num_likes);
             poster_name = (TextView) itemView.findViewById(R.id.poster_name);
             img_progrss = (ProgressBar) itemView.findViewById(R.id.img_progrss);
             num_comment = (TextView) itemView.findViewById(R.id.num_comment);
-
+//            video_view = (AAH_VideoImage) itemView.findViewById(R.id.video_view);
 
             //  txtworkurl.setTextColor(context.getResources().getColor(R.color.txt_light));
             num_likes.setTypeface(customFonts.calibri);
@@ -598,9 +698,11 @@ public class FeedPostAdapter extends RecyclerView.Adapter<FeedPostAdapter.Holder
             post_time.setTypeface(customFonts.calibri);
             num_comment.setTypeface(customFonts.calibri);
 
+
+
+
         }
+
+
     }
-
-
 }
-

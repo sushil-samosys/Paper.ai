@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.samosys.paperai.activity.activity.ArchiveWorkspaceActivity">
+
+    <RelativeLayout
+        android:id="@+id/rlHomeSearch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#e5e5e5"
+        android:padding="@dimen/_10sdp">
+
+        <ImageView
+            android:id="@+id/archiveWStback"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:padding="@dimen/_5sdp"
+            android:src="@mipmap/signin_back_icon" />
+
+        <TextView
+            android:id="@+id/txt_project_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_centerVertical="true"
+            android:ellipsize="end"
+            android:maxLength="15"
+            android:maxLines="1"
+
+            android:singleLine="true"
+            android:text="Channel Settings"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_15sdp" />
+
+        <LinearLayout
+            android:id="@+id/ll_add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="@dimen/_5sdp">
+
+            <TextView
+                android:id="@+id/txtsave_pro"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SAVE"
+
+                android:textColor="@color/basecolor"
+                android:textSize="@dimen/_12sdp" />
+        </LinearLayout>
+
+
+    </RelativeLayout>
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@color/white"
+                    android:padding="@dimen/_15sdp">
+
+                    <TextView
+                        android:id="@+id/txtEntiretxt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerVertical="true"
+                        android:gravity="center"
+                        android:text="Archive Channel"
+                        android:textColor="@color/red"
+                        android:textSize="@dimen/_15sdp" />
+
+                    <com.samosys.paperai.activity.utils.SwitchButton
+                        android:id="@+id/ProtoglBtn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+
+                        app:kswThumbColor="@color/basecolor" />
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/txt_msg1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:background="@color/light"
+                    android:gravity="center|left"
+                    android:padding="@dimen/_15sdp"
+
+                    android:text="Your channel won’t be visible to anyone, and you will not receive notifications from this channel"
+                    android:textSize="@dimen/_11sdp" />
+
+
+        </LinearLayout>
+    </android.support.v4.widget.NestedScrollView>
+</LinearLayout>
