@@ -13,12 +13,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
-import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -72,7 +72,6 @@ import com.samosys.paperai.activity.utils.MarshMallowPermission;
 import com.samosys.paperai.activity.utils.NetworkAvailablity;
 import com.samosys.paperai.activity.utils.RecyclerTouchListener;
 import com.samosys.paperai.activity.utils.SimpleDividerItemDecoration;
-import com.samosys.paperai.activity.video_view.MyModel;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -82,7 +81,6 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -99,24 +97,23 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
 
     public static final int AUDIO_PERMISSION_REQUEST_CODE = 102;
     public static final String[] WRITE_EXTERNAL_STORAGE_PERMS = {
-            Manifest.permission.RECORD_AUDIO
-    };
-    private static final String AUDIO_RECORDER_FILE_EXT_3GP = ".3gp";
-    private static final String AUDIO_RECORDER_FILE_EXT_MP4 = ".mp4";
+            Manifest.permission.RECORD_AUDIO};
+
     public static File file = null;
     public static int prog = 0;
-    private final List<MyModel> modelList = new ArrayList<>();
+
     public ArrayList<CategoriesProjectbeanclass> categoriesProjectbeanclasses;
     public ImageView work_space_img, imgWorkSpaceSetting;
-    protected MediaPlayer mediaPlayer;
     MarshMallowPermission marshMallowPermission;
     NestedScrollView scrollView;
     Intent recordService;
     Picasso p;
     AQuery aq;
     CustomFonts customFonts;
+    RelativeLayout topWorkSpace;
+    FeedPostAdapter feedPostAdapter;
     private ArrayList<String> childList;
-    private ImageView img_wrokspace, mypic, img_addpost, img_log, img_mic;
+    private ImageView img_wrokspace, mypic, img_log, img_mic;
     private RecyclerView listView;
     private CircleImageView imgMenuIcon;
     private boolean mStartRecording = true;
@@ -126,11 +123,12 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
     private ExpandableListView project_expandableList;
     private View menuLayout;
     private ArcLayout arcLayout;
-    private TextView work_txt, workspace_name, txt_all, work_title;
+    private TextView work_txt, workspace_name, txt_all, work_title, txtfollow, txtNoPost, txtMember;
     private RecyclerView Rv_feed_post;
     private ArrayList<ShowPostBean> postList;
+    private ImageView img_addpost;
     private ArrayList<WorkspaceBean> workList;
-    private CircularProgressBar circularProgressBar;
+    private CircularProgressBar circularProgressBar, pro_free;
     private WorkspaceAdapter adapter;
     private MenuProjectAdapter projectAdapter;
     private Button btn_recordVoice, btn_camera, btn_text;
@@ -142,7 +140,6 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
     private ArrayList<ChildBean> childBeans;
     private MediaRecorder mRecorder = null;
     private RelativeLayout rl_audioRecord;
-    private String file_exts[] = {AUDIO_RECORDER_FILE_EXT_MP4, AUDIO_RECORDER_FILE_EXT_3GP};
     private ACProgressFlower dialog;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -151,14 +148,13 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_feed);
         AppConstants.getstatusbar(HomeFeedActivity.this);
-        getWindow().setSoftInputMode(
-                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         findview();
 
-
+        workList = new ArrayList<>();
         p = Picasso.with(this);
         LinearLayoutManager mLayoutManager = new LinearLayoutManager(this);
-
+        aq = new AQuery(HomeFeedActivity.this);
 
         for (int i = 0, size = arcLayout.getChildCount(); i < size; i++) {
             arcLayout.getChildAt(i).setOnClickListener(this);
@@ -169,19 +165,21 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
         BitmapDrawable bd = (BitmapDrawable) HomeFeedActivity.this.getResources().getDrawable(R.mipmap.img_feed_center_1);
         img_height = bd.getBitmap().getHeight() + (img_height * 2);
         img_width = bd.getBitmap().getWidth() + (img_width);
-//        if (NetworkAvailablity.chkStatus(HomeFeedActivity.this)) {
-//            getuserdata();
-//            getworkspaceList();
-//        } else {
-//            Toast.makeText(HomeFeedActivity.this, "Please Check Your Internet Connection", Toast.LENGTH_SHORT).show();
-//        }
 
 
+        topWorkSpace.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(HomeFeedActivity.this, WorkspaceSettingActivity.class);
+//
+                startActivity(i);
+            }
+        });
         mypic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(HomeFeedActivity.this, MyProfileActivity.class);
-//                i.putExtra("id", listitem.get(position).getPost_userID());
+//
                 startActivity(i);
             }
         });
@@ -196,18 +194,17 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
         project_expandableList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-//                parent.expandGroup(groupPosition);
                 drawerLayout.closeDrawers();
                 postList.clear();
                 AppConstants.ALL = false;
 
 
                 AppConstants.savePreferences(HomeFeedActivity.this, "workid", workList.get(AppConstants.workPOS).getObjectId());
-                AppConstants.savePreferences(HomeFeedActivity.this, "workname", workList.get(AppConstants.workPOS).getWorkspace_url());
+                AppConstants.savePreferences(HomeFeedActivity.this, "workname", workList.get(AppConstants.workPOS).getWorkspace_name());
                 AppConstants.savePreferences(HomeFeedActivity.this, "projectID", parentBeans.get(childPosition).getCategoryId());
 
                 workspace_name.setText(First_Char_Capital.capitalizeString(workList.get(AppConstants.workPOS).getWorkspace_name()));
-                work_txt.setText(First_Char_Capital.capitalizeString(workList.get(AppConstants.workPOS).getWorkspace_name()));
+                work_txt.setText(First_Char_Capital.capitalizeString(workList.get(AppConstants.workPOS).getMission()));
                 //  work_name.setText(First_Char_Capital.capitalizeString(workList.get(AppConstants.workPOS).getWorkspace_name()));
                 ParseFile parseFile = workList.get(AppConstants.workPOS).getImage();
                 String a = parseFile.getUrl();
@@ -248,9 +245,9 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
 
 
                         AppConstants.savePreferences(HomeFeedActivity.this, "workid", workList.get(AppConstants.workPOS).getObjectId());
-                        AppConstants.savePreferences(HomeFeedActivity.this, "workname", workList.get(AppConstants.workPOS).getWorkspace_url());
+                        AppConstants.savePreferences(HomeFeedActivity.this, "workname", workList.get(AppConstants.workPOS).getWorkspace_name());
                         AppConstants.savePreferences(HomeFeedActivity.this, "projectID", parentBeans.get(groupPosition).getCategoryId());
-
+//                        AppConstants.savePreferences(HomeFeedActivity.this, "projectID", "00");
                         drawerLayout.closeDrawers();
                         postList.clear();
                         //parentBeans.clear();
@@ -261,7 +258,7 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
 
 
                         workspace_name.setText(First_Char_Capital.capitalizeString(parentBeans.get(groupPosition).getCategoryName()));
-                        work_txt.setText(First_Char_Capital.capitalizeString(parentBeans.get(groupPosition).getCategoryName()));
+                        work_txt.setText(First_Char_Capital.capitalizeString(workList.get(AppConstants.workPOS).getMission()));
                         work_title.setText(First_Char_Capital.capitalizeString(workList.get(AppConstants.workPOS).getWorkspace_name()));
 
                         String img = parentBeans.get(groupPosition).getImage();
@@ -306,7 +303,7 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                 //txt_all.setBackgroundColor(getResources().getColor(R.color.black));
 
                 String img = parentBeans.get(AppConstants.workPOS).getImage();
-                Log.e("FileAMAN", "" + img);
+
                 if (parentBeans.get(AppConstants.workPOS).getImage() != null) {
 
                     Picasso.with(HomeFeedActivity.this)
@@ -328,7 +325,9 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                 AppConstants.ALL = true;
                 postList.clear();
                 getfeedpost();
+//                feedPostAdapter.notifyDataSetChanged();
                 drawerLayout.closeDrawers();
+
             }
         });
 
@@ -337,46 +336,10 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
             public void onClick(View v) {
 
 
-//                SandriosCamera
-//                        .with(HomeFeedActivity.this)
-//                        .setShowPicker(false)
-//                        .setMediaAction(CameraConfiguration.CAMERA_FACE_FRONT)
-//                        .enableImageCropping(true)
-//
-//                        .launchCamera(new SandriosCamera.CameraCallback() {
-//                            @Override
-//                            public void onComplete(CameraOutputModel model) {
-//
-//
-//                                // ParseFile file = new ParseFile("",model.getType());
-//                                Uri uri = Uri.fromFile(new File(model.getPath()));
-//                                try {
-//                                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(HomeFeedActivity.this.getContentResolver(), uri);
-//
-//                                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-//                                    // Compress image to lower quality scale 1 - 100
-//                                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-//                                    byte[] image = stream.toByteArray();
-//
-//
-//                                    // Create the ParseFile
-//
-//                                    ParseFile parseFile = new ParseFile("postfile.jpg", image);
-//                                    createPostImage(parseFile);
-//                                } catch (IOException e) {
-//                                    e.printStackTrace();
-//                                }
-//
-////                                Log.e("File", "" + model.getPath());
-////                                Log.e("Type", "" + model.getType());
-////                                Toast.makeText(getApplicationContext(), "Media captured.", Toast.LENGTH_SHORT).show();
-//                            }
-//                        });
-
-
+                hideMenu();
                 Intent intent = new Intent(HomeFeedActivity.this, CameraPostActivity.class);
                 startActivity(intent);
-                hideMenu();
+
             }
         });
         imgWorkSpaceSetting.setOnClickListener(new View.OnClickListener() {
@@ -390,6 +353,7 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
         btn_text.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                hideMenu();
                 Intent intent = new Intent(HomeFeedActivity.this, PostfeedActivity.class);
                 intent.putExtra("file", "");
                 intent.putExtra("post_type", "0");
@@ -401,15 +365,18 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
             @Override
             public void onClick(View v) {
                 //startRecording();
+
                 hideMenu();
-
-
                 final Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        img_addpost.setVisibility(View.GONE);
+
+
                         rl_audioRecord.setVisibility(View.VISIBLE);
+                        img_addpost.setVisibility(View.GONE);
+                        pro_free.setVisibility(View.GONE);
+
                     }
                 }, 1000);
 
@@ -452,6 +419,7 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
 
                                                 } else {
                                                     img_addpost.setVisibility(View.VISIBLE);
+                                                    pro_free.setVisibility(View.VISIBLE);
                                                     rl_audioRecord.setVisibility(View.INVISIBLE);
 
                                                     circularProgressBar.setProgress(0);
@@ -469,7 +437,7 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                             case MotionEvent.ACTION_UP:
                                 //    prog = 0;
                                 timer.cancel();
-
+                                pro_free.setVisibility(View.VISIBLE);
                                 img_addpost.setVisibility(View.VISIBLE);
                                 rl_audioRecord.setVisibility(View.INVISIBLE);
                                 Log.e("PROGRESS11", prog + "");
@@ -505,6 +473,7 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                                                 Log.e("PROGRESS22", prog + "");
 
                                             } else {
+                                                pro_free.setVisibility(View.VISIBLE);
                                                 img_addpost.setVisibility(View.VISIBLE);
                                                 rl_audioRecord.setVisibility(View.INVISIBLE);
 
@@ -523,6 +492,7 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                             //+  prog = 0;
                             timer.cancel();
                             stopService(recordService);
+                            pro_free.setVisibility(View.VISIBLE);
 
                             img_addpost.setVisibility(View.VISIBLE);
                             rl_audioRecord.setVisibility(View.INVISIBLE);
@@ -567,18 +537,21 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
             @Override
             public void onClick(View view, final int position) {
 
-//                AppConstants.workPOS = position;
+
                 parentBeans.clear();
                 childBeans.clear();
+
                 project_expandableList.setVisibility(View.GONE);
                 img_progrss_projct.setVisibility(View.VISIBLE);
                 // load data here
                 projectList.clear();
                 expandableListDetail.clear();
+                AppConstants.savePreferences(HomeFeedActivity.this, "workid", workList.get(position).getObjectId());
+                AppConstants.savePreferences(HomeFeedActivity.this, "workname", workList.get(position).getWorkspace_name());
+                workspace_name.setText(First_Char_Capital.capitalizeString(workList.get(position).getWorkspace_name()));
+                getprojectlist();
 
-                AppConstants.savePreferences(HomeFeedActivity.this, "projectID", "00");
-
-                AppConstants.ALL = true;
+//                AppConstants.ALL =
                 adapter.setSelectedItem(position);
                 adapter.notifyDataSetChanged();
 //                getfeedpost();
@@ -592,6 +565,30 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
             }
         }));
     }
+
+    @Override
+    public void onRequestPermissionsResult(
+            int requestCode,
+            @NonNull String[] permissions,
+            @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case AUDIO_PERMISSION_REQUEST_CODE:
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if (NetworkAvailablity.chkStatus(HomeFeedActivity.this)) {
+                        getuserdata();
+
+                        getworkspaceList();
+
+                    } else {
+                        Toast.makeText(HomeFeedActivity.this, "Please Check Your Internet Connection", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    initialize();
+                }
+        }
+    }
+
 
     private void createnBrowseworkspace() {
         ActionSheet actionSheet = new ActionSheet.Builder()
@@ -630,41 +627,40 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
         actionSheet.show(getFragmentManager());
     }
 
-    private void stopRecording() {
-        Log.e("FILANMEEeee", ">>>>>" + file);
-        if (file != null) {
-            recordService = new Intent(HomeFeedActivity.this, RecordingService.class);
-            stopService(recordService);
-
-            converttexttospeech(file);
-
-        }
-//        Intent i = new Intent(this, PostfeedActivity.class);
-//        i.putExtra("file", HomeFeedActivity.file.toString());
-//        i.putExtra("post_type", "2");
-//
-//          i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        this.startActivity(i);
-    }
 
     private void converttexttospeech(File file) {
-        String url = " https://paprspeechtotext.azurewebsites.net/api/Recognize?code=esVh5fZUJUqnm6N4JeW7FofYCmNL9ltW7fxpfOSIzq3m0VrlaRI3YA=='";
+
+        String url = "https://paprspeechtotext.azurewebsites.net/api/Recognize?code=esVh5fZUJUqnm6N4JeW7FofYCmNL9ltW7fxpfOSIzq3m0VrlaRI3YA==";
+
+
         AjaxCallback<JSONObject> cb = new AjaxCallback<JSONObject>() {
 
             @Override
             public void callback(String url, JSONObject html, AjaxStatus status) {
-                System.out.println(html);
+
                 Log.e("APIRESPONSE", ">>>>>" + url);
                 Log.e("APIRESPONSE", ">>>>>" + html);
                 Log.e("APIRESPONSE", ">>>>>" + status);
+
+
             }
+
+
         };
+//        "content-type": "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW",
+//                "token": "b79f0858-f00f-4b8e-9341-75b37cc85a61",
+//                "cache-control": "no-cache",
+//                "postman-token": "cf97286b-a623-8cf0-1fee-c6e75ebd2887"
 
-        AQuery aq = new AQuery(HomeFeedActivity.this);
 
-
+//        Content-Type: application/x-www-form-urlencoded
         cb.header("token", "b79f0858-f00f-4b8e-9341-75b37cc85a61");
-
+//        cb.header("content-type", "multipart/form-data");
+////        cb.header("Content-Type", "application/x-www-form-urlencoded");
+//        cb.header("boundary", "----WebKitFormBoundary7MA4YWxkTrZu0gW");
+//        cb.header("Cache-Control", "no-cache");
+////        cb.header("Postman-Token", "cf97286b-a623-8cf0-1fee-c6e75ebd2887");
+//        Log.e("FILANMEEeee", ">>>>>" + cb);
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("AudioFile", file);
         params.put("AudioType", "audio/m4a");
@@ -672,146 +668,44 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
 
         cb.params(params);
 
+
         aq.ajax(url, JSONObject.class, cb);
+    }
+
+    private void stopRecording() {
+
+        if (file != null) {
+
+            stopService(recordService);
+
+
+        }
+//
     }
 
     private void onRecord(boolean mStartRecording) {
 
+
         recordService = new Intent(HomeFeedActivity.this, RecordingService.class);
 
-        if (mStartRecording) {
-            // start recording
-
-            File ff = new File(Environment.getExternalStorageDirectory() + "/SoundRecorder");
-            if (!ff.exists()) {
-                //folder /SoundRecorder doesn't exist, create the folder
-                ff.mkdir();
-            }
-
-            //start Chronometer
-
-
-            //start RecordingService
-            startService(recordService);
-            //keep screen on while recording
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-
-        } else {
-//
+        recordService.putExtra("image", "no");
+        File folder = new File(Environment.getExternalStorageDirectory() + "/SoundRecorder");
+        if (!folder.exists()) {
+            //folder /SoundRecorder doesn't exist, create the folder
+            folder.mkdir();
         }
+
+        //start Chronometer
+
+        //start RecordingService
+        startService(recordService);
+        //keep screen on while recording
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+
     }
 
-//    private void openworkspaceSheet() {
-//        final String workid = AppConstants.loadPreferences(HomeFeedActivity.this, "workid");
-//        final String workname = AppConstants.loadPreferences(HomeFeedActivity.this, "workname");
-//        ViewGroup nullParent = null;
-//        LayoutInflater lInflater = (LayoutInflater) HomeFeedActivity.this.getSystemService(
-//                Activity.LAYOUT_INFLATER_SERVICE);
-//        View view = lInflater.inflate(R.layout.create_work_space_bottomsheet, null);
-//        // view.getBackground().setAlpha(51);
-//        final Dialog mBottomSheetDialog = new Dialog(HomeFeedActivity.this, R.style.MaterialDialogSheet);
-//        mBottomSheetDialog.setContentView(view);
-//        mBottomSheetDialog.setCancelable(true);
-//        DisplayMetrics metrics = HomeFeedActivity.this.getResources().getDisplayMetrics();
-//        int height = metrics.heightPixels;
-//        mBottomSheetDialog.getWindow().setLayout(LinearLayout.LayoutParams.MATCH_PARENT, (height) / 3);
-//        mBottomSheetDialog.getWindow().setGravity(Gravity.BOTTOM);
-//        mBottomSheetDialog.show();
-//
-//        TextView txt_cancel = (TextView) mBottomSheetDialog.findViewById(R.id.txt_cancel);
-//        TextView txtworkspace = (TextView) mBottomSheetDialog.findViewById(R.id.txtworkspace);
-//        TextView txtBrowseWS = (TextView) mBottomSheetDialog.findViewById(R.id.txtBrowseWS);
-//
-//
-//        txt_cancel.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                mBottomSheetDialog.dismiss();
-//            }
-//        });
-//        txtworkspace.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(HomeFeedActivity.this, NewWorkspaceActivity.class);
-//                startActivity(intent);
-//                mBottomSheetDialog.dismiss();
-//            }
-//        });
-//        txtBrowseWS.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(HomeFeedActivity.this, BrowesWorkspace.class);
-//
-//                startActivity(intent);
-//
-//                mBottomSheetDialog.dismiss();
-//            }
-//        });
-//
-//    }
 
-    //    private void opensettingbottomshet() {
-//        final String workid = AppConstants.loadPreferences(HomeFeedActivity.this, "workid");
-//        final String workname = AppConstants.loadPreferences(HomeFeedActivity.this, "workname");
-//        ViewGroup nullParent = null;
-//        LayoutInflater lInflater = (LayoutInflater) HomeFeedActivity.this.getSystemService(
-//                Activity.LAYOUT_INFLATER_SERVICE);
-//        View view = lInflater.inflate(R.layout.fragment_modal_bottomsheet, null);
-//        // view.getBackground().setAlpha(51);
-//        final Dialog mBottomSheetDialog = new Dialog(HomeFeedActivity.this, R.style.MaterialDialogSheet);
-//        mBottomSheetDialog.setContentView(view);
-//        mBottomSheetDialog.setCancelable(true);
-//        DisplayMetrics metrics = HomeFeedActivity.this.getResources().getDisplayMetrics();
-//        int height = metrics.heightPixels;
-//        mBottomSheetDialog.getWindow().setLayout(LinearLayout.LayoutParams.MATCH_PARENT, (height * 3) / 4);
-//        mBottomSheetDialog.getWindow().setGravity(Gravity.BOTTOM);
-//        mBottomSheetDialog.show();
-//
-//
-//        TextView txt_cancel = (TextView) mBottomSheetDialog.findViewById(R.id.txt_cancel);
-//        TextView txt_createproject = (TextView) mBottomSheetDialog.findViewById(R.id.txt_createproject);
-//        TextView txtworkSetting = (TextView) mBottomSheetDialog.findViewById(R.id.txtworkSetting);
-//        TextView createCategory = (TextView) mBottomSheetDialog.findViewById(R.id.createCategory);
-////        TextView txtlocation = (TextView) mBottomSheetDialog.findViewById(R.id.txtlocation);
-//        createCategory.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(HomeFeedActivity.this, CategoryListingActivity.class);
-//                intent.putExtra("id", workid);
-//                intent.putExtra("name", workname);
-//                startActivity(intent);
-//                mBottomSheetDialog.dismiss();
-//            }
-//        });
-//
-//        txt_cancel.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                mBottomSheetDialog.dismiss();
-//            }
-//        });
-//        txt_createproject.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(HomeFeedActivity.this, ProjectSettingActivity.class);
-//                intent.putExtra("id", workid);
-//                startActivity(intent);
-//                mBottomSheetDialog.dismiss();
-//            }
-//        });
-//        txtworkSetting.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(HomeFeedActivity.this, WorkspaceSettingActivity.class);
-//
-//                startActivity(intent);
-//
-//                mBottomSheetDialog.dismiss();
-//            }
-//        });
-//
-//    }
     private void opensettingbottomshet() {
         final String workid = AppConstants.loadPreferences(HomeFeedActivity.this, "workid");
         final String workname = AppConstants.loadPreferences(HomeFeedActivity.this, "workname");
@@ -1036,10 +930,7 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
 
 
                 }
-//                d >>>>>LPH07qWwlr
-//                d >>>>>n6mgFIKVta
-                Log.e("parentBeansHHH", childBeans.size() + "");
-                Log.e("childListAAAA", childList.size() + "");
+//
 
                 for (int a = 0; a < childList.size(); a++) {
 
@@ -1066,9 +957,15 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
 
     }
 
-    private void getworkspaceList(final ACProgressFlower dialog) {
+    private void getworkspaceList() {
 
+        workList.clear();
+        dialog = new ACProgressFlower.Builder(this)
+                .direction(ACProgressConstant.DIRECT_CLOCKWISE)
+                .themeColor(Color.WHITE)
 
+                .fadeColor(Color.DKGRAY).build();
+        dialog.show();
         //demolist.clear();
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery("WorkSpace");
@@ -1103,6 +1000,7 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                         }
 
                     }
+
                     String w_id = AppConstants.loadPreferences(HomeFeedActivity.this, "workid");
 
 
@@ -1113,7 +1011,7 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
 
 
                                 workspace_name.setText(First_Char_Capital.capitalizeString(workList.get(a).getWorkspace_name()));
-                                work_txt.setText(First_Char_Capital.capitalizeString(workList.get(a).getWorkspace_name()));
+                                work_txt.setText(First_Char_Capital.capitalizeString(workList.get(a).getMission()));
                                 work_title.setText(First_Char_Capital.capitalizeString(workList.get(a).getWorkspace_name()));
 
                                 //  work_name.setText(First_Char_Capital.capitalizeString(workList.get(a).getWorkspace_name()));
@@ -1139,7 +1037,7 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                                 work_space_img.getLayoutParams().height = img_height;
                             }
                             AppConstants.savePreferences(HomeFeedActivity.this, "workid", workList.get(a).getObjectId());
-                            AppConstants.savePreferences(HomeFeedActivity.this, "workname", workList.get(a).getWorkspace_url());
+                            AppConstants.savePreferences(HomeFeedActivity.this, "workname", workList.get(a).getWorkspace_name());
 
                         } else if (workList.get(a).getObjectId().equals(w_id)) {
 //
@@ -1148,7 +1046,7 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                             AppConstants.savePreferences(HomeFeedActivity.this, "position", "" + a);
 
                             workspace_name.setText(First_Char_Capital.capitalizeString(workList.get(a).getWorkspace_name()));
-                            work_txt.setText(First_Char_Capital.capitalizeString(workList.get(a).getWorkspace_name()));
+                            work_txt.setText(First_Char_Capital.capitalizeString(workList.get(a).getMission()));
                             work_title.setText(First_Char_Capital.capitalizeString(workList.get(a).getWorkspace_name()));
                             ParseFile parseFile = workList.get(a).getImage();
                             String newimage = parseFile.getUrl();
@@ -1173,13 +1071,13 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
 
 //                    ArrayList<WorkspaceBean> tempElements = new ArrayList<WorkspaceBean>(workList);
 //                    Collections.reverse(tempElements);
-                    adapter = new WorkspaceAdapter(HomeFeedActivity.this, workList, workspace_name);
-
-                    listView.setHasFixedSize(true);
-                    RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(HomeFeedActivity.this);
-                    listView.setLayoutManager(layoutManager);
-                    listView.setAdapter(adapter);
-                    adapter.notifyDataSetChanged();
+//                    adapter = new WorkspaceAdapter(HomeFeedActivity.this, workList, workspace_name);
+//
+//                    listView.setHasFixedSize(true);
+//                    RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(HomeFeedActivity.this);
+//                    listView.setLayoutManager(layoutManager);
+//                    listView.setAdapter(adapter);
+//                    adapter.notifyDataSetChanged();
 
 
                 } else {
@@ -1187,9 +1085,8 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
 
 
                 }
-                if (dialog.isShowing()) {
-                    dialog.dismiss();
-                }
+
+                getmyfolloelist(dialog);
 
             }
         });
@@ -1227,17 +1124,21 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
         projectList.clear();
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Project");
-        Log.e("workspaceID", "d>>>>>" + AppConstants.loadPreferences(HomeFeedActivity.this, "workid"));
+        // Log.e("workspaceID", "d>>>>>" + AppConstants.loadPreferences(HomeFeedActivity.this, "workid"));
         query.whereEqualTo("workspace", ParseObject.createWithoutData("WorkSpace", AppConstants.loadPreferences(HomeFeedActivity.this, "workid")));
-
+        query.include("user");
         query.findInBackground(new FindCallback<ParseObject>() {
             public void done(List<ParseObject> objects, ParseException e) {
                 if (e == null) {
                     try {
                         //  childBeans = new ArrayList<>();
                         // parentBeans.clear();
-                         Log.e("ProjectDATA", "d>>>>>" + objects.size());
+
                         for (int i = 0; i < objects.size(); i++) {
+                            ParseObject parseObject = objects.get(i).getParseObject("user");
+
+                            String objectId1 = parseObject.getObjectId();
+                            Log.e("objectId1", "d>>>>>" + objectId1);
 
                             String strdefault = "";
                             String objectId = objects.get(i).getObjectId();
@@ -1258,12 +1159,22 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
 
 //                            if (!childList.contains(objectId)) {
                             if (archive.equals("0")) {
-                                projectList.add(new ProjctBean(objectId, name, updatedAt, workspaceID, objective, createdAt, image, type, objects.get(i), archive));
+                                if (objectId1.equals(ParseUser.getCurrentUser().getObjectId())) {
 
 
-                                parentBeans.add(new ParentBean(objectId, name, type, strdefault, image, childBeans));
+                                    projectList.add(new ProjctBean(objectId, name, updatedAt, workspaceID, objective, createdAt, image, type, objects.get(i), archive));
+
+
+                                    parentBeans.add(new ParentBean(objectId, name, type, strdefault, image, childBeans));
+                                } else {
+                                    if (strdefault.equals("2") && type.equals("1")) {
+                                        projectList.add(new ProjctBean(objectId, name, updatedAt, workspaceID, objective, createdAt, image, type, objects.get(i), archive));
+
+
+                                        parentBeans.add(new ParentBean(objectId, name, type, strdefault, image, childBeans));
+                                    }
+                                }
                             }
-//                            }
 
                         }
 
@@ -1283,11 +1194,15 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                 } else {
                     Toast.makeText(HomeFeedActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
 
-                    Log.e("lse", e.getMessage());
+
                     // error
                 }
+
+                getfeedpost();
+
+
 //                getcatogory();
-//                getfeedpost();
+
 
             }
         });
@@ -1301,11 +1216,9 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Post");
         if (!AppConstants.ALL && !AppConstants.loadPreferences(HomeFeedActivity.this, "projectID").equals("00")) {
             query.whereEqualTo("project", ParseObject.createWithoutData("Project", AppConstants.loadPreferences(HomeFeedActivity.this, "projectID")));
-
         } else {
 
             query.whereEqualTo("workspace", ParseObject.createWithoutData("WorkSpace", AppConstants.loadPreferences(HomeFeedActivity.this, "workid")));
-
 
         }
         query.orderByAscending("createdAt");
@@ -1317,8 +1230,14 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                 if (e == null) {
 
                     Log.e("FEEDPOST", objects.size() + "");
+                    int a = objects.size();
+                    txtNoPost.setText(a + " posts");
+                    txtfollow.setText("0 follower");
+                    txtMember.setText("0 member");
 
-
+                    if (dialog.isShowing()) {
+                        dialog.dismiss();
+                    }
                     postList.clear();
                     for (int i = 0; i < objects.size(); i++) {
                         String post_image = "no_image";
@@ -1357,31 +1276,28 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                                 objectId, updatedAt, createdAt, post_image, post_type,
                                 tagUserId, post_file_url, userTag, CommentCount,
                                 likesCount, post_userID, post_file));
-                        Log.e("VIDEOPOST", post_file);
+
                     }
 //
-                    Collections.reverse(postList);
+//                    Collections.reverse(postList);
 
 
 //
-                    FeedPostAdapter adapter = new FeedPostAdapter(HomeFeedActivity.this, postList);
-                    RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(HomeFeedActivity.this);
-                    Rv_feed_post.setLayoutManager(layoutManager);
+                    feedPostAdapter = new FeedPostAdapter(HomeFeedActivity.this, postList);
+//                    RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(HomeFeedActivity.this);
+                    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(HomeFeedActivity.this, LinearLayoutManager.VERTICAL, true);
+                    Rv_feed_post.setLayoutManager(linearLayoutManager);
+                    Rv_feed_post.setHasFixedSize(true);
                     Rv_feed_post.addItemDecoration(new SimpleDividerItemDecoration(HomeFeedActivity.this));
-                    Rv_feed_post.setAdapter(adapter);
-                    adapter.notifyDataSetChanged();
-
-
-                    if (dialog.isShowing()) {
-                        dialog.dismiss();
-                    }
+                    Rv_feed_post.setAdapter(feedPostAdapter);
+//
 
 
                 } else {
                     if (dialog.isShowing()) {
                         dialog.dismiss();
                     }
-                    postList.clear();
+//                    postList.clear();
                     Toast.makeText(HomeFeedActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
 
                     Log.e("else_post", e.getMessage());
@@ -1393,6 +1309,22 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
             dialog.dismiss();
         }
     }
+
+//    public void scrollToPosition(final int position) {
+//        if (Rv_feed_post != null) {
+//     this.getHandler().post(new Runnable() {
+//                @Override
+//                public void run() {
+//                    Rv_feed_post.scrollToPosition(position);
+//                    if (position == 0) {
+//                        LinearLayoutManager layoutManager = (LinearLayoutManager) Rv_feed_post.getLayoutManager();
+//                        layoutManager.scrollToPositionWithOffset(0, 0);
+//                        scrollView.fullScroll(View.FOCUS_UP);
+//                    }
+//                }
+//            });
+//        }
+//    }
 
 
     private void findview() {
@@ -1411,6 +1343,7 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
         postList.clear();
         customFonts = new CustomFonts(HomeFeedActivity.this);
         circularProgressBar = (CircularProgressBar) findViewById(R.id.circularProgressBar);
+        pro_free = (CircularProgressBar) findViewById(R.id.pro_free);
         btn_recordVoice = (Button) findViewById(R.id.btn_RecorVoice);
         btn_camera = (Button) findViewById(R.id.btn_camera);
         workList = new ArrayList<>();
@@ -1430,7 +1363,11 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
         work_title = (TextView) findViewById(R.id.work_title);
         work_txt = (TextView) findViewById(R.id.work_txt);
         txt_all = (TextView) findViewById(R.id.txt_all);
+        txtNoPost = (TextView) findViewById(R.id.txtNoPost);
+        txtfollow = (TextView) findViewById(R.id.txtfollow);
+        txtMember = (TextView) findViewById(R.id.txtMember);
         workspace_name = (TextView) findViewById(R.id.workspace_name);
+        topWorkSpace = (RelativeLayout) findViewById(R.id.topWorkSpace);
         Rv_feed_post.setNestedScrollingEnabled(false);
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
@@ -1457,13 +1394,7 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
             {
                 requestPermissions(WRITE_EXTERNAL_STORAGE_PERMS, AUDIO_PERMISSION_REQUEST_CODE);
             } else {
-                if (NetworkAvailablity.chkStatus(HomeFeedActivity.this)) {
-                    getuserdata();
-                    getmyfolloelist();
 
-                } else {
-                    Toast.makeText(HomeFeedActivity.this, "Please Check Your Internet Connection", Toast.LENGTH_SHORT).show();
-                }
             }
 
 
@@ -1471,7 +1402,7 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
 
             if (NetworkAvailablity.chkStatus(HomeFeedActivity.this)) {
                 getuserdata();
-                getmyfolloelist();
+                getworkspaceList();
 
             } else {
                 Toast.makeText(HomeFeedActivity.this, "Please Check Your Internet Connection", Toast.LENGTH_SHORT).show();
@@ -1479,15 +1410,9 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
-    private void getmyfolloelist() {
-        workList = new ArrayList<>();
-        workList.clear();
-        dialog = new ACProgressFlower.Builder(this)
-                .direction(ACProgressConstant.DIRECT_CLOCKWISE)
-                .themeColor(Color.WHITE)
+    private void getmyfolloelist(final ACProgressFlower dialog) {
 
-                .fadeColor(Color.DKGRAY).build();
-        dialog.show();
+
         ParseQuery<ParseObject> query = ParseQuery.getQuery("workspace_follower");
         query.whereEqualTo("user", ParseObject.createWithoutData("_User", ParseUser.getCurrentUser().getObjectId()));
         query.include("workspace");
@@ -1502,7 +1427,7 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
 
 
                         for (int i = 0; i < objects.size(); i++) {
-                           // String objectId = objects.get(i).getObjectId();
+                            // String objectId = objects.get(i).getObjectId();
 //
 
 
@@ -1521,13 +1446,24 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                             String ws_image = image.getUrl();
                             String user_name = parseObject.getString("user_name");
                             String workspace_url = parseObject.getString("workspace_url");
+
                             String archive = parseObject.getString("archive");
 
                             if (archive.equals("0")) {
+
                                 workList.add(new WorkspaceBean(objectId, parseObject, mission, updatedAt, workspace_n, createdAt, image, ws_image, user_name, workspace_url, archive));
+
                             }
 
+
                         }
+                        adapter = new WorkspaceAdapter(HomeFeedActivity.this, workList, workspace_name);
+
+                        listView.setHasFixedSize(true);
+                        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(HomeFeedActivity.this);
+                        listView.setLayoutManager(layoutManager);
+                        listView.setAdapter(adapter);
+                        adapter.notifyDataSetChanged();
 
                     }
 
@@ -1537,16 +1473,13 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                     Log.e("else", e.getMessage());
                     // error
                 }
-                getworkspaceList(dialog);
+
+                if (dialog.isShowing()) {
+                    dialog.dismiss();
+                }
+
             }
         });
-    }
-
-
-    private void setPlayer() {
-        mediaPlayer = MediaPlayer.create(this, R.raw.red_e);
-        mediaPlayer.setLooping(true);
-
     }
 
 

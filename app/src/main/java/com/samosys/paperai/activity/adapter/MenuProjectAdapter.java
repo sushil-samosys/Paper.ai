@@ -136,28 +136,30 @@ public class MenuProjectAdapter extends BaseExpandableListAdapter {
         }
         String PID = AppConstants.loadPreferences(context, "projectID");
 
-        if (PID.equals("00")) {
-//            if (parentBeans.size() >= 3) {
-            AppConstants.savePreferences(context, "projectID", parentBeans.get(2).getCategoryId());
+//        if (PID.equals("00")) {
+////            if (parentBeans.size() >= 3) {
+////            AppConstants.savePreferences(context, "projectID", "00");
+////                ((HomeFeedActivity) context).getfeedpost();
+////            }
+////            Log.e("getGroupView IF", "==> " + parentBeans.get(2).getCategoryId());
+//
+//
+//
+//
+//        } else {
+//
+//            if (PID.equals(parentBeans.get(groupPosition).getCategoryId())) {
+//                //if (SELECTEDPOSITION == groupPosition) {
+//                AppConstants.savePreferences(context, "projectID", PID);
+//
+//                Log.e("getGroupView _ELSE11", "==> " + PID);
+//                ((HomeFeedActivity) context).getfeedpost();
 //            }
-            Log.e("childView IF", "==> " + parentBeans.get(2).getCategoryId());
-
-
-            ((HomeFeedActivity) context).getfeedpost();
-
-        } else {
-
-            if (PID.equals(parentBeans.get(groupPosition).getCategoryId())) {
-                //if (SELECTEDPOSITION == groupPosition) {
-                //AppConstants.savePreferences(context, "projectID", parentBeans.get(groupPosition).getCategoryId());
-
-                Log.e("childView PID_ELSE", "==> " + parentBeans.get(2).getCategoryId());
-                ((HomeFeedActivity) context).getfeedpost();
-            }
-//            }
-            //
-
-        }
+//            Log.e("getGroupView _ELSE22", "==> " +PID);
+////            }
+//            //
+//
+//        }
 
 
         if (groupPosition == 2) {
@@ -189,7 +191,7 @@ public class MenuProjectAdapter extends BaseExpandableListAdapter {
         ImageView img_proLock = (ImageView) convertView.findViewById(R.id.img_proLock);
         if (AppConstants.loadPreferences(context, "projectID").equals("00")) {
 
-            AppConstants.savePreferences(context, "projectID", parentBeans.get(groupPosition).getChildBeans().get(childPosition).getChildObjectId());
+//            AppConstants.savePreferences(context, "projectID", parentBeans.get(groupPosition).getChildBeans().get(childPosition).getChildObjectId());
 //            ((HomeFeedActivity) context).getfeedpost();
 
         } else {

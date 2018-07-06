@@ -84,7 +84,7 @@ public class WorkspaceAdapter extends RecyclerView.Adapter<WorkspaceAdapter.Hold
                // if (AppConstants.loadPreferences(context, "workid").equals("00")) {
 
                     AppConstants.savePreferences(context, "workid", listitem.get(position).getObjectId());
-                    AppConstants.savePreferences(context, "workname", listitem.get(position).getWorkspace_url());
+                    AppConstants.savePreferences(context, "workname", listitem.get(position).getWorkspace_name());
                     workspace_name.setText(First_Char_Capital.capitalizeString(listitem.get(position).getWorkspace_name()));
                     holder.txtSelect.setVisibility(View.VISIBLE);
                     if (context instanceof HomeFeedActivity) {

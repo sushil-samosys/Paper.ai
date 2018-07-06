@@ -19,15 +19,12 @@ package com.samosys.paperai.activity.activity;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -47,6 +44,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.GestureDetector;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -59,21 +57,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.androidquery.AQuery;
-import com.androidquery.callback.AjaxCallback;
-import com.androidquery.callback.AjaxStatus;
-import com.androidquery.callback.BitmapAjaxCallback;
 import com.google.android.cameraview.AspectRatio;
 import com.google.android.cameraview.CameraView;
-import com.parse.ParseException;
-import com.parse.ParseFile;
-import com.parse.ParseObject;
-import com.parse.ParseUser;
-import com.parse.SaveCallback;
 import com.samosys.paperai.R;
 import com.samosys.paperai.activity.utils.AppConstants;
 import com.samosys.paperai.activity.utils.AspectRatioFragment;
-import com.samosys.paperai.activity.utils.CircularProgressBar;
+import com.samosys.paperai.activity.utils.CustomFonts;
 import com.samosys.paperai.activity.utils.MarshMallowPermission;
+import com.samosys.paperai.activity.utils.SimpleTooltip;
 import com.samosys.paperai.activity.utils.SquaredFrameLayout;
 
 import java.io.File;
@@ -83,7 +74,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.Timer;
 
 import io.github.memfis19.annca.Annca;
 import io.github.memfis19.annca.internal.configuration.AnncaConfiguration;
@@ -124,15 +114,15 @@ public class CameraPostActivity extends AppCompatActivity implements
     });
     MarshMallowPermission marshMallowPermission;
     AQuery aq;
-    TextView txtNext;
+    TextView txtNext, txtHeader;
     SquaredFrameLayout squareImage;
     File imageFile = new File("");
     int REQUEST_CAMERA = 0, SELECT_FILE = 1, SELECT_VIDEO = 3;
     ImageView capturedImage, imgback_camera;
     RelativeLayout rl_bottom_capture;
+    CustomFonts customFonts;
 
-    private Timer timer;
-    private Uri picUri;
+
     private int mCurrentFlash;
     private ImageView take_picture, img_switchcam, img_gallary;
     private CameraView mCameraView;
@@ -197,60 +187,43 @@ public class CameraPostActivity extends AppCompatActivity implements
                     }
 
 
-                    if (file.exists()) {
-                        BitmapAjaxCallback cb = new BitmapAjaxCallback();
-                        cb.targetWidth(500).rotate(true);
-                        aq.id(capturedImage).image(new File(file.getAbsolutePath()), true, 500, cb);
-                        //aq.id(imgCapturedimage).image(new File(listitem.get(position).getPost_image()), false, 500, cb);
-                    } else {
-
-                        if (file.exists()) {
-                            aq.ajax(file.getAbsolutePath(), File.class, new AjaxCallback<File>() {
-                                @Override
-                                public void callback(String url, File bm, AjaxStatus status) {
-
-                                    if (bm != null) {
-//                                        mCameraView.setVisibility(View.GONE);
-//                                        rl_bottom_capture.setVisibility(View.GONE);
-//                                        squareImage.setVisibility(View.VISIBLE);
-                                        BitmapAjaxCallback cb = new BitmapAjaxCallback();
-                                        cb.targetWidth(1000).rotate(true);
-                                        aq.id(capturedImage).image(bm, true, 500, cb);
-
-                                    } else {
-                                        capturedImage.setImageResource(R.mipmap.sign_up_project);
-                                    }
-                                }
-                            });
-                        } else {
-                            capturedImage.setImageResource(R.mipmap.sign_up_project);
-                        }
-                    }
-                    imageFile = file;
-//                    Intent intent = new Intent(CameraPostActivity.this, RecordAudioActivity.class);
-//                    intent.putExtra("file", file.toString());
-//                    startActivity(intent);
-
-//               Uri selectedImage= Uri.fromFile(file);
+//                    if (file.exists()) {
+//                        BitmapAjaxCallback cb = new BitmapAjaxCallback();
+//                        cb.targetWidth(500).rotate(true);
+//                        aq.id(capturedImage).image(new File(file.getAbsolutePath()), true, 500, cb);
+//                        //aq.id(imgCapturedimage).image(new File(listitem.get(position).getPost_image()), false, 500, cb);
+//                    } else {
 //
+//                        if (file.exists()) {
+//                            aq.ajax(file.getAbsolutePath(), File.class, new AjaxCallback<File>() {
+//                                @Override
+//                                public void callback(String url, File bm, AjaxStatus status) {
 //
+//                                    if (bm != null) {
+////                                        mCameraView.setVisibility(View.GONE);
+////                                        rl_bottom_capture.setVisibility(View.GONE);
+////                                        squareImage.setVisibility(View.VISIBLE);
+//                                        BitmapAjaxCallback cb = new BitmapAjaxCallback();
+//                                        cb.targetWidth(1000).rotate(true);
+//                                        aq.id(capturedImage).image(bm, true, 500, cb);
 //
-//                    try {
-//                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(CameraPostActivity.this.getContentResolver(), selectedImage);
-//
-//                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-//                        // Compress image to lower quality scale 1 - 100
-//                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-//                        byte[] image = stream.toByteArray();
-//
-//
-//                        // Create the ParseFile
-//
-//                        ParseFile parseFile = new ParseFile("postfile.jpg", image);
-//                        createPostImage(parseFile);
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
+//                                    } else {
+//                                        capturedImage.setImageResource(R.mipmap.sign_up_project);
+//                                    }
+//                                }
+//                            });
+//                        } else {
+//                            capturedImage.setImageResource(R.mipmap.sign_up_project);
+//                        }
 //                    }
+                    imageFile = file;
+                    Intent intent = new Intent(CameraPostActivity.this, RecordAudioActivity.class);
+
+                    intent.putExtra("file", imageFile.toString());
+
+                    startActivity(intent);
+                    finish();
+//
 
 
                 }
@@ -259,42 +232,6 @@ public class CameraPostActivity extends AppCompatActivity implements
 
     };
 
-    public static Bitmap rotate(Bitmap bitmap, float degrees) {
-        Matrix matrix = new Matrix();
-        matrix.postRotate(degrees);
-        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-    }
-
-    public static Bitmap flip(Bitmap bitmap, boolean horizontal, boolean vertical) {
-        Matrix matrix = new Matrix();
-        matrix.preScale(horizontal ? -1 : 1, vertical ? -1 : 1);
-        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-    }
-
-    public static Bitmap modifyOrientation(Bitmap bitmap, String image_absolute_path) throws IOException {
-        ExifInterface ei = new ExifInterface(image_absolute_path);
-        int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-
-        switch (orientation) {
-            case ExifInterface.ORIENTATION_ROTATE_90:
-                return rotate(bitmap, 90);
-
-            case ExifInterface.ORIENTATION_ROTATE_180:
-                return rotate(bitmap, 180);
-
-            case ExifInterface.ORIENTATION_ROTATE_270:
-                return rotate(bitmap, 270);
-
-            case ExifInterface.ORIENTATION_FLIP_HORIZONTAL:
-                return flip(bitmap, true, false);
-
-            case ExifInterface.ORIENTATION_FLIP_VERTICAL:
-                return flip(bitmap, false, true);
-
-            default:
-                return bitmap;
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -305,28 +242,43 @@ public class CameraPostActivity extends AppCompatActivity implements
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_camera);
-
+        mCameraView = (CameraView) findViewById(R.id.camera);
         aq = new AQuery(CameraPostActivity.this);
         marshMallowPermission = new MarshMallowPermission(CameraPostActivity.this);
         capturedImage = (ImageView) findViewById(R.id.capturedImage);
-        mCameraView = (CameraView) findViewById(R.id.camera);
+//        mCameraView = (CameraView) findViewById(R.id.camera);
+        customFonts = new CustomFonts(CameraPostActivity.this);
 
         txtNext = (TextView) findViewById(R.id.txtNext);
+        txtHeader = (TextView) findViewById(R.id.txtHeader);
+        txtHeader.setTypeface(customFonts.CabinBold);
+        txtNext.setTypeface(customFonts.CabinBold);
         rl_bottom_capture = (RelativeLayout) findViewById(R.id.rl_bottom_capture);
         // squareImage = (SquaredFrameLayout) findViewById(R.id.squareImage);
         take_picture = (ImageView) findViewById(R.id.take_picture);
         img_switchcam = (ImageView) findViewById(R.id.img_switchcam);
         imgback_camera = (ImageView) findViewById(R.id.imgback_camera);
         img_gallary = (ImageView) findViewById(R.id.img_gallary);
-        if (take_picture != null) {
-            take_picture.setOnClickListener(mOnClickListener);
-        }
+//        if (take_picture != null) {
+//            take_picture.setOnClickListener(mOnClickListener);
+//        }
+//
+        new SimpleTooltip.Builder(this)
+                .anchorView(take_picture)
+                .text("Tap to take a picture or press hold to record video")
+                .gravity(Gravity.TOP)
+
+                .animated(true)
+                .build()
+                .show();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayShowTitleEnabled(false);
         }
+        String workname = AppConstants.loadPreferences(CameraPostActivity.this, "workname");
+        txtHeader.setText(workname);
         img_switchcam.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -357,11 +309,6 @@ public class CameraPostActivity extends AppCompatActivity implements
         });
 
 
-//        public boolean onTouchEvent(MotionEvent event) {
-//            return gestureDetector.onTouchEvent(event);
-//        };
-
-
         take_picture.setOnLongClickListener(new View.OnLongClickListener() {
             @SuppressLint("MissingPermission")
             @Override
@@ -380,15 +327,8 @@ public class CameraPostActivity extends AppCompatActivity implements
         imgback_camera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mCameraView.getVisibility() == View.VISIBLE) {
-                    onBackPressed();
-                } else {
-                    mCameraView.setVisibility(View.VISIBLE);
-                    capturedImage.setVisibility(View.GONE);
-
-                    rl_bottom_capture.setVisibility(View.VISIBLE);
-
-                }
+//
+                finish();
             }
         });
 
@@ -398,9 +338,7 @@ public class CameraPostActivity extends AppCompatActivity implements
                 Log.e("imageFile", "imageFile==" + imageFile);
                 if (imageFile.exists()) {
                     Intent intent = new Intent(CameraPostActivity.this, RecordAudioActivity.class);
-
                     intent.putExtra("file", imageFile.toString());
-
                     startActivity(intent);
                 } else {
                     Toast.makeText(CameraPostActivity.this, "Please capture photo", Toast.LENGTH_SHORT).show();
@@ -472,17 +410,27 @@ public class CameraPostActivity extends AppCompatActivity implements
                 // This method is call for getting image from gallary
                 onSelectFromGalleryResult(data);
                 //    getdata(data);
-            } else if (requestCode == CAPTURE_MEDIA ) {
+            } else if (requestCode == CAPTURE_MEDIA) {
 
 
                 String filePath = data.getStringExtra(AnncaConfiguration.Arguments.FILE_PATH);
-                imageFile=new File(filePath);
+                imageFile = new File(filePath);
                 if (imageFile.exists()) {
-                    Intent intent = new Intent(CameraPostActivity.this, PostfeedActivity.class);
 
-                    intent.putExtra("file", filePath);
-                    intent.putExtra("post_type","3");;
+
+                    Intent intent = new Intent(CameraPostActivity.this, RecordAudioActivity.class);
+
+                    intent.putExtra("file", imageFile.toString());
+
                     startActivity(intent);
+                    finish();
+
+//                    Intent intent = new Intent(CameraPostActivity.this, PostfeedActivity.class);
+//
+//                    intent.putExtra("file", filePath);
+//                    intent.putExtra("post_type", "3");
+//
+//                    startActivity(intent);
                 } else {
                     Toast.makeText(CameraPostActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
                 }
@@ -511,94 +459,40 @@ public class CameraPostActivity extends AppCompatActivity implements
         File file = new File(selectedImagePath);
         mCameraView.setVisibility(View.GONE);
         rl_bottom_capture.setVisibility(View.GONE);
-        capturedImage.setVisibility(View.GONE);
-        if (file.exists()) {
-            BitmapAjaxCallback cb = new BitmapAjaxCallback();
-            cb.targetWidth(500).rotate(true);
-            aq.id(capturedImage).image(new File(file.getAbsolutePath()), true, 500, cb);
-            //aq.id(imgCapturedimage).image(new File(listitem.get(position).getPost_image()), false, 500, cb);
-        } else {
+        capturedImage.setVisibility(View.VISIBLE);
 
-            if (file.exists()) {
-                aq.ajax(file.getAbsolutePath(), File.class, new AjaxCallback<File>() {
-                    @Override
-                    public void callback(String url, File bm, AjaxStatus status) {
 
-                        if (bm != null) {
-//                                        mCameraView.setVisibility(View.GONE);
-//                                        rl_bottom_capture.setVisibility(View.GONE);
-//                                        squareImage.setVisibility(View.VISIBLE);
-                            BitmapAjaxCallback cb = new BitmapAjaxCallback();
-                            cb.targetWidth(1000).rotate(true);
-                            aq.id(capturedImage).image(bm, true, 500, cb);
-
-                        } else {
-                            capturedImage.setImageResource(R.mipmap.sign_up_project);
-                        }
-                    }
-                });
-            } else {
-                capturedImage.setImageResource(R.mipmap.sign_up_project);
-            }
-        }
         imageFile = file;
+        Intent intent = new Intent(CameraPostActivity.this, RecordAudioActivity.class);
 
+        intent.putExtra("file", imageFile.toString());
 
-//        try {
-//            Bitmap bitmap = MediaStore.Images.Media.getBitmap(CameraPostActivity.this.getContentResolver(), selectedImage);
+        startActivity(intent);
+        finish();
 //
-//            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-//            // Compress image to lower quality scale 1 - 100
-//            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-//            byte[] image = stream.toByteArray();
-//
-//
-//            // Create the ParseFile
-//
-//            ParseFile parseFile = new ParseFile("postfile.jpg", image);
-//            createPostImage(parseFile);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
 
     }
 
-    private void createPostImage(ParseFile parseFile) {
-
-        final ProgressDialog dialog = AppConstants.showProgressDialog(CameraPostActivity.this, "Please wait...");
-
-        ParseObject gameScore = new ParseObject("Post");
-        gameScore.put("user", ParseObject.createWithoutData("_User", ParseUser.getCurrentUser().getObjectId()));
-//
-        gameScore.put("text", "android post test");
-        gameScore.put("workspace", ParseObject.createWithoutData("WorkSpace", AppConstants.loadPreferences(CameraPostActivity.this, "workid")));
-
-        gameScore.put("postImage", parseFile);
-
-        gameScore.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (dialog.isShowing()) {
-                    dialog.dismiss();
-                }
-                if (e == null) {
-                    Toast.makeText(CameraPostActivity.this, "Success", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(CameraPostActivity.this, HomeFeedActivity.class);
-                    fileList();
-                    startActivity(intent);
-
-                } else {
-
-                    Toast.makeText(CameraPostActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-    }
 
     @Override
     protected void onResume() {
         super.onResume();
+        imageFile = null;
+        mCameraView.start();
+
+        if (take_picture != null) {
+            take_picture.setOnClickListener(mOnClickListener);
+        }
+
+
+        if (Build.VERSION.SDK_INT > 15) {
+            askForPermissions(new String[]{
+                            android.Manifest.permission.CAMERA,
+                            android.Manifest.permission.RECORD_AUDIO,
+                            android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                            android.Manifest.permission.READ_EXTERNAL_STORAGE},
+                    REQUEST_CAMERA_PERMISSIONS);
+        }
         if (mCameraView != null) {
             mCameraView.addCallback(mCallback);
         }

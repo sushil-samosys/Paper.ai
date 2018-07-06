@@ -41,7 +41,11 @@ public class VideoFullscreenActivity extends AppCompatActivity implements
 
                 videoView.setMediaController(mcontroller);
                 mcontroller.show();
+
                 videoView.setVideoPath(videoUrl);
+                if (acProgressFlower.isShowing()) {
+                    acProgressFlower.dismiss();
+                }
                 videoView.start();
 
             } catch (Exception e) {

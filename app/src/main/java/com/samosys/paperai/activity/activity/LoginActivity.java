@@ -62,6 +62,10 @@ public class LoginActivity extends AppCompatActivity {
 //        slackToken = AppConstants.loadPreferences(LoginActivity.this, "slack_token");
 
         findview();
+        AppConstants.savePreferences(LoginActivity.this, "projectID", "00");
+        AppConstants.savePreferences(LoginActivity.this, "workid", "00");
+
+
         txtForgot.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

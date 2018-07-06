@@ -10,7 +10,6 @@
       <module fileurl="file://$PROJECT_DIR$/autoplayvideorecyclerview/autoplayvideorecyclerview.iml" filepath="$PROJECT_DIR$/autoplayvideorecyclerview/autoplayvideorecyclerview.iml" />
       <module fileurl="file://$PROJECT_DIR$/library/library.iml" filepath="$PROJECT_DIR$/library/library.iml" />
       <module fileurl="file://$PROJECT_DIR$/material-viewpagerindicator/material-viewpagerindicator.iml" filepath="$PROJECT_DIR$/material-viewpagerindicator/material-viewpagerindicator.iml" />
-      <module fileurl="file://$PROJECT_DIR$/mentions/mentions.iml" filepath="$PROJECT_DIR$/mentions/mentions.iml" />
     </modules>
   </component>
 </project>

@@ -15,7 +15,6 @@
             <option value="$PROJECT_DIR$/autoplayvideorecyclerview" />
             <option value="$PROJECT_DIR$/library" />
             <option value="$PROJECT_DIR$/material-viewpagerindicator" />
-            <option value="$PROJECT_DIR$/mentions" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

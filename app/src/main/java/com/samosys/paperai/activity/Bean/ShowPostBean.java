@@ -24,6 +24,26 @@ public class ShowPostBean {
     String post_userID;
     String post_file;
 
+    public ShowPostBean(String username, ParseFile user_imge, String text, String objectId, String updatedAt, String createdAt, String post_image, String post_type, String tagUserId, String post_file_url, String userTag, int commentCount, int likesCount, String post_userID, String post_file) {
+
+        this.username = username;
+        this.user_imge = user_imge;
+
+        this.text = text;
+        this.objectId = objectId;
+        this.updatedAt = updatedAt;
+        this.createdAt = createdAt;
+        this.post_image = post_image;
+        this.post_type = post_type;
+        this.tagUserId = tagUserId;
+        this.post_file_url = post_file_url;
+        this.userTag = userTag;
+        this.CommentCount = commentCount;
+        this.likesCount = likesCount;
+        this.post_userID = post_userID;
+this.post_file=post_file;
+    }
+
     public ParseFile getUser_imge() {
         return user_imge;
     }
@@ -40,28 +60,28 @@ public class ShowPostBean {
         this.post_file = post_file;
     }
 
-    public ShowPostBean(String username, ParseFile user_imge, String text, String objectId, String updatedAt, String createdAt, String image, String post_type, String tagUserId, String post_file_url, String userTag, int commentCount, int likesCount, String post_userID, String post_file) {
-
-        this.username = username;
-        this.user_imge = user_imge;
-
-        this.text = text;
-        this.objectId = objectId;
-        this.updatedAt = updatedAt;
-        this.createdAt = createdAt;
-        this.post_image = image;
-        this.post_type = post_type;
-        this.tagUserId = tagUserId;
-        this.post_file_url = post_file_url;
-        this.userTag = userTag;
-        this.CommentCount = commentCount;
-        this.likesCount = likesCount;
-        this.post_userID = post_userID;
-this.post_file=post_file;
-
-
-
-    }
+//    public ShowPostBean(String username, ParseFile user_imge, String text, String objectId, String updatedAt, String createdAt, String image, String post_type, String tagUserId, String post_file_url, String userTag, int commentCount, int likesCount, String post_userID, String post_file) {
+//
+//        this.username = username;
+//        this.user_imge = user_imge;
+//
+//        this.text = text;
+//        this.objectId = objectId;
+//        this.updatedAt = updatedAt;
+//        this.createdAt = createdAt;
+//        this.post_image = image;
+//        this.post_type = post_type;
+//        this.tagUserId = tagUserId;
+//        this.post_file_url = post_file_url;
+//        this.userTag = userTag;
+//        this.CommentCount = commentCount;
+//        this.likesCount = likesCount;
+//        this.post_userID = post_userID;
+//this.post_file=post_file;
+//
+//
+//
+//    }
 
     public String getPost_image() {
         return post_image;

@@ -11,7 +11,17 @@
     <dimen name="ic_delete">30dp</dimen>
     <dimen name="thumbnail">90dp</dimen>
 
+    <dimen name="simpletooltip_overlay_offset">10dp</dimen>
+    <dimen name="simpletooltip_margin">10dp</dimen>
+    <dimen name="simpletooltip_padding">8dp</dimen>
+    <dimen name="simpletooltip_arrow_width">30dp</dimen>
+    <dimen name="simpletooltip_arrow_height">15dp</dimen>
+    <dimen name="simpletooltip_animation_padding">4dp</dimen>
+
+
+
     <dimen name="settings_toggle_width">44dp</dimen>
+
     <dimen name="settings_toggle_height">22dp</dimen>
     <dimen name="settings_toggle_circle_diameter">22dp</dimen>
     <dimen name="settings_toggle_circle_radius">11dp</dimen>

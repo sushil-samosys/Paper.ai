@@ -28,10 +28,10 @@
         android:name=".activity.utils.UILApplication"
         android:allowBackup="true"
         android:hardwareAccelerated="true"
-        android:icon="@mipmap/first_screen_logo"
+        android:icon="@mipmap/app_icon"
         android:label="@string/app_name"
         android:largeHeap="true"
-        android:roundIcon="@mipmap/first_screen_logo"
+        android:roundIcon="@mipmap/app_icon"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".activity.activity.SplashActivity">
@@ -127,6 +127,7 @@
         <activity
             android:name=".activity.activity.PostfeedActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize"
+
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity

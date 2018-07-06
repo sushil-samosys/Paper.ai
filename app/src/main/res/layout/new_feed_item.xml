@@ -4,14 +4,15 @@
     android:id="@+id/card_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_gravity="center"
     card_view:cardCornerRadius="4dp"
     card_view:cardElevation="@dimen/_5sdp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+
+        android:paddingTop="@dimen/_5sdp">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -101,27 +102,28 @@
             android:id="@+id/RL_imagefeed"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/lightGrey"
-            android:visibility="visible">
+
+            android:visibility="gone">
 
 
             <ImageView
                 android:id="@+id/feed_image"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_230sdp"
-                android:scaleType="centerCrop"
+                android:layout_height="wrap_content"
+                android:scaleType="fitXY"
                 android:visibility="gone" />
 
             <LinearLayout
                 android:id="@+id/ll_visual"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
+
+
                 android:layout_marginLeft="@dimen/_5sdp"
-                android:gravity="center"
+
                 android:orientation="horizontal"
                 android:paddingBottom="@dimen/_15sdp"
-                android:paddingTop="@dimen/_15sdp"
+
                 android:visibility="gone"
                 android:weightSum="1">
 
@@ -130,6 +132,7 @@
                     android:id="@+id/ib_play_pause_feed"
                     android:layout_width="0dp"
                     android:layout_height="@dimen/_30sdp"
+                    android:layout_gravity="center"
                     android:layout_weight="0.1"
                     android:background="@android:color/transparent"
                     android:contentDescription="@string/image_play_pause"
@@ -159,21 +162,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <VideoView
+
+                    <com.samosys.paperai.activity.FullVideoview.FullscreenVideoLayout
                         android:id="@+id/videoView"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center"
-
-                        android:layout_margin="2dp" />
+                        android:layout_height="match_parent" />
 
 
-                    <!--<com.samosys.paperai.activity.video_view.AAH_VideoImage-->
-                    <!--android:id="@+id/video_view"-->
-                    <!--android:layout_width="fill_parent"-->
-                    <!--android:layout_height="match_parent"-->
-                    <!--android:layout_alignParentLeft="true"-->
-                    <!--android:layout_alignParentRight="true" />-->
+
 
                     <ImageView
                         android:id="@+id/img_playback"
@@ -182,7 +178,7 @@
                         android:layout_gravity="bottom|right"
                         android:layout_margin="8dp"
                         android:src="@drawable/ic_pause"
-                        android:visibility="visible" />
+                        android:visibility="gone" />
 
 
                     <ImageView
@@ -193,7 +189,7 @@
                         android:layout_gravity="bottom"
                         android:padding="@dimen/_10sdp"
                         android:src="@mipmap/mute_button"
-                        android:visibility="visible" />
+                        android:visibility="gone" />
                 </android.support.v7.widget.CardView>
             </RelativeLayout>
 
@@ -214,22 +210,21 @@
             android:layout_marginTop="@dimen/_5sdp"
             android:gravity="left"
             android:maxLines="2"
-            android:visibility="gone"
             android:text="cgbgb"
             android:textColor="@color/black"
-            android:textSize="@dimen/_13sdp" />
+            android:textSize="@dimen/_13sdp"
+            android:visibility="gone" />
 
         <com.luseen.autolinklibrary.AutoLinkTextView
             android:id="@+id/post_text"
-            android:textSize="@dimen/_13sdp"
-            android:gravity="left"
-            android:maxLines="2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/_10sdp"
             android:layout_marginTop="@dimen/_5sdp"
+            android:gravity="left"
+            android:maxLines="2"
             android:textColor="@color/black"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
+            android:textSize="@dimen/_13sdp" />
 
 
         <TextView
@@ -327,9 +322,8 @@
             android:id="@+id/rl_commnet"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/_5sdp"
             android:layout_margin="@dimen/_5sdp"
-            >
+            android:layout_marginLeft="@dimen/_5sdp">
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/poster_image_comment"
