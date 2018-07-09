@@ -84,6 +84,8 @@ public class SearchWorkspace extends RecyclerView.Adapter<SearchWorkspace.Holder
                     @Override
                     public void done(ParseException e) {
                         if (e == null) {
+
+
                             Toast.makeText(context, "follow successfully", Toast.LENGTH_SHORT).show();
 //                            Intent intent = new Intent(context, HomeFeedActivity.class);
 //                            context.startActivity(intent);

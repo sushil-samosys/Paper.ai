@@ -136,7 +136,7 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
     private int img_height, img_width;
     private ArrayList<ProjctBean> projectList;
     private HashMap<String, List<String>> expandableListDetail;
-    private ArrayList<ParentBean> parentBeans = new ArrayList<>();
+    private ArrayList<ParentBean> parentBeans;
     private ArrayList<ChildBean> childBeans;
     private MediaRecorder mRecorder = null;
     private RelativeLayout rl_audioRecord;
@@ -549,8 +549,8 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                 AppConstants.savePreferences(HomeFeedActivity.this, "workid", workList.get(position).getObjectId());
                 AppConstants.savePreferences(HomeFeedActivity.this, "workname", workList.get(position).getWorkspace_name());
                 workspace_name.setText(First_Char_Capital.capitalizeString(workList.get(position).getWorkspace_name()));
-                getprojectlist();
 
+                AppConstants.workPOS=position;
 //                AppConstants.ALL =
                 adapter.setSelectedItem(position);
                 adapter.notifyDataSetChanged();
@@ -1117,7 +1117,7 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
 
 
     public void getprojectlist() {
-        childBeans = new ArrayList<>();
+
         childList.clear();
         expandableListDetail.clear();
         parentBeans.clear();
@@ -1167,7 +1167,7 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
 
                                     parentBeans.add(new ParentBean(objectId, name, type, strdefault, image, childBeans));
                                 } else {
-                                    if (strdefault.equals("2") && type.equals("1")) {
+                                    if (type.equals("1")) {
                                         projectList.add(new ProjctBean(objectId, name, updatedAt, workspaceID, objective, createdAt, image, type, objects.get(i), archive));
 
 
@@ -1330,10 +1330,12 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
     private void findview() {
         mRecorder = new MediaRecorder();
         postList = new ArrayList<>();
+        parentBeans=new ArrayList<>();
         projectList = new ArrayList<>();
         expandableListDetail = new HashMap<>();
         expandableListDetail.clear();
         childList = new ArrayList<>();
+        childBeans = new ArrayList<>();
         childList.clear();
         projectList.clear();
         scrollView = (NestedScrollView) findViewById(R.id.scrollView_feed);
@@ -1394,6 +1396,13 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
             {
                 requestPermissions(WRITE_EXTERNAL_STORAGE_PERMS, AUDIO_PERMISSION_REQUEST_CODE);
             } else {
+                if (NetworkAvailablity.chkStatus(HomeFeedActivity.this)) {
+                    getuserdata();
+                    getworkspaceList();
+
+                } else {
+                    Toast.makeText(HomeFeedActivity.this, "Please Check Your Internet Connection", Toast.LENGTH_SHORT).show();
+                }
 
             }
 

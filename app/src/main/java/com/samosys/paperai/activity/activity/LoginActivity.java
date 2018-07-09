@@ -103,7 +103,7 @@ public class LoginActivity extends AppCompatActivity {
         String pwd = edt_workpwd.getText().toString();
         if (email.equals("") || email == null) {
             Toast.makeText(this, "Please enter email", Toast.LENGTH_SHORT).show();
-        } else if (!AppConstants.isEmailValid(email)) {
+        } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             Toast.makeText(this, "Please enter valid email", Toast.LENGTH_SHORT).show();
         } else if (pwd.equals("") || pwd == null) {
             Toast.makeText(this, "Please enter password", Toast.LENGTH_SHORT).show();

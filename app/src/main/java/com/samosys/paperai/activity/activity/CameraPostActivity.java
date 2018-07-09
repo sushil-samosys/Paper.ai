@@ -418,9 +418,10 @@ public class CameraPostActivity extends AppCompatActivity implements
                 if (imageFile.exists()) {
 
 
-                    Intent intent = new Intent(CameraPostActivity.this, RecordAudioActivity.class);
+                    Intent intent = new Intent(CameraPostActivity.this, PostfeedActivity.class);
 
                     intent.putExtra("file", imageFile.toString());
+                    intent.putExtra("post_type", "3");
 
                     startActivity(intent);
                     finish();
@@ -478,7 +479,7 @@ public class CameraPostActivity extends AppCompatActivity implements
     protected void onResume() {
         super.onResume();
         imageFile = null;
-        mCameraView.start();
+//        mCameraView.start();
 
         if (take_picture != null) {
             take_picture.setOnClickListener(mOnClickListener);

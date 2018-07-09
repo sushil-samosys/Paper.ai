@@ -48,6 +48,7 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.samosys.paperai.R;
 import com.samosys.paperai.activity.AudioVisualizer.LineBarVisualizer;
+import com.samosys.paperai.activity.Bean.ParentBean;
 import com.samosys.paperai.activity.Bean.ProjctBean;
 import com.samosys.paperai.activity.Bean.WorkSpaceMemberBean;
 import com.samosys.paperai.activity.FullVideoview.FullscreenVideoLayout;
@@ -160,7 +161,7 @@ public class PostfeedActivity extends AppCompatActivity {
         RL_imagefeed = (RelativeLayout) findViewById(R.id.RL_imagefeed);
         // customMultiAutoComplete.onViewAttached(caption_txt);
         myVideoView.setShouldAutoplay(false);
-        initialize();
+
 
         mAudioManager = (AudioManager) PostfeedActivity.this.getSystemService(Context.AUDIO_SERVICE);
 
@@ -281,6 +282,7 @@ public class PostfeedActivity extends AppCompatActivity {
         ib_play_pause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                initialize();
                 if (mediaPlayer != null) {
                     if (mediaPlayer.isPlaying()) {
                         mediaPlayer.pause();
@@ -698,7 +700,7 @@ public class PostfeedActivity extends AppCompatActivity {
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Project");
 
         query.whereEqualTo("workspace", ParseObject.createWithoutData("WorkSpace", workid));
-
+        query.include("user");
         query.findInBackground(new FindCallback<ParseObject>() {
             public void done(List<ParseObject> objects, ParseException e) {
                 if (e == null) {
@@ -707,6 +709,11 @@ public class PostfeedActivity extends AppCompatActivity {
                         // parentBeans.clear();
                         Log.e("ProjectDATA", "d>>>>>" + objects.size());
                         for (int i = 0; i < objects.size(); i++) {
+
+                            ParseObject parseObject = objects.get(i).getParseObject("user");
+
+                            String objectId1 = parseObject.getObjectId();
+                            Log.e("objectId1", "d>>>>>" + objectId1);
 
                             String strdefault = "";
                             String objectId = objects.get(i).getObjectId();
@@ -725,13 +732,32 @@ public class PostfeedActivity extends AppCompatActivity {
 
                             Log.e("Project_IDDSs", name + ">>>>>>>>>" + archive);
 
-//                            if (!childList.contains(objectId)) {
-                            if (archive.equals("0") && strdefault.equals("2") && type.equals("1")) {
+//
+                            Log.e("Project_IDDSs", name + ">>>>>>>>>" + archive);
 
-                                projectList.add(new ProjctBean(objectId, name, updatedAt, workspaceID, objective, createdAt, image, type, objects.get(i), archive));
+                            if (archive.equals("0")) {
+                                if (objectId1.equals(ParseUser.getCurrentUser().getObjectId())) {
 
 
+                                    projectList.add(new ProjctBean(objectId, name, updatedAt, workspaceID, objective, createdAt, image, type, objects.get(i), archive));
+
+
+                                 } else {
+                                    if (type.equals("1")) {
+                                        projectList.add(new ProjctBean(objectId, name, updatedAt, workspaceID, objective, createdAt, image, type, objects.get(i), archive));
+
+
+                                     }
+                                }
                             }
+
+
+
+
+
+
+
+
 //                            }
 
                         }

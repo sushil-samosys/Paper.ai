@@ -28,6 +28,8 @@ import com.samosys.paperai.activity.utils.First_Char_Capital;
 
 import java.util.List;
 
+import cc.cloudist.acplibrary.ACProgressFlower;
+
 public class MyProfileActivity extends AppCompatActivity {
     CustomFonts customFonts;
     private String user_id = "";
@@ -91,6 +93,8 @@ public class MyProfileActivity extends AppCompatActivity {
     }
 
     private void getuserdata() {
+        final ACProgressFlower acProgressFlower=AppConstants.CustomshowProgressDialog(MyProfileActivity.this,"");
+        acProgressFlower.show();
 
         ParseQuery<ParseUser> query = ParseUser.getQuery();
         query.whereEqualTo("objectId", ParseUser.getCurrentUser().getObjectId());
@@ -133,6 +137,10 @@ public class MyProfileActivity extends AppCompatActivity {
                     }
                 } else {
                     Toast.makeText(MyProfileActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+
+                if (acProgressFlower.isShowing()){
+                    acProgressFlower.dismiss();
                 }
             }
         });

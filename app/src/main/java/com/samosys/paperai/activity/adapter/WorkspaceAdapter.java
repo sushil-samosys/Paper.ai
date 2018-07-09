@@ -78,6 +78,7 @@ public class WorkspaceAdapter extends RecyclerView.Adapter<WorkspaceAdapter.Hold
 
         Log.e("workspaceID", ">>>>>" + listitem.get(position).getObjectId());
         int pos = Integer.parseInt(AppConstants.loadPreferences(context, "position"));
+        Log.e("workspaceID", ">>>>>" + pos);
         if (pos == 0) {
 
             if (position == mSelectedItem) {
