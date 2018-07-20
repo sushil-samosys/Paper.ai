@@ -20,6 +20,10 @@
         <item name="android:paddingBottom">4dp</item>
     </style>
 
+
+    <style name="TranslucentDialog" parent="@android:style/Theme.DeviceDefault.Dialog.Alert">
+        <item name="android:colorBackground">#32FFFFFF</item>
+    </style>
     <style name="SwitchButtonStyleMD" parent="SwitchButtonMD">
         <item name="android:paddingLeft">10dp</item>
         <item name="android:paddingRight">10dp</item>
@@ -87,5 +91,14 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+
+    <style name="MyTheme" parent="android:Theme">
+        <item name="android:textViewStyle">@style/MyTextViewStyle</item>
+    </style>
+
+    <style name="MyTextViewStyle" parent="android:Widget.TextView">
+        <item name="android:textColor">@color/colorPrimaryDark</item>
+        <item name="android:textStyle">normal</item>
+    </style>
 
 </resources>

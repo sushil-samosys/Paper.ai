@@ -9,19 +9,19 @@ import com.parse.ParseObject;
 
 public class WorkspaceBean {
 
-    String objectId;
-    String user;
-    ParseObject userObj;
-    String mission;
-    String updatedAt;
-    String workspaceID;
-    String workspace_name;
-    String createdAt;
-    ParseFile image;
-    String user_name;
-    String workspace_url;
-    String ws_image;
-    String archive;
+    private String objectId;
+    private String user;
+    private ParseObject userObj;
+    private String mission;
+    private String updatedAt;
+    private String workspaceID;
+    private String workspace_name;
+    private String createdAt;
+    private ParseFile image;
+    private String user_name;
+    private String workspace_url;
+    private String ws_image;
+    private String archive;
 
     public WorkspaceBean(String objectId, ParseObject user, String mission, String updatedAt, String workspace_name, String createdAt, ParseFile image, String ws_image, String user_name, String workspace_url, String archive) {
 
@@ -36,8 +36,8 @@ public class WorkspaceBean {
         this.image = image;
         this.user_name = user_name;
         this.workspace_url = workspace_url;
-        this.ws_image=ws_image;
-        this.archive=archive;
+        this.ws_image = ws_image;
+        this.archive = archive;
 
     }
 
@@ -152,7 +152,6 @@ public class WorkspaceBean {
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
-
 
 
     public String getUser_name() {

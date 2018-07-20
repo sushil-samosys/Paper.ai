@@ -12,6 +12,7 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaRecorder;
 import android.os.Build;
@@ -36,6 +37,7 @@ import android.view.animation.OvershootInterpolator;
 import android.widget.Button;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -67,7 +69,6 @@ import com.samosys.paperai.activity.utils.AppConstants;
 import com.samosys.paperai.activity.utils.ArcLayout;
 import com.samosys.paperai.activity.utils.CircularProgressBar;
 import com.samosys.paperai.activity.utils.CustomFonts;
-import com.samosys.paperai.activity.utils.First_Char_Capital;
 import com.samosys.paperai.activity.utils.MarshMallowPermission;
 import com.samosys.paperai.activity.utils.NetworkAvailablity;
 import com.samosys.paperai.activity.utils.RecyclerTouchListener;
@@ -98,22 +99,17 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
     public static final int AUDIO_PERMISSION_REQUEST_CODE = 102;
     public static final String[] WRITE_EXTERNAL_STORAGE_PERMS = {
             Manifest.permission.RECORD_AUDIO};
-
     public static File file = null;
     public static int prog = 0;
-
     public ArrayList<CategoriesProjectbeanclass> categoriesProjectbeanclasses;
     public ImageView work_space_img, imgWorkSpaceSetting;
-    MarshMallowPermission marshMallowPermission;
-    NestedScrollView scrollView;
-    Intent recordService;
-    Picasso p;
-    AQuery aq;
-    CustomFonts customFonts;
-    RelativeLayout topWorkSpace;
-    FeedPostAdapter feedPostAdapter;
+    private Intent recordService;
+    private AQuery aq;
+    private CustomFonts customFonts;
+    private LinearLayout topWorkSpace;
+    private FeedPostAdapter feedPostAdapter;
     private ArrayList<String> childList;
-    private ImageView img_wrokspace, mypic, img_log, img_mic;
+    private ImageView mypic;
     private RecyclerView listView;
     private CircleImageView imgMenuIcon;
     private boolean mStartRecording = true;
@@ -138,9 +134,9 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
     private HashMap<String, List<String>> expandableListDetail;
     private ArrayList<ParentBean> parentBeans;
     private ArrayList<ChildBean> childBeans;
-    private MediaRecorder mRecorder = null;
     private RelativeLayout rl_audioRecord;
     private ACProgressFlower dialog;
+
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -151,10 +147,6 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         findview();
 
-        workList = new ArrayList<>();
-        p = Picasso.with(this);
-        LinearLayoutManager mLayoutManager = new LinearLayoutManager(this);
-        aq = new AQuery(HomeFeedActivity.this);
 
         for (int i = 0, size = arcLayout.getChildCount(); i < size; i++) {
             arcLayout.getChildAt(i).setOnClickListener(this);
@@ -183,13 +175,7 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                 startActivity(i);
             }
         });
-        img_log.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-
-            }
-        });
 
         project_expandableList.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
@@ -203,9 +189,8 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                 AppConstants.savePreferences(HomeFeedActivity.this, "workname", workList.get(AppConstants.workPOS).getWorkspace_name());
                 AppConstants.savePreferences(HomeFeedActivity.this, "projectID", parentBeans.get(childPosition).getCategoryId());
 
-                workspace_name.setText(First_Char_Capital.capitalizeString(workList.get(AppConstants.workPOS).getWorkspace_name()));
-                work_txt.setText(First_Char_Capital.capitalizeString(workList.get(AppConstants.workPOS).getMission()));
-                //  work_name.setText(First_Char_Capital.capitalizeString(workList.get(AppConstants.workPOS).getWorkspace_name()));
+                workspace_name.setText(workList.get(AppConstants.workPOS).getWorkspace_name());
+                work_txt.setText(workList.get(AppConstants.workPOS).getMission());
                 ParseFile parseFile = workList.get(AppConstants.workPOS).getImage();
                 String a = parseFile.getUrl();
                 if (workList.get(AppConstants.workPOS).getImage() != null) {
@@ -257,12 +242,11 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                         AppConstants.ALL = false;
 
 
-                        workspace_name.setText(First_Char_Capital.capitalizeString(parentBeans.get(groupPosition).getCategoryName()));
-                        work_txt.setText(First_Char_Capital.capitalizeString(workList.get(AppConstants.workPOS).getMission()));
-                        work_title.setText(First_Char_Capital.capitalizeString(workList.get(AppConstants.workPOS).getWorkspace_name()));
+                        workspace_name.setText(parentBeans.get(groupPosition).getCategoryName());
+                        work_txt.setText(workList.get(AppConstants.workPOS).getMission());
+                        work_title.setText(workList.get(AppConstants.workPOS).getWorkspace_name());
 
                         String img = parentBeans.get(groupPosition).getImage();
-                        Log.e("FileAMAN", "" + img);
                         if (parentBeans.get(groupPosition).getImage() != null) {
 
                             Picasso.with(HomeFeedActivity.this)
@@ -325,7 +309,6 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                 AppConstants.ALL = true;
                 postList.clear();
                 getfeedpost();
-//                feedPostAdapter.notifyDataSetChanged();
                 drawerLayout.closeDrawers();
 
             }
@@ -383,6 +366,8 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
 
             }
         });
+
+
         rl_audioRecord.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -390,15 +375,24 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
-                    if (!marshMallowPermission.checkPermissionForRecord()) {
-                        marshMallowPermission.requestPermissionForRecord();
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                            checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, AUDIO_PERMISSION_REQUEST_CODE);
+
                     } else {
-                        //  showDialog();
+
                         switch (event.getAction()) {
                             case MotionEvent.ACTION_DOWN:
 
 
                                 prog = 0;
+//                                circularProgressBar.requestLayout();
+
+//                                box5TextView.setTextSize(
+//                                        TypedValue.COMPLEX_UNIT_PX,
+//                                        getResources().getDimension(R.dimen._23sdp));
+
+
                                 //  if (prog == 1) {
 
                                 onRecord(mStartRecording);
@@ -413,15 +407,20 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                                                 // Your code
 
                                                 prog++;
+                                                if (prog == 1) {
+                                                    rl_audioRecord.requestLayout();
+                                                    rl_audioRecord.getLayoutParams().height = ((int) getResources().getDimension(R.dimen._70sdp));
+
+                                                }
                                                 if (prog <= 60) {
                                                     circularProgressBar.setProgress(prog);
-                                                    Log.e("PROGRESS22", prog + "");
+
 
                                                 } else {
                                                     img_addpost.setVisibility(View.VISIBLE);
                                                     pro_free.setVisibility(View.VISIBLE);
                                                     rl_audioRecord.setVisibility(View.INVISIBLE);
-
+                                                    prog = 0;
                                                     circularProgressBar.setProgress(0);
                                                     stopRecording();
 
@@ -430,18 +429,18 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                                             }
                                         });
                                     }
-                                }, 1000, 1000);
+                                }, 100, 1000);
 
 
                                 return true; // if you want to handle the touch event
                             case MotionEvent.ACTION_UP:
-                                //    prog = 0;
+                                prog = 0;
                                 timer.cancel();
                                 pro_free.setVisibility(View.VISIBLE);
                                 img_addpost.setVisibility(View.VISIBLE);
                                 rl_audioRecord.setVisibility(View.INVISIBLE);
                                 Log.e("PROGRESS11", prog + "");
-//                                circularProgressBar.setProgress(0);
+                                circularProgressBar.setProgress(0);
                                 stopRecording();
                                 // RELEASED
                                 return true; // if you want to handle the touch event
@@ -458,6 +457,8 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
 
                             onRecord(mStartRecording);
                             mStartRecording = !mStartRecording;
+
+//                            circularProgressBar.requestLayout();
                             // }
                             timer = new Timer();
                             timer.schedule(new TimerTask() {
@@ -466,7 +467,11 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                                         @Override
                                         public void run() {
                                             // Your code
+                                            if (prog == 1) {
+                                                rl_audioRecord.requestLayout();
+                                                rl_audioRecord.getLayoutParams().height = ((int) getResources().getDimension(R.dimen._70sdp));
 
+                                            }
                                             prog++;
                                             if (prog <= 60) {
                                                 circularProgressBar.setProgress(prog);
@@ -476,7 +481,7 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                                                 pro_free.setVisibility(View.VISIBLE);
                                                 img_addpost.setVisibility(View.VISIBLE);
                                                 rl_audioRecord.setVisibility(View.INVISIBLE);
-
+                                                prog = 0;
                                                 circularProgressBar.setProgress(0);
                                                 stopRecording();
                                                 timer.cancel();
@@ -484,16 +489,15 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                                         }
                                     });
                                 }
-                            }, 1000, 1000);
+                            }, 100, 1000);
 
 
                             return true; // if you want to handle the touch event
                         case MotionEvent.ACTION_UP:
-                            //+  prog = 0;
+                            prog = 0;
                             timer.cancel();
                             stopService(recordService);
                             pro_free.setVisibility(View.VISIBLE);
-
                             img_addpost.setVisibility(View.VISIBLE);
                             rl_audioRecord.setVisibility(View.INVISIBLE);
                             Log.e("PROGRESS11", prog + "");
@@ -526,8 +530,6 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
             @Override
             public void onClick(View v) {
 
-
-                //openworkspaceSheet();
                 createnBrowseworkspace();
                 drawerLayout.closeDrawers();
             }
@@ -548,13 +550,11 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                 expandableListDetail.clear();
                 AppConstants.savePreferences(HomeFeedActivity.this, "workid", workList.get(position).getObjectId());
                 AppConstants.savePreferences(HomeFeedActivity.this, "workname", workList.get(position).getWorkspace_name());
-                workspace_name.setText(First_Char_Capital.capitalizeString(workList.get(position).getWorkspace_name()));
+                workspace_name.setText(workList.get(position).getWorkspace_name());
 
-                AppConstants.workPOS=position;
-//                AppConstants.ALL =
+                AppConstants.workPOS = position;
                 adapter.setSelectedItem(position);
                 adapter.notifyDataSetChanged();
-//                getfeedpost();
 
 
             }
@@ -592,18 +592,13 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
 
     private void createnBrowseworkspace() {
         ActionSheet actionSheet = new ActionSheet.Builder()
-                // .setTitle("Title", Color.BLUE)
-                //.setTitleTextSize(20)
-                .setOtherBtn(new String[]{"Create Workspace", "Browse Other Workspace"}, new int[]{Color.parseColor("#2dc8bc"), Color.parseColor("#2dc8bc")})
 
-                //.setOtherBtnSubTextSize(20)
+                .setOtherBtn(new String[]{"Create Workspace", "Browse Other Workspace"}, new int[]{Color.parseColor("#2dc8bc"), Color.parseColor("#2dc8bc")})
                 .setCancelBtn("Cancel", Color.parseColor("#2dc8bc"))
-                //.setCancelBtnTextSize(30)
                 .setCancelableOnTouchOutside(true)
                 .setActionSheetListener(new ActionSheet.ActionSheetListener() {
                     @Override
                     public void onDismiss(ActionSheet actionSheet, boolean isByBtn) {
-                        // Toast.makeText(HomeFeedActivity.this, "onDismiss: " + isByBtn, Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -620,7 +615,6 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                         }
 
 
-                        //  Toast.makeText(HomeFeedActivity.this, "onButtonClicked: " + index, Toast.LENGTH_SHORT).show();
                     }
                 }).build();
 
@@ -628,49 +622,6 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
     }
 
 
-    private void converttexttospeech(File file) {
-
-        String url = "https://paprspeechtotext.azurewebsites.net/api/Recognize?code=esVh5fZUJUqnm6N4JeW7FofYCmNL9ltW7fxpfOSIzq3m0VrlaRI3YA==";
-
-
-        AjaxCallback<JSONObject> cb = new AjaxCallback<JSONObject>() {
-
-            @Override
-            public void callback(String url, JSONObject html, AjaxStatus status) {
-
-                Log.e("APIRESPONSE", ">>>>>" + url);
-                Log.e("APIRESPONSE", ">>>>>" + html);
-                Log.e("APIRESPONSE", ">>>>>" + status);
-
-
-            }
-
-
-        };
-//        "content-type": "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW",
-//                "token": "b79f0858-f00f-4b8e-9341-75b37cc85a61",
-//                "cache-control": "no-cache",
-//                "postman-token": "cf97286b-a623-8cf0-1fee-c6e75ebd2887"
-
-
-//        Content-Type: application/x-www-form-urlencoded
-        cb.header("token", "b79f0858-f00f-4b8e-9341-75b37cc85a61");
-//        cb.header("content-type", "multipart/form-data");
-////        cb.header("Content-Type", "application/x-www-form-urlencoded");
-//        cb.header("boundary", "----WebKitFormBoundary7MA4YWxkTrZu0gW");
-//        cb.header("Cache-Control", "no-cache");
-////        cb.header("Postman-Token", "cf97286b-a623-8cf0-1fee-c6e75ebd2887");
-//        Log.e("FILANMEEeee", ">>>>>" + cb);
-        Map<String, Object> params = new HashMap<String, Object>();
-        params.put("AudioFile", file);
-        params.put("AudioType", "audio/m4a");
-        params.put("Model_ID", "43442cfe-6d3f-4a65-a268-e0eff02ebc53");
-
-        cb.params(params);
-
-
-        aq.ajax(url, JSONObject.class, cb);
-    }
 
     private void stopRecording() {
 
@@ -710,20 +661,19 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
         final String workid = AppConstants.loadPreferences(HomeFeedActivity.this, "workid");
         final String workname = AppConstants.loadPreferences(HomeFeedActivity.this, "workname");
         ActionSheet actionSheet = new ActionSheet.Builder()
-                // .setTitle("Title", Color.BLUE)
-                //.setTitleTextSize(20)
+
                 .setOtherBtn(new String[]{"Workspace Settings", "Category Settings", "Channel Settings", "Notification Settings"}, new int[]{Color.parseColor("#2dc8bc"), Color.parseColor("#2dc8bc"),
                         Color.parseColor("#2dc8bc"),
                         Color.parseColor("#2dc8bc")})
 
-                //.setOtherBtnSubTextSize(20)
+
                 .setCancelBtn("Cancel", Color.parseColor("#2dc8bc"))
-                //.setCancelBtnTextSize(30)
+
                 .setCancelableOnTouchOutside(true)
                 .setActionSheetListener(new ActionSheet.ActionSheetListener() {
                     @Override
                     public void onDismiss(ActionSheet actionSheet, boolean isByBtn) {
-                        // Toast.makeText(HomeFeedActivity.this, "onDismiss: " + isByBtn, Toast.LENGTH_SHORT).show();
+
                     }
 
                     @Override
@@ -747,7 +697,6 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                         }
 
 
-                        //  Toast.makeText(HomeFeedActivity.this, "onButtonClicked: " + index, Toast.LENGTH_SHORT).show();
                     }
                 }).build();
 
@@ -758,36 +707,38 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == 1111) {
-            File folder = new File(Environment.getExternalStorageDirectory(), "/Sounds");
-            long folderModi = folder.lastModified();
-
-            FilenameFilter filter = new FilenameFilter() {
-                public boolean accept(File dir, String name) {
-                    return (name.endsWith("3gp"));
-                }
-            };
-
-            File[] folderList = folder.listFiles(filter);
-
-            String recentName = "";
-
-            for (int i = 0; i < folderList.length; i++) {
-                long fileModi = folderList[i].lastModified();
-
-                if (folderModi == fileModi) {
-                    recentName = folderList[i].getName();
-                }
-            }
-
-            Log.e("FILANMEEeee", recentName);
-        }
+//        if (requestCode == 1111) {
+//            File folder = new File(Environment.getExternalStorageDirectory(), "/Sounds");
+//            long folderModi = folder.lastModified();
+//
+//            FilenameFilter filter = new FilenameFilter() {
+//                public boolean accept(File dir, String name) {
+//                    return (name.endsWith("3gp"));
+//                }
+//            };
+//
+//            File[] folderList = folder.listFiles(filter);
+//
+//            String recentName = "";
+//
+//            for (int i = 0; i < folderList.length; i++) {
+//                long fileModi = folderList[i].lastModified();
+//
+//                if (folderModi == fileModi) {
+//                    recentName = folderList[i].getName();
+//                }
+//            }
+//
+//
+//        }
     }
 
 
     @Override
     protected void onResume() {
         super.onResume();
+        rl_audioRecord.invalidate();
+        rl_audioRecord.getLayoutParams().height = ((int) getResources().getDimension(R.dimen._60sdp));
 
 
     }
@@ -824,12 +775,10 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                                 String image = objects.get(i).getString("image");
                                 String type = objects.get(i).getString("type");
 
-                                Log.e("CATEGRORY", "d>>>>>" + objectId);
-                                //  parentBeans.add(new ParentBean(objectId, name, type, strdefault, childBeans));
+
                             }
 //
                         }
-//                        projectAdapter.notifyDataSetChanged();
 
                     } catch (NullPointerException ea) {
                         ea.printStackTrace();
@@ -837,10 +786,9 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                 } else {
                     Toast.makeText(HomeFeedActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
 
-                    Log.e("lse", e.getMessage());
-                    // error
+
                 }
-                //getcatogory();
+
 
 
             }
@@ -870,9 +818,9 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                             String cat_name = objects.get(i).getString("name");
                             String cat_id = objects.get(i).getObjectId();
                             JSONArray jsonArray = objects.get(i).getJSONArray("Projects");
-//                            Log.e("CategoryAMANANA", "d>>>>>" + jsonArray.length());
+//
                             for (int a = 0; a < jsonArray.length(); a++) {
-                                //Log.e("CategoryAMANANA", "d>>>>>" + jsonArray.toString());
+
                                 childBeans = new ArrayList<>();
 
                                 JSONArray jsonArray1 = jsonArray.getJSONArray(a);
@@ -894,12 +842,10 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                                         strdefault = objects.get(i).getString("default");
 
 
-                                        //  categoriesProjectbeanclasses.add(new CategoriesProjectbeanclass(name, objective, createdAt, updatedAt, catProjectobjectId, type));
 
                                         childBeans.add(new ChildBean(catProjectobjectId, name, updatedAt,
                                                 objective, createdAt, type, strdefault));
                                     } else {
-                                        //  categoriesProjectbeanclasses.add(new CategoriesProjectbeanclass(name, objective, createdAt, updatedAt, catProjectobjectId, type));
 
 
                                         childBeans.add(new ChildBean(catProjectobjectId, name, updatedAt,
@@ -910,7 +856,6 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                                 }
                             }
 
-//                            getprojectlist(objectId,cat_name,cat_id);
 
                             parentBeans.add(new ParentBean(cat_id, cat_name, "", "", "", childBeans));
                         }
@@ -935,9 +880,6 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                 for (int a = 0; a < childList.size(); a++) {
 
                     if (childList.contains(parentBeans.get(a).getCategoryId())) {
-
-                        Log.e("INLOOOP", parentBeans.get(a).getCategoryId() + "");
-
                         parentBeans.remove(a);
                     }
                 }
@@ -1010,11 +952,10 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                             if (a == 0) {
 
 
-                                workspace_name.setText(First_Char_Capital.capitalizeString(workList.get(a).getWorkspace_name()));
-                                work_txt.setText(First_Char_Capital.capitalizeString(workList.get(a).getMission()));
-                                work_title.setText(First_Char_Capital.capitalizeString(workList.get(a).getWorkspace_name()));
+                                workspace_name.setText(workList.get(a).getWorkspace_name());
+                                work_txt.setText(workList.get(a).getMission());
+                                work_title.setText(workList.get(a).getWorkspace_name());
 
-                                //  work_name.setText(First_Char_Capital.capitalizeString(workList.get(a).getWorkspace_name()));
                                 ParseFile parseFile = workList.get(a).getImage();
                                 String newimage = parseFile.getUrl();
                                 if (newimage != null) {
@@ -1045,9 +986,9 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
 
                             AppConstants.savePreferences(HomeFeedActivity.this, "position", "" + a);
 
-                            workspace_name.setText(First_Char_Capital.capitalizeString(workList.get(a).getWorkspace_name()));
-                            work_txt.setText(First_Char_Capital.capitalizeString(workList.get(a).getMission()));
-                            work_title.setText(First_Char_Capital.capitalizeString(workList.get(a).getWorkspace_name()));
+                            workspace_name.setText(workList.get(a).getWorkspace_name());
+                            work_txt.setText(workList.get(a).getMission());
+                            work_title.setText(workList.get(a).getWorkspace_name());
                             ParseFile parseFile = workList.get(a).getImage();
                             String newimage = parseFile.getUrl();
                             if (newimage != null) {
@@ -1310,27 +1251,13 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
-//    public void scrollToPosition(final int position) {
-//        if (Rv_feed_post != null) {
-//     this.getHandler().post(new Runnable() {
-//                @Override
-//                public void run() {
-//                    Rv_feed_post.scrollToPosition(position);
-//                    if (position == 0) {
-//                        LinearLayoutManager layoutManager = (LinearLayoutManager) Rv_feed_post.getLayoutManager();
-//                        layoutManager.scrollToPositionWithOffset(0, 0);
-//                        scrollView.fullScroll(View.FOCUS_UP);
-//                    }
-//                }
-//            });
-//        }
-//    }
+
 
 
     private void findview() {
-        mRecorder = new MediaRecorder();
+
         postList = new ArrayList<>();
-        parentBeans=new ArrayList<>();
+        parentBeans = new ArrayList<>();
         projectList = new ArrayList<>();
         expandableListDetail = new HashMap<>();
         expandableListDetail.clear();
@@ -1338,8 +1265,9 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
         childBeans = new ArrayList<>();
         childList.clear();
         projectList.clear();
-        scrollView = (NestedScrollView) findViewById(R.id.scrollView_feed);
-        marshMallowPermission = new MarshMallowPermission(HomeFeedActivity.this);
+        workList = new ArrayList<>();
+        LinearLayoutManager mLayoutManager = new LinearLayoutManager(this);
+        aq = new AQuery(HomeFeedActivity.this);
         rl_audioRecord = (RelativeLayout) findViewById(R.id.Rl_audioRecord);
         categoriesProjectbeanclasses = new ArrayList<>();
         postList.clear();
@@ -1353,11 +1281,9 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
         img_progrss_projct = (ProgressBar) findViewById(R.id.img_progrss_projct);
         project_expandableList = (ExpandableListView) findViewById(R.id.project_expandableList);
         btn_addworkspace = (ImageView) findViewById(R.id.btn_addworkspace);
-        img_mic = (ImageView) findViewById(R.id.img_mic);
         btn_text = (Button) findViewById(R.id.btn_text);
         listView = (RecyclerView) findViewById(R.id.listView);
         listView.setNestedScrollingEnabled(false);
-        img_wrokspace = (ImageView) findViewById(R.id.img_wrokspace);
         imgMenuIcon = (CircleImageView) findViewById(R.id.imgMenuIcon);
         work_space_img = (ImageView) findViewById(R.id.work_space_img);
         imgWorkSpaceSetting = (ImageView) findViewById(R.id.imgWorkSpaceSetting);
@@ -1369,20 +1295,22 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
         txtfollow = (TextView) findViewById(R.id.txtfollow);
         txtMember = (TextView) findViewById(R.id.txtMember);
         workspace_name = (TextView) findViewById(R.id.workspace_name);
-        topWorkSpace = (RelativeLayout) findViewById(R.id.topWorkSpace);
+        topWorkSpace = (LinearLayout) findViewById(R.id.topWorkSpace);
         Rv_feed_post.setNestedScrollingEnabled(false);
 
         drawerLayout = (DrawerLayout) findViewById(R.id.drawerLayout);
-//        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-        img_log = (ImageView) findViewById(R.id.img_log);
+
         mypic = (ImageView) findViewById(R.id.mypic);
         img_addpost = (ImageView) findViewById(R.id.img_addpost);
         arcLayout = (ArcLayout) findViewById(R.id.arc_layout);
         menuLayout = findViewById(R.id.menu_layout);
-        // work_name.setTypeface(customFonts.CabinBold);
         workspace_name.setTypeface(customFonts.CabinBold);
+        txtNoPost.setTypeface(customFonts.calibri);
+        txtfollow.setTypeface(customFonts.calibri);
+        txtMember.setTypeface(customFonts.calibri);
+
         work_title.setTypeface(customFonts.CabinBold);
-        work_txt.setTypeface(customFonts.CabinRegular);
+        work_txt.setTypeface(customFonts.CabinBold);
 
         initialize();
     }
@@ -1442,9 +1370,11 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
 
 //                            ParseObject user = ParseObject.createWithoutData("WorkSpace", "user");
                             ParseObject parseObject = objects.get(i).getParseObject("workspace");
+//                            if (parseObject != null) {
+
 
                             String objectId = parseObject.getObjectId();
-                            Log.e("workspace_n12", objectId);
+//                            Log.e("workspace_n12", objectId);
                             String mission = parseObject.getString("mission");
                             String updatedAt = parseObject.getUpdatedAt().toString();
                             String workspace_n = parseObject.getString("workspace_name");
@@ -1463,6 +1393,7 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                                 workList.add(new WorkspaceBean(objectId, parseObject, mission, updatedAt, workspace_n, createdAt, image, ws_image, user_name, workspace_url, archive));
 
                             }
+//                            }
 
 
                         }
@@ -1473,6 +1404,7 @@ public class HomeFeedActivity extends AppCompatActivity implements View.OnClickL
                         listView.setLayoutManager(layoutManager);
                         listView.setAdapter(adapter);
                         adapter.notifyDataSetChanged();
+
 
                     }
 

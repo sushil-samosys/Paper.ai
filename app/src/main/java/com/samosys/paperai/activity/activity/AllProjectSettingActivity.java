@@ -33,22 +33,22 @@ import cc.cloudist.acplibrary.ACProgressFlower;
 import cn.zjy.actionsheet.ActionSheet;
 
 public class AllProjectSettingActivity extends AppCompatActivity {
-    RelativeLayout rlAdminsonly, rlmembersonly, rlEveryonesonly;
-    ImageView ImgEveryonesonly, Imgmembersonly, ImgAdminsonly;
-    String proID = "", workID = "";
-    TextView txtCrewatePro;
-    RecyclerView rvChannels;
-    ArchiveProjectAdapter adapter;
+    private RelativeLayout rlAdminsonly, rlmembersonly, rlEveryonesonly;
+    private ImageView ImgEveryonesonly, Imgmembersonly, ImgAdminsonly;
+    private String proID = "", workID = "";
+    private TextView txtCrewatePro;
+    private RecyclerView rvChannels;
+    private ArchiveProjectAdapter adapter;
     private ArrayList<ProjctBean> projectList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_archive_project);
         AppConstants.getstatusbar(AllProjectSettingActivity.this);
-        projectList = new ArrayList<>();
-        workID = AppConstants.loadPreferences(AllProjectSettingActivity.this, "workid");
+
         findview();
-        proID = getIntent().getStringExtra("id");
+
         rlAdminsonly.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -106,18 +106,16 @@ public class AllProjectSettingActivity extends AppCompatActivity {
 
     private void delete(final int position) {
         ActionSheet actionSheet = new ActionSheet.Builder()
-                // .setTitle("Title", Color.BLUE)
-                //.setTitleTextSize(20)
                 .setOtherBtn(new String[]{"Archive Project", "View Project"}, new int[]{Color.parseColor("#4C4C4C"), Color.parseColor("#4C4C4C")})
 
-                //.setOtherBtnSubTextSize(20)
+
                 .setCancelBtn("Cancel", Color.parseColor("#4C4C4C"))
-                //.setCancelBtnTextSize(30)
+
                 .setCancelableOnTouchOutside(true)
                 .setActionSheetListener(new ActionSheet.ActionSheetListener() {
                     @Override
                     public void onDismiss(ActionSheet actionSheet, boolean isByBtn) {
-                        // Toast.makeText(HomeFeedActivity.this, "onDismiss: " + isByBtn, Toast.LENGTH_SHORT).show();
+
                     }
 
                     @Override
@@ -132,8 +130,6 @@ public class AllProjectSettingActivity extends AppCompatActivity {
                             startActivity(intent);
                         }
 
-
-                        //  Toast.makeText(HomeFeedActivity.this, "onButtonClicked: " + index, Toast.LENGTH_SHORT).show();
                     }
                 }).build();
 
@@ -175,19 +171,17 @@ public class AllProjectSettingActivity extends AppCompatActivity {
     }
 
     private void getprojectlist() {
-
         final ACProgressFlower dialog = new ACProgressFlower.Builder(this)
                 .direction(ACProgressConstant.DIRECT_CLOCKWISE)
                 .themeColor(Color.WHITE)
 
                 .fadeColor(Color.DKGRAY).build();
         dialog.show();
-        // load data here
         projectList.clear();
 
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Project");
-//        query.whereEqualTo("workspaceID", workID);
+
         query.whereEqualTo("workspace", ParseObject.createWithoutData("WorkSpace", workID));
         query.findInBackground(new FindCallback<ParseObject>() {
             public void done(List<ParseObject> objects, ParseException e) {
@@ -207,11 +201,11 @@ public class AllProjectSettingActivity extends AppCompatActivity {
                         String type = objects.get(i).getString("type");
                         String archive = objects.get(i).getString("archive");
 
-                        //childList.add("")
+
                         if (objects.get(i).has("default")) {
                             String state = objects.get(i).getString("default");
 
-                            // projectList.add(new ProjctBean(objectId, name, updatedAt, workspaceID, objective, createdAt, proImage, type, objects.get(i), archive));
+
                         } else {
                             if (archive.equals("0")) {
                                 projectList.add(new ProjctBean(objectId, name, updatedAt, workspaceID, objective, createdAt, proImage, type, objects.get(i), archive));
@@ -222,18 +216,12 @@ public class AllProjectSettingActivity extends AppCompatActivity {
                     adapter = new ArchiveProjectAdapter(AllProjectSettingActivity.this, projectList, "");
                     RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(AllProjectSettingActivity.this);
                     rvChannels.setLayoutManager(layoutManager);
-                    // listChannels.addItemDecoration(new SimpleDividerItemDecoration(ArchiveWorkspaceActivity.this));
                     rvChannels.setAdapter(adapter);
-
-
                     adapter.notifyDataSetChanged();
 
 
                 } else {
                     Toast.makeText(AllProjectSettingActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-
-                    Log.e("lse", "" + e.getMessage());
-                    // error
                 }
                 if (dialog.isShowing()) {
                     dialog.dismiss();
@@ -245,6 +233,9 @@ public class AllProjectSettingActivity extends AppCompatActivity {
     }
 
     private void findview() {
+        proID = getIntent().getStringExtra("id");
+        projectList = new ArrayList<>();
+        workID = AppConstants.loadPreferences(AllProjectSettingActivity.this, "workid");
         rlAdminsonly = (RelativeLayout) findViewById(R.id.rlAdminsonly);
         rlmembersonly = (RelativeLayout) findViewById(R.id.rlmembersonly);
         rlEveryonesonly = (RelativeLayout) findViewById(R.id.rlEveryonesonly);
@@ -252,6 +243,6 @@ public class AllProjectSettingActivity extends AppCompatActivity {
         Imgmembersonly = (ImageView) findViewById(R.id.Imgmembersonly);
         ImgAdminsonly = (ImageView) findViewById(R.id.ImgAdminsonly);
         rvChannels = (RecyclerView) findViewById(R.id.rvChannels);
-        txtCrewatePro=(TextView)findViewById(R.id.txtCrewatePro);
+        txtCrewatePro = (TextView) findViewById(R.id.txtCrewatePro);
     }
 }

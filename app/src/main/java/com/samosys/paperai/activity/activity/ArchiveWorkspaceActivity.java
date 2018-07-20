@@ -34,15 +34,15 @@ import cc.cloudist.acplibrary.ACProgressConstant;
 import cc.cloudist.acplibrary.ACProgressFlower;
 import cn.zjy.actionsheet.ActionSheet;
 
-public class ArchiveWorkspaceActivity extends AppCompatActivity{
-    CustomFonts customFonts;
-    RecyclerView listChannels;
-    String workID = "";
-    TextView txtsave;
-    SwitchButton toglBtn;
-    String toggle = "";
-    ImageView archiveWStback;
-    ArchiveProjectAdapter adapter;
+public class ArchiveWorkspaceActivity extends AppCompatActivity {
+    private CustomFonts customFonts;
+    private RecyclerView listChannels;
+    private String workID = "";
+    private TextView txtsave;
+    private SwitchButton toglBtn;
+    private String toggle = "";
+    private ImageView archiveWStback;
+    private ArchiveProjectAdapter adapter;
     private TextView txtEntiretxt, txtChaneelstxt, txt_msg1, txt_msg2;
     private ArrayList<ProjctBean> projectList;
 
@@ -51,8 +51,7 @@ public class ArchiveWorkspaceActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_archive_workspace);
         AppConstants.getstatusbar(ArchiveWorkspaceActivity.this);
-        projectList = new ArrayList<>();
-        workID = AppConstants.loadPreferences(ArchiveWorkspaceActivity.this, "workid");
+
         Findviews();
 
         listChannels.addOnItemTouchListener(new RecyclerTouchListener(ArchiveWorkspaceActivity.this, listChannels, new RecyclerTouchListener.ClickListener() {
@@ -76,11 +75,10 @@ public class ArchiveWorkspaceActivity extends AppCompatActivity{
 
                     toggle = "1";
 
-                    Log.e("toggle>>", ">" + toggle);
+
                 } else {
                     toggle = "0";
 
-                    Log.e("toggle22>>", "22>" + toggle);
 
                 }
             }
@@ -108,29 +106,25 @@ public class ArchiveWorkspaceActivity extends AppCompatActivity{
 
     private void delete(final int position) {
         ActionSheet actionSheet = new ActionSheet.Builder()
-                // .setTitle("Title", Color.BLUE)
-                //.setTitleTextSize(20)
-                .setOtherBtn(new String[]{"Retrive Project"}, new int[]{Color.parseColor("#4C4C4C"),Color.parseColor("#2dc8bc")})
 
-                //.setOtherBtnSubTextSize(20)
+                .setOtherBtn(new String[]{"Retrive Project"}, new int[]{Color.parseColor("#4C4C4C"), Color.parseColor("#2dc8bc")})
+
+
                 .setCancelBtn("Cancel", Color.parseColor("#4C4C4C"))
-                //.setCancelBtnTextSize(30)
+
                 .setCancelableOnTouchOutside(true)
                 .setActionSheetListener(new ActionSheet.ActionSheetListener() {
                     @Override
                     public void onDismiss(ActionSheet actionSheet, boolean isByBtn) {
-                        // Toast.makeText(HomeFeedActivity.this, "onDismiss: " + isByBtn, Toast.LENGTH_SHORT).show();
+
                     }
 
                     @Override
                     public void onButtonClicked(ActionSheet actionSheet, int index) {
                         if (index == 0) {
- retiveproject(position);
+                            retiveproject(position);
                         }
 
-
-
-                        //  Toast.makeText(HomeFeedActivity.this, "onButtonClicked: " + index, Toast.LENGTH_SHORT).show();
                     }
                 }).build();
 
@@ -191,33 +185,7 @@ public class ArchiveWorkspaceActivity extends AppCompatActivity{
             Toast.makeText(ArchiveWorkspaceActivity.this, "Please Check Your Internet Connection", Toast.LENGTH_SHORT).show();
         }
 
-//        ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecyclerItemTouchHelper(0, ItemTouchHelper.LEFT, this);
-//        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(listChannels);
-//
-//
-//        // making http call and fetching menu json
-//
-//
-//        ItemTouchHelper.SimpleCallback itemTouchHelperCallback1 = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
-//            @Override
-//            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-//                return false;
-//            }
-//
-//            @Override
-//            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-//                // Row is swiped from recycler view
-//                // remove it from adapter
-//            }
-//
-//            @Override
-//            public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
-//                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
-//            }
-//        };
-//
-//        // attaching the touch helper to recycler view
-//        new ItemTouchHelper(itemTouchHelperCallback1).attachToRecyclerView(listChannels);
+
     }
 
 
@@ -234,7 +202,6 @@ public class ArchiveWorkspaceActivity extends AppCompatActivity{
 
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Project");
-//        query.whereEqualTo("workspaceID", workID);
         query.whereEqualTo("workspace", ParseObject.createWithoutData("WorkSpace", workID));
         query.findInBackground(new FindCallback<ParseObject>() {
             public void done(List<ParseObject> objects, ParseException e) {
@@ -254,11 +221,10 @@ public class ArchiveWorkspaceActivity extends AppCompatActivity{
                         String type = objects.get(i).getString("type");
                         String archive = objects.get(i).getString("archive");
 
-                        //childList.add("")
+
                         if (objects.get(i).has("default")) {
                             String state = objects.get(i).getString("default");
 
-                            // projectList.add(new ProjctBean(objectId, name, updatedAt, workspaceID, objective, createdAt, proImage, type, objects.get(i), archive));
                         } else {
                             if (archive.equals("1")) {
                                 projectList.add(new ProjctBean(objectId, name, updatedAt, workspaceID, objective, createdAt, proImage, type, objects.get(i), archive));
@@ -269,7 +235,6 @@ public class ArchiveWorkspaceActivity extends AppCompatActivity{
                     adapter = new ArchiveProjectAdapter(ArchiveWorkspaceActivity.this, projectList, "");
                     RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(ArchiveWorkspaceActivity.this);
                     listChannels.setLayoutManager(layoutManager);
-                    // listChannels.addItemDecoration(new SimpleDividerItemDecoration(ArchiveWorkspaceActivity.this));
                     listChannels.setAdapter(adapter);
 
 
@@ -279,8 +244,7 @@ public class ArchiveWorkspaceActivity extends AppCompatActivity{
                 } else {
                     Toast.makeText(ArchiveWorkspaceActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
 
-                    Log.e("lse", "" + e.getMessage());
-                    // error
+
                 }
                 if (dialog.isShowing()) {
                     dialog.dismiss();
@@ -292,6 +256,8 @@ public class ArchiveWorkspaceActivity extends AppCompatActivity{
     }
 
     private void Findviews() {
+        projectList = new ArrayList<>();
+        workID = AppConstants.loadPreferences(ArchiveWorkspaceActivity.this, "workid");
         customFonts = new CustomFonts(ArchiveWorkspaceActivity.this);
         txtEntiretxt = (TextView) findViewById(R.id.txtEntiretxt);
         txtChaneelstxt = (TextView) findViewById(R.id.txtChaneelstxt);
@@ -308,7 +274,6 @@ public class ArchiveWorkspaceActivity extends AppCompatActivity{
         txt_msg2.setTypeface(customFonts.CabinRegular);
         txtsave.setTypeface(customFonts.CabinRegular);
     }
-
 
 
 }

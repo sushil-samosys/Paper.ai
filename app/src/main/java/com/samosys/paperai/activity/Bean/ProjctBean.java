@@ -7,16 +7,16 @@ import com.parse.ParseObject;
  */
 
 public class ProjctBean {
-    String objectId;
-    String name;
-    String updatedAt;
-    String workspaceID;
-    String objective;
-    String createdAt;
-    String image;
-    String type;
-    ParseObject parseObject;
-    String archive;
+    private  String objectId;
+    private  String name;
+    private  String updatedAt;
+    private String workspaceID;
+    private String objective;
+    private  String createdAt;
+    private  String image;
+    private   String type;
+    private  ParseObject parseObject;
+    private  String archive;
 
     public ParseObject getParseObject() {
         return parseObject;

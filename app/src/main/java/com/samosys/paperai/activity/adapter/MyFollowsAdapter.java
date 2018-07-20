@@ -25,10 +25,10 @@ import java.util.ArrayList;
  */
 
 public class MyFollowsAdapter extends RecyclerView.Adapter<MyFollowsAdapter.Holder> implements Filterable {
-    Context context;
-    CustomFonts customFonts;
-    ArrayList<Myfollowlist> filterlist = new ArrayList<>();
-    ArrayList<Myfollowlist> listitem;
+    private  Context context;
+    private  CustomFonts customFonts;
+    private  ArrayList<Myfollowlist> filterlist = new ArrayList<>();
+    private  ArrayList<Myfollowlist> listitem;
 
     ContactsFilter mFilter;
     int selectedPosition = 0;
@@ -71,7 +71,7 @@ public class MyFollowsAdapter extends RecyclerView.Adapter<MyFollowsAdapter.Hold
         }
 
         holder.txtworkurl.setText(filterlist.get(position).getWorkspace_url());
-        holder.txtworkName.setText(First_Char_Capital.capitalizeString(filterlist.get(position).getWorkspace_name()));
+        holder.txtworkName.setText(filterlist.get(position).getWorkspace_name());
         holder.rl_item.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -22,31 +22,34 @@ import com.samosys.paperai.R;
 import com.samosys.paperai.activity.Bean.CommentBean;
 import com.samosys.paperai.activity.adapter.CommentAdapter;
 import com.samosys.paperai.activity.utils.AppConstants;
+import com.samosys.paperai.activity.utils.NetworkAvailablity;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CommentActivity extends AppCompatActivity {
-    String post_id = "";
-    RecyclerView rv_comment;
-    ArrayList<CommentBean> Mylist;
-    EditText edt_comment;
-    ImageView comment_send;
-    CommentAdapter adapter;
+    private String post_id = "";
+    private RecyclerView rv_comment;
+    private ArrayList<CommentBean> Mylist;
+    private EditText edt_comment;
+    private ImageView comment_send;
+    private CommentAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comment);
-        AppConstants.getstatusbar(CommentActivity.this);
-        rv_comment = (RecyclerView) findViewById(R.id.rv_comment);
-        edt_comment = (EditText) findViewById(R.id.edt_comment);
-        comment_send = (ImageView) findViewById(R.id.comment_send);
-        post_id = getIntent().getStringExtra("id");
-        Log.e("post_id", post_id);
-        Mylist = new ArrayList<>();
 
-        getCommenetList();
+        AppConstants.getstatusbar(CommentActivity.this);
+
+        findview();
+        if (NetworkAvailablity.chkStatus(CommentActivity.this)) {
+            getCommenetList();
+
+        } else {
+            Toast.makeText(CommentActivity.this, "Please Check Your Internet Connection", Toast.LENGTH_SHORT).show();
+        }
+
         comment_send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -54,7 +57,6 @@ public class CommentActivity extends AppCompatActivity {
                 if (comment.equals("") || comment == null) {
                     Toast.makeText(CommentActivity.this, "Pleasse enter comment ", Toast.LENGTH_SHORT).show();
                 } else {
-                    //  updatecomment(comment);
 
                     newupdatecomment(comment);
                 }
@@ -62,10 +64,20 @@ public class CommentActivity extends AppCompatActivity {
         });
     }
 
+    private void findview() {
+        rv_comment = (RecyclerView) findViewById(R.id.rv_comment);
+        edt_comment = (EditText) findViewById(R.id.edt_comment);
+        comment_send = (ImageView) findViewById(R.id.comment_send);
+        post_id = getIntent().getStringExtra("id");
+        Log.e("post_id", post_id);
+        Mylist = new ArrayList<>();
+
+    }
+
     private void newupdatecomment(String comment) {
 
         ParseObject gameScore = new ParseObject("PostSocial");
-        //gameScore.put("user", ParseUser.getCurrentUser().getObjectId());
+
         gameScore.put("user", ParseObject.createWithoutData("_User", ParseUser.getCurrentUser().getObjectId()));
 
         gameScore.put("post", ParseObject.createWithoutData("Post", post_id));
@@ -92,9 +104,9 @@ public class CommentActivity extends AppCompatActivity {
                                 myobject.increment("CommentCount", 1);
                                 myobject.saveInBackground();
 
-//                                Toast.makeText(context, ""+count, Toast.LENGTH_SHORT).show();
+//
                             } else {
-                                Log.e("Count_reroor", e.getMessage());
+                                Toast.makeText(CommentActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
 
                             }
                         }
@@ -102,7 +114,7 @@ public class CommentActivity extends AppCompatActivity {
 
 
                 } else {
-                    Log.e("ERRROr", e.getMessage());
+
 
                 }
             }
@@ -136,7 +148,6 @@ public class CommentActivity extends AppCompatActivity {
                                 myobject.increment("CommentCount", 1);
                                 myobject.saveInBackground();
 
-//                                Toast.makeText(context, ""+count, Toast.LENGTH_SHORT).show();
                             } else {
                                 Log.e("Count_reroor", e.getMessage());
 
@@ -178,14 +189,11 @@ public class CommentActivity extends AppCompatActivity {
 
                     }
                     adapter = new CommentAdapter(CommentActivity.this, Mylist);
-                    // RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(CommentActivity.this);
                     LinearLayoutManager layoutManager = new LinearLayoutManager(CommentActivity.this);
                     rv_comment.setHasFixedSize(true);
                     layoutManager.setReverseLayout(true);
                     layoutManager.setStackFromEnd(true);
                     rv_comment.setLayoutManager(layoutManager);
-
-                    //  rv_comment.addItemDecoration(new SimpleDividerItemDecoration(CommentActivity.this));
                     rv_comment.setAdapter(adapter);
                     adapter.notifyDataSetChanged();
 

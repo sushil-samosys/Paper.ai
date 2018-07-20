@@ -1,7 +1,6 @@
 package com.samosys.paperai.activity.Bean;
 
 
-
 /**
  * Created by samosys on 22/6/18.
  */
@@ -9,34 +8,51 @@ package com.samosys.paperai.activity.Bean;
 public class WorkSpaceMemberBean {
 
 
-    String objectId;
-    String username;
-    String email;
-    String updatedAt;
-    String createdAt;
-    String image;
-    String passion;
-    String title;
-    String fullname;
-    String campanyrole;
-    String communityrole;
-    String address;
+    private String objectId;
+    private String username;
+    private String email;
+    private String updatedAt;
+    private String createdAt;
+    private String image;
+    private String passion;
+    private String title;
+    private String fullname;
+    private String campanyrole;
+    private String communityrole;
+    private String address;
 
-    public WorkSpaceMemberBean(String objectId, String username, String email, String updatedAt, String createdAt, String image, String passion, String title, String fullname, String campanyrole, String communityrole, String address) {
+    public WorkSpaceMemberBean(String objectId, String username, String email, String updatedAt, String createdAt, String passion, String img, String title, String fullname, String campanyrole, String communityrole, String address) {
         this.objectId = objectId;
         this.username = username;
         this.email = email;
         this.updatedAt = updatedAt;
         this.createdAt = createdAt;
-        this.image = image;
         this.passion = passion;
+        this.image = img;
+
         this.title = title;
         this.fullname = fullname;
         this.campanyrole = campanyrole;
         this.communityrole = communityrole;
         this.address = address;
+
     }
 
+
+//    public WorkSpaceMemberBean(String objectId, String username, String email, String updatedAt, String createdAt, String image, String passion, String title, String fullname, String campanyrole, String communityrole, String address) {
+//        this.objectId = objectId;
+//        this.username = username;
+//        this.email = email;
+//        this.updatedAt = updatedAt;
+//        this.createdAt = createdAt;
+//        this.image = image;
+//        this.passion = passion;
+//        this.title = title;
+//        this.fullname = fullname;
+//        this.campanyrole = campanyrole;
+//        this.communityrole = communityrole;
+//        this.address = address;
+//    }
 
 
     public String getObjectId() {

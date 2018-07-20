@@ -14,20 +14,15 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.parse.DeleteCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.samosys.paperai.R;
 import com.samosys.paperai.activity.Bean.ProjctBean;
-import com.samosys.paperai.activity.activity.BrowesWorkspace;
-import com.samosys.paperai.activity.activity.HomeFeedActivity;
-import com.samosys.paperai.activity.activity.NewWorkspaceActivity;
 import com.samosys.paperai.activity.activity.ProjectDetailActivity;
 import com.samosys.paperai.activity.activity.ProjectSettingActivity;
 import com.samosys.paperai.activity.utils.CustomFonts;
-import com.samosys.paperai.activity.utils.First_Char_Capital;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -43,13 +38,12 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.Holder> 
     private Context context;
     private CustomFonts customFonts;
     private ArrayList<ProjctBean> listitem;
-    private String frag;
 
 
     public ProjectAdapter(Context context, ArrayList<ProjctBean> listitem, String frag) {
         this.context = context;
         this.listitem = listitem;
-        this.frag = frag;
+
         customFonts = new CustomFonts(context);
     }
 
@@ -64,7 +58,7 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.Holder> 
     public void onBindViewHolder(final Holder holder, final int position) {
 
 
-        holder.txt_project_value.setText(First_Char_Capital.capitalizeString(listitem.get(position).getName()));
+        holder.txt_project_value.setText(listitem.get(position).getName());
 
         if (listitem.get(position).getImage() != null) {
 
@@ -86,31 +80,18 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.Holder> 
         holder.ll_projectName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Intent intent=new Intent(context, ProjectDetailActivity.class);
-//                intent.putExtra("id",listitem.get(position).getObjectId());
-//                context.startActivity(intent);
+//
                 delete(position);
             }
         });
 
-//        holder.ll_projectName.setOnLongClickListener(new View.OnLongClickListener() {
-//            @Override
-//            public boolean onLongClick(View v) {
-//
-//                return true;
-//            }
-//        });
+
     }
 
     private void delete(final int position) {
         ActionSheet actionSheet = new ActionSheet.Builder()
-                // .setTitle("Title", Color.BLUE)
-                //.setTitleTextSize(20)
-                .setOtherBtn(new String[]{"View Project", "Delete Project"}, new int[]{Color.parseColor("#4C4C4C"),Color.parseColor("#4C4C4C")})
-
-                //.setOtherBtnSubTextSize(20)
+                .setOtherBtn(new String[]{"View Project", "Delete Project"}, new int[]{Color.parseColor("#4C4C4C"), Color.parseColor("#4C4C4C")})
                 .setCancelBtn("Cancel", Color.parseColor("#4C4C4C"))
-                //.setCancelBtnTextSize(30)
                 .setCancelableOnTouchOutside(true)
                 .setActionSheetListener(new ActionSheet.ActionSheetListener() {
                     @Override
@@ -121,31 +102,26 @@ public class ProjectAdapter extends RecyclerView.Adapter<ProjectAdapter.Holder> 
                     @Override
                     public void onButtonClicked(ActionSheet actionSheet, int index) {
                         if (index == 0) {
-                            Intent intent=new Intent(context, ProjectDetailActivity.class);
-                            intent.putExtra("id",listitem.get(position).getObjectId());
+                            Intent intent = new Intent(context, ProjectDetailActivity.class);
+                            intent.putExtra("id", listitem.get(position).getObjectId());
                             context.startActivity(intent);
                         }
                         if (index == 1) {
 
 
-
                             ParseQuery<ParseObject> query = ParseQuery.getQuery("Project");
-                     //       query.whereEqualTo("objectId", listitem.get(position).getObjectId());
                             query.getInBackground(listitem.get(position).getObjectId(), new GetCallback<ParseObject>() {
                                 public void done(ParseObject object, ParseException e) {
                                     if (e == null) {
                                         object.deleteInBackground();
                                         Toast.makeText(context, "Delete Projct Successfully", Toast.LENGTH_SHORT).show();
-                                        ((ProjectSettingActivity)context).getprojectlist();
-//                                        ((HomeFeedActivity)context).getprojectlist();
+                                        ((ProjectSettingActivity) context).getprojectlist();
+
                                     } else {
                                         Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             });
-
-
-
 
 
                         }

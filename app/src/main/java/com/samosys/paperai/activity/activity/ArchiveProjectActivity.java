@@ -22,9 +22,9 @@ import java.util.List;
 import cc.cloudist.acplibrary.ACProgressFlower;
 
 public class ArchiveProjectActivity extends AppCompatActivity {
-    SwitchButton ProtoglBtn;
-    TextView txtsave_pro;
-    String toggle = "", proID = "";
+    private SwitchButton ProtoglBtn;
+    private TextView txtsave_pro;
+    private String toggle = "", proID = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +64,7 @@ public class ArchiveProjectActivity extends AppCompatActivity {
     }
 
     private void archiveproject() {
-        final ACProgressFlower acProgressFlower= AppConstants.CustomshowProgressDialog(ArchiveProjectActivity.this,"");
+        final ACProgressFlower acProgressFlower = AppConstants.CustomshowProgressDialog(ArchiveProjectActivity.this, "");
         acProgressFlower.show();
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Project");
         query.whereEqualTo("objectId", proID);
@@ -76,7 +76,7 @@ public class ArchiveProjectActivity extends AppCompatActivity {
                     if (NetworkAvailablity.chkStatus(ArchiveProjectActivity.this)) {
 //                        getprojectlist();
 
-                        if (acProgressFlower.isShowing()){
+                        if (acProgressFlower.isShowing()) {
                             acProgressFlower.dismiss();
                         }
                         Toast.makeText(ArchiveProjectActivity.this, "Archive Successfully", Toast.LENGTH_SHORT).show();
@@ -89,7 +89,7 @@ public class ArchiveProjectActivity extends AppCompatActivity {
 
                     person.saveInBackground();
                 } else {
-                    if (acProgressFlower.isShowing()){
+                    if (acProgressFlower.isShowing()) {
                         acProgressFlower.dismiss();
                     }
                     Log.d("score", "Error: " + e.getMessage());

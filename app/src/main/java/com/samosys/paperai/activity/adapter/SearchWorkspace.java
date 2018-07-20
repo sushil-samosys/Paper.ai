@@ -31,10 +31,10 @@ import java.util.ArrayList;
  */
 
 public class SearchWorkspace extends RecyclerView.Adapter<SearchWorkspace.Holder> implements Filterable {
-    Context context;
-    CustomFonts customFonts;
-    ArrayList<WorkspaceBean> listitem;
-    ArrayList<WorkspaceBean> filterlist = new ArrayList<>();
+    private  Context context;
+    private CustomFonts customFonts;
+    private  ArrayList<WorkspaceBean> listitem;
+    private ArrayList<WorkspaceBean> filterlist = new ArrayList<>();
     private ContactsFilter mFilter;
 
 
@@ -58,8 +58,7 @@ public class SearchWorkspace extends RecyclerView.Adapter<SearchWorkspace.Holder
 
 //
         holder.txt_workspace.setText(filterlist.get(position).getWorkspace_name());
-//        holder.txt_workspace_value.setText(filterlist.get(position).getMission());
-        Log.e("IAMGEW", filterlist.get(position).getWs_image());
+         Log.e("IAMGEW", filterlist.get(position).getWs_image());
         Picasso.with(context).load(filterlist.get(position).getWs_image()).error(R.mipmap.sign_up_workspace)
                 .into(holder.imgProject, new Callback() {
                     @Override
@@ -75,11 +74,13 @@ public class SearchWorkspace extends RecyclerView.Adapter<SearchWorkspace.Holder
                 });
 
         holder.txtfollow.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
                 ParseObject message = new ParseObject("workspace_follower");
                 message.put("user", ParseObject.createWithoutData("_User", ParseUser.getCurrentUser().getObjectId()));
                 message.put("workspace", ParseObject.createWithoutData("WorkSpace", filterlist.get(position).getObjectId()));
+                message.put("type", "1");
                 message.saveInBackground(new SaveCallback() {
                     @Override
                     public void done(ParseException e) {
@@ -87,8 +88,7 @@ public class SearchWorkspace extends RecyclerView.Adapter<SearchWorkspace.Holder
 
 
                             Toast.makeText(context, "follow successfully", Toast.LENGTH_SHORT).show();
-//                            Intent intent = new Intent(context, HomeFeedActivity.class);
-//                            context.startActivity(intent);
+//
                         } else {
                             e.printStackTrace();
                             Log.e("DATAAA", e.getMessage());
@@ -121,17 +121,10 @@ public class SearchWorkspace extends RecyclerView.Adapter<SearchWorkspace.Holder
 
         public Holder(View itemView) {
             super(itemView);
-
-
             txtfollow = (TextView) itemView.findViewById(R.id.txtfollow);
             txt_workspace = (TextView) itemView.findViewById(R.id.txt_workspace);
-
             imgProject = (ImageView) itemView.findViewById(R.id.imgProject);
-//            rl_item = (LinearLayout) itemView.findViewById(R.id.rl_item);
             img_progrss = (ProgressBar) itemView.findViewById(R.id.img_progrss);
-
-            //  txt_workspace_value.setTypeface(customFonts.calibri);
-//            txt_follow.setTypeface(customFonts.HelveticaNeue);
             txtfollow.setTypeface(customFonts.HelveticaNeue);
             txt_workspace.setTypeface(customFonts.CabinBold);
         }

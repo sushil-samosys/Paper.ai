@@ -10,11 +10,9 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/annca" />
             <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/audiovisualizer" />
             <option value="$PROJECT_DIR$/autolinklibrary" />
-            <option value="$PROJECT_DIR$/autoplayvideorecyclerview" />
+            <option value="$PROJECT_DIR$/jiaozivideoplayer" />
             <option value="$PROJECT_DIR$/library" />
-            <option value="$PROJECT_DIR$/material-viewpagerindicator" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

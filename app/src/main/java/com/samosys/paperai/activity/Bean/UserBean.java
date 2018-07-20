@@ -7,15 +7,15 @@ import com.parse.ParseFile;
  */
 
 public class UserBean {
-    String objectId;
-    String username;
-    String email;
-    String updatedAt;
-    String createdAt;
-    String passion;
-    ParseFile profileimage;
-    String title;
-    String fullname;
+    private String objectId;
+    private  String username;
+    private  String email;
+    private  String updatedAt;
+    private String createdAt;
+    private String passion;
+    private ParseFile profileimage;
+    private  String title;
+    private  String fullname;
 
     public UserBean(String objectId, String username, String email, String updatedAt, String createdAt, String passion, ParseFile profileimage, String title, String fullname) {
        this.objectId=objectId;

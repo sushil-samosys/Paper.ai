@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CategoryListingActivity extends AppCompatActivity {
-    CustomFonts customFonts;
+    private CustomFonts customFonts;
     private RecyclerView recycleCategory;
     private String workID = "", workname = "";
     private ArrayList<CategoryList> categoryList;

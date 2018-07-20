@@ -32,9 +32,9 @@ import java.util.List;
 
 public class CreateCategoryActivity extends AppCompatActivity {
     public static ArrayList<ParseObject> proList;
-    CustomFonts customFonts;
-    RecyclerView cateList;
-    String workID = "";
+    private CustomFonts customFonts;
+    private RecyclerView cateList;
+    private String workID = "";
     private ImageView img_catewgory_back;
     private TextView txt_workname_header;
     private ArrayList<ProjctBean> projectList;
@@ -64,7 +64,7 @@ public class CreateCategoryActivity extends AppCompatActivity {
                 String name = edt_catname.getText().toString();
                 if (name.equals("")) {
                     Toast.makeText(CreateCategoryActivity.this, "Please enter category name", Toast.LENGTH_SHORT).show();
-                } else if (proList.size()<=0){
+                } else if (proList.size() <= 0) {
                     saveCategory();
                 }
             }
@@ -82,12 +82,10 @@ public class CreateCategoryActivity extends AppCompatActivity {
         final ProgressDialog dialog = AppConstants.showProgressDialog(CreateCategoryActivity.this, "Please wait...");
 
         final ParseObject gameScore = new ParseObject("Category");
-          gameScore.put("user", ParseObject.createWithoutData("_User", ParseUser.getCurrentUser().getObjectId()));
-//
+        gameScore.put("user", ParseObject.createWithoutData("_User", ParseUser.getCurrentUser().getObjectId()));
         gameScore.put("name", edt_catname.getText().toString());
-//        gameScore.include("post_id.user_id");
         gameScore.put("workspaceID", ParseObject.createWithoutData("WorkSpace", workID));
-        gameScore.add("Projects",proList );
+        gameScore.add("Projects", proList);
 
         gameScore.saveInBackground(new SaveCallback() {
             @Override
@@ -99,24 +97,6 @@ public class CreateCategoryActivity extends AppCompatActivity {
 
                     Toast.makeText(CreateCategoryActivity.this, "succes", Toast.LENGTH_SHORT).show();
                     finish();
-//                    for (int a = 0; a < proList.size(); a++) {
-//                        ParseQuery<ParseObject> query = ParseQuery.getQuery("Project");
-//                      //  query.include("category.objectId");
-//                        query.whereEqualTo("workspace",ParseObject.createWithoutData("WorkSpace",workID));
-//                        query.getInBackground(proList.get(a), new GetCallback<ParseObject>() {
-//                            @Override
-//                            public void done(ParseObject object, ParseException e) {
-//                                if (e == null) {
-//
-//                                    object.put("category", ParseObject.createWithoutData("Category", gameScore.getObjectId()));
-//                                    object.saveInBackground();
-//                                    Toast.makeText(CreateCategoryActivity.this, "succes", Toast.LENGTH_SHORT).show();
-//                                finish();
-//                                }
-//                            }
-//                        });
-//                    }
-
 
                 } else {
 
@@ -135,7 +115,7 @@ public class CreateCategoryActivity extends AppCompatActivity {
 
 
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Project");
-        query.whereEqualTo("workspace",ParseObject.createWithoutData("WorkSpace",workID));
+        query.whereEqualTo("workspace", ParseObject.createWithoutData("WorkSpace", workID));
 
         query.include("category");
         //query.whereEqualTo("category", ParseObject.createWithoutData("Category", "null"));
@@ -148,9 +128,8 @@ public class CreateCategoryActivity extends AppCompatActivity {
                     for (int i = 0; i < objects.size(); i++) {
 
                         ParseObject parseObject = objects.get(i).getParseObject("category");
-                        if (parseObject==null) {
-//                            String name1 = parseObject.getString("name");
-//                            Log.e("category11", name1);
+                        if (parseObject == null) {
+//
                             String objectId = objects.get(i).getObjectId();
 
                             String name = objects.get(i).getString("name");
@@ -160,18 +139,15 @@ public class CreateCategoryActivity extends AppCompatActivity {
                             String createdAt = objects.get(i).getString("createdAt");
                             ParseFile proImage = (ParseFile) objects.get(i).get("image");
                             String image = proImage.getUrl();
+                            String defaultProject = objects.get(i).getString("default");
                             String type = objects.get(i).getString("type");
                             String archive = objects.get(i).getString("archive");
-                           // String type = objects.get(i).getString("type");
-//                        String type = objects.get(i).getString("category");
-                            //childList.add("")
-                            //if (!name.equals("General") && !name.equals("My Notes")) {
-                                projectList.add(new ProjctBean(objectId, name, updatedAt, workspaceID, objective, createdAt, image, type,objects.get(i), archive));
-//                            }
+                            if (defaultProject.equals("2")) {
+                                projectList.add(new ProjctBean(objectId, name, updatedAt, workspaceID, objective, createdAt, image, type, objects.get(i), archive));
 
+                            }
                         }
                     }
-
 
 
                     CategoryProjectAdapter categoryProjectAdapter = new CategoryProjectAdapter(CreateCategoryActivity.this, projectList);
@@ -197,15 +173,12 @@ public class CreateCategoryActivity extends AppCompatActivity {
     private void findview() {
         customFonts = new CustomFonts(CreateCategoryActivity.this);
         projectList = new ArrayList<>();
-
         proList = new ArrayList<>();
-        img_catewgory_back=(ImageView)findViewById(R.id.img_catewgory_back);
+        img_catewgory_back = (ImageView) findViewById(R.id.img_catewgory_back);
         txt_workname_header = (TextView) findViewById(R.id.txt_workname_header);
         cateList = (RecyclerView) findViewById(R.id.cateList);
         edt_catname = (EditText) findViewById(R.id.edt_catname);
         ll_saveCategory = (LinearLayout) findViewById(R.id.ll_saveCategory);
-
-
         txt_workname_header.setTypeface(customFonts.CabinBold);
     }
 }

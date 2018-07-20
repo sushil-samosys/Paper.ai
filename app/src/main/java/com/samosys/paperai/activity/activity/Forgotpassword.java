@@ -17,10 +17,10 @@ import com.samosys.paperai.activity.utils.AppConstants;
 import com.samosys.paperai.activity.utils.CustomFonts;
 
 public class Forgotpassword extends AppCompatActivity {
-    TextView txt_forget;
-    CustomFonts customFonts;
-    LinearLayout llBottomforgot;
-    EditText edtforgot;
+    private TextView txt_forget;
+    private CustomFonts customFonts;
+    private LinearLayout llBottomforgot;
+    private EditText edtforgot;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +45,7 @@ public class Forgotpassword extends AppCompatActivity {
                                 Toast.makeText(Forgotpassword.this, "Password send to your email", Toast.LENGTH_SHORT).show();
                                 // An email was successfully sent with reset instructions.
                             } else {
-                                Log.e("error",e.getMessage());
+                                Log.e("error", e.getMessage());
                                 Toast.makeText(Forgotpassword.this, "Email not registered", Toast.LENGTH_SHORT).show();
                                 // Something went wrong. Look at the ParseException to see what's up.
                             }

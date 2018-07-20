@@ -1,4 +1,4 @@
-package com.samosys.paperai.activity.menuBeanList;
+package com.samosys.paperai.activity.Bean;
 
 import java.util.ArrayList;
 

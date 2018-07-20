@@ -30,7 +30,6 @@ import com.parse.SaveCallback;
 import com.samosys.paperai.R;
 import com.samosys.paperai.activity.utils.AppConstants;
 import com.samosys.paperai.activity.utils.CustomFonts;
-import com.samosys.paperai.activity.utils.First_Char_Capital;
 import com.samosys.paperai.activity.utils.MarshMallowPermission;
 import com.samosys.paperai.activity.utils.NetworkAvailablity;
 import com.samosys.paperai.activity.utils.SwitchButton;
@@ -44,7 +43,7 @@ import java.io.IOException;
 import java.util.List;
 
 public class ProjectDetailActivity extends AppCompatActivity {
-    MarshMallowPermission marshMallowPermission;
+    private MarshMallowPermission marshMallowPermission;
     private String proID = "";
     private ImageView imgProject, img_camera, img_project_back;
     private TextView txtproject_header, txt_followrs, txt_member, txt_notification, txt_public, txt_cat, txt_cat_value, txt_object, txt_project;
@@ -58,7 +57,7 @@ public class ProjectDetailActivity extends AppCompatActivity {
     private ParseFile file = null, imageFile = null;
     private String type = "";
     private RelativeLayout rlProjectArchive;
-//ArchiveProjectActivity
+//
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,7 +121,7 @@ public class ProjectDetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ProjectDetailActivity.this, ArchiveProjectActivity.class);
-                intent.putExtra("id",proID);
+                intent.putExtra("id", proID);
                 startActivity(intent);
             }
         });
@@ -279,26 +278,7 @@ public class ProjectDetailActivity extends AppCompatActivity {
                 if (items[item].equals("Take Photo")) {
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-//                    File file = getOutputMediaFile(1);
-//
-//
-//                    // String extension = android.webkit.MimeTypeMap.getFileExtensionFromUrl(Uri.fromF‌​ile(file).toString()‌​);
-//
-//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-//                        //   String extension = android.webkit.MimeTypeMap.getFileExtensionFromUrl(file.toString()‌​);
-////                        intent.setDataAndType(picUri, type);
-//                        picUri = FileProvider.getUriForFile(WorkspaceSettingActivity.this, WorkspaceSettingActivity.this.getApplicationContext().getPackageName() + ".provider", file);
-//                        //picUri=FileProvider.getUriForFile(AddPhotoVideo.this, BuildConfig.APPLICATION_ID+".provider", file);
-//                        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//                        intent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-//
-//
-//                    } else {
-//                        picUri = Uri.fromFile(file); // create
-//
-//                    }
-//                    intent.putExtra(MediaStore.EXTRA_OUTPUT, picUri);
-                    // set the image file
+
                     startActivityForResult(intent, REQUEST_CAMERA);
 
 
@@ -354,7 +334,6 @@ public class ProjectDetailActivity extends AppCompatActivity {
     }
 
     private void getProject() {
-        // Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
 
 
         final ProgressDialog dialog = AppConstants.showProgressDialog(ProjectDetailActivity.this, "Loading...");
@@ -388,8 +367,8 @@ public class ProjectDetailActivity extends AppCompatActivity {
                             String post_image = imageFile.getUrl();
                             String user_name = objects1.get(i).getString("user_name");
                             Log.e("imageFile", imageFile + "");
-                            txt_projct_value.setText(First_Char_Capital.capitalizeString(projectname));
-                            txtproject_header.setText(First_Char_Capital.capitalizeString(projectname));
+                            txt_projct_value.setText(projectname);
+                            txtproject_header.setText(projectname);
                             txt_objective_value.setText(objective);
                             if (type.equals("1")) {
                                 awesomeToggle.setChecked(true);

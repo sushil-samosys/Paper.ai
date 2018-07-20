@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
@@ -25,6 +26,7 @@ import com.samosys.paperai.activity.utils.CircularProgressBar;
 import com.samosys.paperai.activity.utils.CustomFonts;
 import com.samosys.paperai.activity.utils.MarshMallowPermission;
 import com.samosys.paperai.activity.utils.SimpleTooltip;
+import com.samosys.paperai.activity.utils.ZoomableImageView;
 
 import java.io.File;
 import java.util.Timer;
@@ -32,16 +34,18 @@ import java.util.TimerTask;
 
 public class RecordAudioActivity extends AppCompatActivity {
     public static File file = null;
-    ImageView imgCapturedimage, img_mic, imgback_signup;
-    String strFile;
-    AQuery aq;
-    int prog = 0;
-    TextView txt_next_audio, txtheader;
-    Intent recordService;
-    Timer timer;
-    CustomFonts customFonts;
-    CircularProgressBar circularProgressbar;
     MarshMallowPermission marshMallowPermission;
+    private ImageView img_mic, imgback_signup;
+    private String strFile;
+    private AQuery aq;
+    private ZoomableImageView imgCapturedimage;
+    private int prog = 0;
+    private RelativeLayout rl_audioRecord;
+    private TextView txt_next_audio, txtheader;
+    private Intent recordService;
+    private Timer timer;
+    private CustomFonts customFonts;
+    private CircularProgressBar circularProgressbar;
     private boolean mStartRecording = true;
 
     @Override
@@ -50,23 +54,13 @@ public class RecordAudioActivity extends AppCompatActivity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setContentView(R.layout.activity_record_audio);
-        customFonts = new CustomFonts(RecordAudioActivity.this);
-        txt_next_audio = (TextView) findViewById(R.id.txt_next_audio);
-        txtheader = (TextView) findViewById(R.id.txtheader);
-        imgCapturedimage = (ImageView) findViewById(R.id.imgCapturedimage);
-        img_mic = (ImageView) findViewById(R.id.img_mic);
-        txtheader = (TextView) findViewById(R.id.txtheader);
-        txtheader.setTypeface(customFonts.CabinBold);
-        marshMallowPermission = new MarshMallowPermission(RecordAudioActivity.this);
-        imgback_signup = (ImageView) findViewById(R.id.imgback_signup);
-        circularProgressbar = (CircularProgressBar) findViewById(R.id.circularProgressbar);
-        aq = new AQuery(RecordAudioActivity.this);
-        strFile = getIntent().getStringExtra("file");
-        File newFile = new File(strFile);
-        String workname = AppConstants.loadPreferences(RecordAudioActivity.this, "workname");
-        txtheader.setText(workname);
+         setContentView(R.layout.activity_record_audio);
 
+        findview();
+
+
+
+        File newFile = new File(strFile);
         new SimpleTooltip.Builder(this)
                 .anchorView(circularProgressbar)
                 .text("Press hold to record your voice")
@@ -80,7 +74,7 @@ public class RecordAudioActivity extends AppCompatActivity {
         if (file.exists()) {
             BitmapAjaxCallback cb = new BitmapAjaxCallback();
             cb.targetWidth(500).rotate(true);
-            aq.id(imgCapturedimage).image(newFile, false, 500, cb);
+            aq.id(imgCapturedimage).image(newFile, true, 500, cb);
             //aq.id(imgCapturedimage).image(new File(listitem.get(position).getPost_image()), false, 500, cb);
         } else {
 
@@ -108,16 +102,11 @@ public class RecordAudioActivity extends AppCompatActivity {
                 Intent intent = new Intent(RecordAudioActivity.this, PostfeedActivity.class);
                 intent.putExtra("file", strFile);
                 intent.putExtra("post_type", "1");
-
                 startActivity(intent);
+
             }
         });
-//        img_mic.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Toast.makeText(RecordAudioActivity.this, "working", Toast.LENGTH_SHORT).show();
-//            }
-//        });
+
 
         img_mic.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -133,9 +122,9 @@ public class RecordAudioActivity extends AppCompatActivity {
                         switch (event.getAction()) {
                             case MotionEvent.ACTION_DOWN:
 
-
                                 prog = 0;
                                 //  if (prog == 1) {
+
 
                                 onRecord(mStartRecording);
                                 mStartRecording = !mStartRecording;
@@ -149,12 +138,18 @@ public class RecordAudioActivity extends AppCompatActivity {
                                                 // Your code
 
                                                 prog++;
+                                                if (prog == 1) {
+                                                    rl_audioRecord.requestLayout();
+                                                    rl_audioRecord.getLayoutParams().height = ((int) getResources().getDimension(R.dimen._70sdp));
+
+                                                }
+
                                                 if (prog <= 60) {
                                                     circularProgressbar.setProgress(prog);
                                                     Log.e("PROGRESS22", prog + "");
 
                                                 } else {
-
+                                                    prog = 0;
                                                     circularProgressbar.setProgress(0);
                                                     stopRecording();
 
@@ -168,9 +163,10 @@ public class RecordAudioActivity extends AppCompatActivity {
 
                                 return true; // if you want to handle the touch event
                             case MotionEvent.ACTION_UP:
-                                //    prog = 0;
+                                prog = 0;
                                 timer.cancel();
 
+                                circularProgressbar.setProgress(0);
                                 Log.e("PROGRESS11", prog + "");
 //                                circularProgressbar.setProgress(0);
                                 stopRecording();
@@ -199,6 +195,11 @@ public class RecordAudioActivity extends AppCompatActivity {
                                             // Your code
 
                                             prog++;
+                                            if (prog == 1) {
+                                                rl_audioRecord.requestLayout();
+                                                rl_audioRecord.getLayoutParams().height = ((int) getResources().getDimension(R.dimen._70sdp));
+
+                                            }
                                             if (prog <= 60) {
                                                 circularProgressbar.setProgress(prog);
                                                 Log.e("PROGRESS22", prog + "");
@@ -207,7 +208,7 @@ public class RecordAudioActivity extends AppCompatActivity {
 //                                                pro_free.setVisibility(View.VISIBLE);
 //                                                img_addpost.setVisibility(View.VISIBLE);
 //                                                rl_audioRecord.setVisibility(View.INVISIBLE);
-
+                                                prog = 0;
                                                 circularProgressbar.setProgress(0);
                                                 stopRecording();
                                                 timer.cancel();
@@ -220,9 +221,10 @@ public class RecordAudioActivity extends AppCompatActivity {
 
                             return true; // if you want to handle the touch event
                         case MotionEvent.ACTION_UP:
-                            //+  prog = 0;
+                            prog = 0;
                             timer.cancel();
                             stopService(recordService);
+
 //                            pro_free.setVisibility(View.VISIBLE);
 
 //                            img_addpost.setVisibility(View.VISIBLE);
@@ -251,6 +253,35 @@ public class RecordAudioActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    private void findview() {
+        customFonts = new CustomFonts(RecordAudioActivity.this);
+        txt_next_audio = (TextView) findViewById(R.id.txt_next_audio);
+        txtheader = (TextView) findViewById(R.id.txtheader);
+        imgCapturedimage = (ZoomableImageView) findViewById(R.id.imgCapturedimage);
+        img_mic = (ImageView) findViewById(R.id.img_mic);
+        rl_audioRecord = (RelativeLayout) findViewById(R.id.rl_audioRecord);
+        txtheader = (TextView) findViewById(R.id.txtheader);
+        txt_next_audio.setTypeface(customFonts.calibri);
+        txtheader.setTypeface(customFonts.CabinBold);
+        marshMallowPermission = new MarshMallowPermission(RecordAudioActivity.this);
+        imgback_signup = (ImageView) findViewById(R.id.imgback_signup);
+        circularProgressbar = (CircularProgressBar) findViewById(R.id.circularProgressbar);
+        aq = new AQuery(RecordAudioActivity.this);
+        strFile = getIntent().getStringExtra("file");
+
+        String workname = AppConstants.loadPreferences(RecordAudioActivity.this, "workname");
+        txtheader.setText(workname);
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        rl_audioRecord.getLayoutParams().height = ((int) getResources().getDimension(R.dimen._60sdp));
+
+//        prog = 0;
     }
 
     @Override

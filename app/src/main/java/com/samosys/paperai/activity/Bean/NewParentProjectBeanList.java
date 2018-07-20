@@ -1,4 +1,4 @@
-package com.samosys.paperai.activity.menuBeanList;
+package com.samosys.paperai.activity.Bean;
 
 /**
  * Created by samosys on 30/5/18.

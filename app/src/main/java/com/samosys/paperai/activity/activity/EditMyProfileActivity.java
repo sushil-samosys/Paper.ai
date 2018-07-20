@@ -31,7 +31,6 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.samosys.paperai.R;
 import com.samosys.paperai.activity.utils.AppConstants;
-import com.samosys.paperai.activity.utils.First_Char_Capital;
 import com.samosys.paperai.activity.utils.MarshMallowPermission;
 import com.samosys.paperai.activity.utils.NetworkAvailablity;
 import com.samosys.paperai.activity.utils.Utility;
@@ -46,12 +45,12 @@ import java.util.List;
 import cc.cloudist.acplibrary.ACProgressFlower;
 
 public class EditMyProfileActivity extends AppCompatActivity {
-    ImageView my_imgEdit, img_camera;
-    EditText edtName, edtRole, edtcommunityrole, edtAdress, edtTitle, edtpassion;
-    TextView txtsaveProfle, txtlogout;
-    MarshMallowPermission marshMallowPermission;
-    Bitmap bitmap = null;
-    ParseFile file = null;
+    private ImageView my_imgEdit, img_camera;
+    private EditText edtName, edtRole, edtcommunityrole, edtAdress, edtTitle, edtpassion;
+    private TextView txtsaveProfle, txtlogout;
+    private  MarshMallowPermission marshMallowPermission;
+    private  Bitmap bitmap = null;
+    private  ParseFile file = null;
     private int REQUEST_CAMERA = 0, SELECT_FILE = 1;
     private String userChoosenTask;
 
@@ -63,7 +62,7 @@ public class EditMyProfileActivity extends AppCompatActivity {
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         AppConstants.getTranparentstatusbar(EditMyProfileActivity.this);
-        my_imgEdit = (ImageView) findViewById(R.id.my_imgEdit);
+
         finvoiew();
         if (NetworkAvailablity.chkStatus(EditMyProfileActivity.this)) {
 
@@ -252,6 +251,7 @@ public class EditMyProfileActivity extends AppCompatActivity {
     }
 
     private void finvoiew() {
+        my_imgEdit = (ImageView) findViewById(R.id.my_imgEdit);
         edtName = (EditText) findViewById(R.id.edtName);
         edtRole = (EditText) findViewById(R.id.edtRole);
         edtcommunityrole = (EditText) findViewById(R.id.edtcommunityrole);
@@ -287,7 +287,7 @@ public class EditMyProfileActivity extends AppCompatActivity {
                         String campanyrole = objects.get(i).getString("campanyrole");
                         String communityrole = objects.get(i).getString("communityrole");
                         String address = objects.get(i).getString("address");
-                        edtName.setText(First_Char_Capital.capitalizeString(fullname));
+                        edtName.setText(fullname);
                         edtRole.setText(campanyrole);
                         edtcommunityrole.setText(communityrole);
                         edtAdress.setText(address);

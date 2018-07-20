@@ -13,7 +13,7 @@ public class ShowPostBean {
     String objectId;
     String updatedAt;
     String createdAt;
-   String post_image;
+    String post_image;
 
     String post_type;
     String tagUserId;
@@ -41,7 +41,7 @@ public class ShowPostBean {
         this.CommentCount = commentCount;
         this.likesCount = likesCount;
         this.post_userID = post_userID;
-this.post_file=post_file;
+        this.post_file = post_file;
     }
 
     public ParseFile getUser_imge() {
@@ -98,7 +98,6 @@ this.post_file=post_file;
     public void setPost_userID(String post_userID) {
         this.post_userID = post_userID;
     }
-
 
 
     public String getUsername() {
@@ -180,7 +179,6 @@ this.post_file=post_file;
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
-
 
 
     public String getPost_type() {

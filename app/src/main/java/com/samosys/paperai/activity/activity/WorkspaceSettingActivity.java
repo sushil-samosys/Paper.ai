@@ -30,7 +30,7 @@ import com.parse.SaveCallback;
 import com.samosys.paperai.R;
 import com.samosys.paperai.activity.utils.AppConstants;
 import com.samosys.paperai.activity.utils.CustomFonts;
-import com.samosys.paperai.activity.utils.First_Char_Capital;
+
 import com.samosys.paperai.activity.utils.MarshMallowPermission;
 import com.samosys.paperai.activity.utils.NetworkAvailablity;
 import com.squareup.picasso.Picasso;
@@ -46,7 +46,7 @@ import java.util.List;
 
 public class WorkspaceSettingActivity extends AppCompatActivity {
     MarshMallowPermission marshMallowPermission;
-    RelativeLayout rlArchive;
+    private RelativeLayout rlArchive;
     private TextView txt_workname_header, txt_workName,
             txt_mission, txt_missionurl, txt_missionurl_value, txt_followrs, txt_member, txt_notification;
     private ImageView img_work_space, img_work_space_back, img_camera;
@@ -54,7 +54,7 @@ public class WorkspaceSettingActivity extends AppCompatActivity {
     private EditText txt_workName_value, txt_mission_value;
     private CustomFonts customFonts;
     private LinearLayout ll_save;
-    private int REQUEST_CAMERA = 0, SELECT_FILE = 1, SELECT_VIDEO = 3;
+    private int REQUEST_CAMERA = 0, SELECT_FILE = 1;
     private Bitmap bitmap = null;
     private ParseFile file = null, imageFile = null;
 
@@ -88,9 +88,7 @@ public class WorkspaceSettingActivity extends AppCompatActivity {
                 if (bitmap != null) {
                     setImage(bitmap);
                 } else {
-//                    bitmap = BitmapFactory.decodeResource(getResources(),
-//                            R.mipmap.sign_up_workspace);
-//                    setImage(bitmap);
+//
                     file = imageFile;
                 }
 
@@ -162,29 +160,7 @@ public class WorkspaceSettingActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int item) {
                 if (items[item].equals("Take Photo")) {
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-//                    File file = getOutputMediaFile(1);
-//
-//
-//                    // String extension = android.webkit.MimeTypeMap.getFileExtensionFromUrl(Uri.fromF‌​ile(file).toString()‌​);
-//
-//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-//                        //   String extension = android.webkit.MimeTypeMap.getFileExtensionFromUrl(file.toString()‌​);
-////                        intent.setDataAndType(picUri, type);
-//                        picUri = FileProvider.getUriForFile(WorkspaceSettingActivity.this, WorkspaceSettingActivity.this.getApplicationContext().getPackageName() + ".provider", file);
-//                        //picUri=FileProvider.getUriForFile(AddPhotoVideo.this, BuildConfig.APPLICATION_ID+".provider", file);
-//                        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//                        intent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-//
-//
-//                    } else {
-//                        picUri = Uri.fromFile(file); // create
-//
-//                    }
-//                    intent.putExtra(MediaStore.EXTRA_OUTPUT, picUri);
-                    // set the image file
                     startActivityForResult(intent, REQUEST_CAMERA);
-
 
                 } else if (items[item].equals("Choose from Library")) {
                     Intent intent = new Intent(
@@ -248,7 +224,6 @@ public class WorkspaceSettingActivity extends AppCompatActivity {
         img_work_space.setImageBitmap(thumbnail);
         bitmap = thumbnail;
 
-        final double viewWidthToBitmapWidthRatio = (double) img_work_space.getWidth() / (double) thumbnail.getWidth();
         img_work_space.getLayoutParams().height = img_height;
 
 
@@ -275,36 +250,12 @@ public class WorkspaceSettingActivity extends AppCompatActivity {
         img_work_space.setImageBitmap(bm);
 
 
-//        image = BitMapToString(bm);
-
-//        file = new File(image);
-
-
         final double viewWidthToBitmapWidthRatio = (double) img_work_space.getWidth() / (double) bm.getWidth();
         img_work_space.getLayoutParams().height = (int) (bm.getHeight() * viewWidthToBitmapWidthRatio);
 
     }
 
-    private File getOutputMediaFile(int type) {
-        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_PICTURES), "MyApplication");
 
-        if (!mediaStorageDir.exists()) {
-            if (!mediaStorageDir.mkdirs()) {
-                return null;
-            }
-        }
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        File mediaFile;
-        if (type == 1) {
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-                    "IMG_" + timeStamp + ".png");
-        } else {
-            return null;
-        }
-
-        return mediaFile;
-    }
 
 
     private void callupdateapi(final ProgressDialog progressDialog) {
@@ -365,7 +316,7 @@ public class WorkspaceSettingActivity extends AppCompatActivity {
     }
 
     private void getworkspace() {
-        // Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
+
 
 
         final ProgressDialog dialog = AppConstants.showProgressDialog(WorkspaceSettingActivity.this, "Loading...");
@@ -400,10 +351,10 @@ public class WorkspaceSettingActivity extends AppCompatActivity {
                             String user_name = objects1.get(i).getString("user_name");
                             Log.e("imageFile_mission", mission + "");
                             AppConstants.savePreferences(WorkspaceSettingActivity.this, "workname", workspace_n);
-                            txt_workname_header.setText(First_Char_Capital.capitalizeString(workspace_n));
-                            txt_mission_value.setText(First_Char_Capital.capitalizeString(mission));
+                            txt_workname_header.setText(workspace_n);
+                            txt_mission_value.setText(mission);
                             txt_missionurl_value.setText(workspace_url);
-                            txt_workName_value.setText(First_Char_Capital.capitalizeString(workspace_n));
+                            txt_workName_value.setText(workspace_n);
                             if (imageFile != null) {
 
 
@@ -425,7 +376,7 @@ public class WorkspaceSettingActivity extends AppCompatActivity {
                     Toast.makeText(WorkspaceSettingActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
 
                     Log.e("else", e.getMessage());
-                    // error
+
                 }
 
 

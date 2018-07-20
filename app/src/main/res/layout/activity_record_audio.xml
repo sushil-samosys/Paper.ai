@@ -1,30 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.samosys.paperai.activity.activity.RecordAudioActivity">
+    android:layout_height="match_parent">
 
-    <!--<com.samosys.paperai.activity.utils.SquaredFrameLayout-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="wrap_content">-->
-
-    <ImageView
+    <com.samosys.paperai.activity.utils.ZoomableImageView
         android:id="@+id/imgCapturedimage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop" />
 
+
+        />
     <RelativeLayout
         android:id="@+id/rlTopbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/_45sdp"
         android:layout_alignParentTop="true"
-        android:background="@mipmap/sign_up_topbar_img"
+        android:background="@color/ksw_md_ripple_normal"
         android:orientation="vertical"
-
-
+        android:padding="@dimen/_10sdp"
         android:visibility="visible">
 
 
@@ -33,7 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-android:padding="@dimen/_5sdp"
+            android:padding="@dimen/_5sdp"
             android:src="@mipmap/signin_back_icon"
             android:visibility="visible" />
 
@@ -58,32 +52,38 @@ android:padding="@dimen/_5sdp"
             android:layout_centerVertical="true"
             android:layout_marginRight="@dimen/_5sdp"
             android:gravity="center"
-            android:padding="@dimen/_5sdp"
+
             android:text="NEXT"
             android:textColor="#fff"
             android:textSize="@dimen/_12sdp" />
     </RelativeLayout>
 
-    <!--</com.samosys.paperai.activity.utils.SquaredFrameLayout>-->
+
+
 
     <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:id="@+id/rl_audioRecord"
+        android:layout_width="@dimen/_70sdp"
+        android:layout_height="@dimen/_60sdp"
         android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"
         android:layout_gravity="center"
         android:layout_marginBottom="@dimen/_10sdp"
         android:gravity="center">
 
         <com.samosys.paperai.activity.utils.CircularProgressBar
             android:id="@+id/circularProgressbar"
-            android:layout_width="70dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
             android:layout_centerInParent="true"
-            app:cpb_background_progressbar_color="#fff"
+            android:layout_centerVertical="true"
+            app:cpb_background_progressbar_color="@color/ksw_md_ripple_normal"
             app:cpb_background_progressbar_width="8dp"
 
-            app:cpb_progressbar_color="@color/colorAccent"
+            app:cpb_progressbar_color="#E52867"
             app:cpb_progressbar_width="8dp" />
+
 
         <ImageView
             android:id="@+id/img_mic"

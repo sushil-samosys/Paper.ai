@@ -24,6 +24,8 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 
+import com.samosys.paperai.R;
+
 /**
  * Base class that contains common implementation for all
  * visualizers.
@@ -34,7 +36,7 @@ abstract public class BaseVisualizer extends View {
     protected byte[] bytes;
     protected Paint paint;
     protected Visualizer visualizer;
-    protected int color = Color.BLUE;
+    protected int color = R.color.colorAccent;
 
     public BaseVisualizer(Context context) {
         super(context);
@@ -65,7 +67,8 @@ abstract public class BaseVisualizer extends View {
      */
     public void setColor(int color) {
         this.color = color;
-        this.paint.setColor(this.color);
+        this.paint.setColor(getResources().getColor(R.color.colorAccent));
+
     }
 
     /**

@@ -18,6 +18,19 @@ buildscript {
     }
 }
 
+ext {
+    // dependency versions
+    versions = [
+            // production
+            supportLibrary: '27.0.3',
+            // test
+            junit         : '4.12',
+            mockito       : '2.11.0',
+            robolectric   : '3.5.1',
+            supportTest   : '1.0.1'
+    ]
+}
+
 
 allprojects {
     repositories {

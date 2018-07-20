@@ -27,7 +27,7 @@ import java.util.ArrayList;
 
 public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.Holder> {
     Context context;
-    ArrayList<CommentBean> filterlist;
+    private ArrayList<CommentBean> filterlist;
     CustomFonts customFonts;
 
 
@@ -47,7 +47,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.Holder> 
     @Override
     public void onBindViewHolder(final Holder holder, final int position) {
         String sourceString =   "</b> " + filterlist.get(position).getTxt();
-        holder.userName.setText(First_Char_Capital.capitalizeString("@" + filterlist.get(position).getPost_user_name()));
+        holder.userName.setText("@" + filterlist.get(position).getPost_user_name());
         holder.user_coment.setText(Html.fromHtml(sourceString));
         filterlist.get(position).getUser_imge().getDataInBackground(new GetDataCallback() {
             @Override
@@ -72,9 +72,9 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.Holder> 
 
 
     public class Holder extends RecyclerView.ViewHolder {
-        TextView userName, user_coment, comment_timeago, cn, txtURL;
+        private  TextView userName, user_coment;
 
-        ImageView imgwork;
+        private ImageView imgwork;
 
         public Holder(View itemView) {
             super(itemView);

@@ -17,7 +17,6 @@ import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-
 import com.samosys.paperai.R;
 import com.samosys.paperai.activity.Bean.WorkspaceBean;
 import com.samosys.paperai.activity.adapter.SearchWorkspace;
@@ -27,12 +26,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BrowesWorkspace extends AppCompatActivity {
-    RecyclerView rvworkspace;
-    ArrayList<WorkspaceBean> workList;
-    EditText edtSerchspace;
-    SearchWorkspace adapter;
-    ProgressDialog dialog;
-    ImageView projectback;
+    private RecyclerView rvworkspace;
+    private ArrayList<WorkspaceBean> workList;
+    private EditText edtSerchspace;
+    private SearchWorkspace adapter;
+    private ProgressDialog dialog;
+    private ImageView projectback;
 
 
     @Override
@@ -41,17 +40,15 @@ public class BrowesWorkspace extends AppCompatActivity {
         setContentView(R.layout.activity_browes_workspace);
         AppConstants.getstatusbar(BrowesWorkspace.this);
         AppConstants.keyboardhide(BrowesWorkspace.this);
-        rvworkspace = (RecyclerView) findViewById(R.id.rvworkspace);
-        edtSerchspace = (EditText) findViewById(R.id.edtSerchspace);
-        projectback = (ImageView) findViewById(R.id.projectback);
-        workList = new ArrayList<>();
-        workList.clear();
+
+        finview();
+
         dialog = AppConstants.showProgressDialog(BrowesWorkspace.this, "Loading");
         ParseQuery<ParseObject> query = ParseQuery.getQuery("WorkSpace");
         query.findInBackground(new FindCallback<ParseObject>() {
             @Override
             public void done(List<ParseObject> objects, ParseException e) {
-                Log.e("WorkSpace",  objects.size() + "");
+                Log.e("WorkSpace", objects.size() + "");
                 if (dialog.isShowing()) {
                     dialog.dismiss();
                 }
@@ -60,18 +57,18 @@ public class BrowesWorkspace extends AppCompatActivity {
                     for (int i = 0; i < objects.size(); i++) {
 
                         String objectId = objects.get(i).getObjectId();
-                         ParseObject user = ParseObject.createWithoutData("WorkSpace", "user");
+                        ParseObject user = ParseObject.createWithoutData("WorkSpace", "user");
                         String mission = objects.get(i).getString("mission");
                         String updatedAt = objects.get(i).getUpdatedAt().toString();
-                         String workspace_name = objects.get(i).getString("workspace_name");
+                        String workspace_name = objects.get(i).getString("workspace_name");
                         String createdAt = objects.get(i).getCreatedAt().toString();
-                         ParseFile image = (ParseFile) objects.get(i).get("image");
+                        ParseFile image = (ParseFile) objects.get(i).get("image");
                         String ws_image = image.getUrl();
                         String user_name = objects.get(i).getString("user_name");
                         String workspace_url = objects.get(i).getString("workspace_url");
                         String archive = objects.get(i).getString("archive");
 
-                         workList.add(new WorkspaceBean(objectId, user, mission, updatedAt, workspace_name, createdAt, image, ws_image, user_name, workspace_url, archive));
+                        workList.add(new WorkspaceBean(objectId, user, mission, updatedAt, workspace_name, createdAt, image, ws_image, user_name, workspace_url, archive));
                     }
                     adapter = new SearchWorkspace(BrowesWorkspace.this, workList);
                     RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(BrowesWorkspace.this);
@@ -110,9 +107,13 @@ public class BrowesWorkspace extends AppCompatActivity {
         });
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-
+    private void finview() {
+        rvworkspace = (RecyclerView) findViewById(R.id.rvworkspace);
+        edtSerchspace = (EditText) findViewById(R.id.edtSerchspace);
+        projectback = (ImageView) findViewById(R.id.projectback);
+        workList = new ArrayList<>();
+        workList.clear();
     }
+
+
 }

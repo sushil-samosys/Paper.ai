@@ -1,4 +1,4 @@
-package com.samosys.paperai.activity.menuBeanList;
+package com.samosys.paperai.activity.Bean;
 
 /**
  * Created by samosys on 30/5/18.
@@ -6,14 +6,14 @@ package com.samosys.paperai.activity.menuBeanList;
 
 public class NewChildCategoryBeanList {
 
-    String childObjectId;
-    String childName;
-    String childUpdatedAt;
-    String childWorkspaceID;
-    String childObjective;
-    String childCreatedAt;
-    String strdefault;
-    String childType;
+    private String childObjectId;
+    private  String childName;
+    private  String childUpdatedAt;
+    private String childWorkspaceID;
+    private String childObjective;
+    private String childCreatedAt;
+    private String strdefault;
+    private String childType;
 
     public NewChildCategoryBeanList(String childObjectId, String childName, String childUpdatedAt,
                                     String childWorkspaceID, String childObjective, String childCreatedAt, String strdefault, String childType) {

@@ -120,7 +120,7 @@ public class MypostAdapter extends RecyclerView.Adapter<MypostAdapter.Holder> {
         holder.num_likes.setText(listitem.get(position).getLikesCount() + " Likes");
         holder.num_comment.setText(listitem.get(position).getCommentCount() + " Comments");
         holder.post_text.setText(listitem.get(position).getText());
-        holder.poster_name.setText(First_Char_Capital.capitalizeString(listitem.get(position).getUsername()));
+        holder.poster_name.setText(listitem.get(position).getUsername());
         holder.post_time.setText(listitem.get(position).getUpdatedAt());
 
 
@@ -173,7 +173,7 @@ public class MypostAdapter extends RecyclerView.Adapter<MypostAdapter.Holder> {
             holder.feed_image.getLayoutParams().height = (img_height * 3) / 2;
         } else {
             holder.RL_imagefeed.setVisibility(View.GONE);
-            holder.post_text.setText(First_Char_Capital.capitalizeString(listitem.get(position).getText()));
+            holder.post_text.setText(listitem.get(position).getText());
             holder.post_text.setTextSize(25);
 
             holder.post_text.setTypeface(customFonts.calibri);

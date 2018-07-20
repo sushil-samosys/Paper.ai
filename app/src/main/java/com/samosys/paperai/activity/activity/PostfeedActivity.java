@@ -3,6 +3,7 @@ package com.samosys.paperai.activity.activity;
 import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -10,19 +11,28 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.media.AudioManager;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.Html;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.TextAppearanceSpan;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -48,12 +58,19 @@ import com.parse.ParseUser;
 import com.parse.SaveCallback;
 import com.samosys.paperai.R;
 import com.samosys.paperai.activity.AudioVisualizer.LineBarVisualizer;
-import com.samosys.paperai.activity.Bean.ParentBean;
 import com.samosys.paperai.activity.Bean.ProjctBean;
 import com.samosys.paperai.activity.Bean.WorkSpaceMemberBean;
-import com.samosys.paperai.activity.FullVideoview.FullscreenVideoLayout;
+import com.samosys.paperai.activity.autocomplete.Autocomplete;
+import com.samosys.paperai.activity.autocomplete.AutocompleteCallback;
+import com.samosys.paperai.activity.autocomplete.AutocompletePolicy;
+import com.samosys.paperai.activity.autocomplete.AutocompletePresenter;
+import com.samosys.paperai.activity.autocomplete.CharPolicy;
+import com.samosys.paperai.activity.autocomplete.ProjectPresenter;
+import com.samosys.paperai.activity.autocomplete.UserPresenter;
 import com.samosys.paperai.activity.utils.AppConstants;
+import com.samosys.paperai.activity.utils.CustomFonts;
 import com.samosys.paperai.activity.utils.NetworkAvailablity;
+import com.samosys.paperai.activity.utils.SimpleTooltip;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -66,14 +83,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import cc.cloudist.acplibrary.ACProgressConstant;
 import cc.cloudist.acplibrary.ACProgressFlower;
+import cn.jzvd.JZVideoPlayerStandard;
 
 import static org.apache.commons.io.IOUtils.toByteArray;
 
-
-//import com.alibaba.fastjson.JSON;
 
 public class PostfeedActivity extends AppCompatActivity {
 
@@ -82,88 +100,52 @@ public class PostfeedActivity extends AppCompatActivity {
             Manifest.permission.RECORD_AUDIO
     };
     public static final int AUDIO_PERMISSION_REQUEST_CODE = 102;
-
-    protected MediaPlayer mediaPlayer1;
-    ImageButton reply;
-    //https://github.com/lgvalle/Material-Animations
-    ParseFile parseFile = null;
-    EditText caption_txt;
-    TextView btn_sendPost;
-    RelativeLayout include_visual;
-
-    ImageView btnVolume, imgSingleUser;
-    LineBarVisualizer lineBarVisualizer;
-    FullscreenVideoLayout myVideoView;
-    MediaPlayer mediaPlayer;
-    Spinner projectSpinner;
-    RelativeLayout rlEditext, rlSingleUser, rlpublic, rlcard, rlmember;
-    Boolean editIcon = true;
-    ImageButton ib_play_pause;
-    ImageView imgPrivacy, imgpublic, imgcard, imgBinoculor;
-    LinearLayout ll_privecy;
+    public static ArrayList<WorkSpaceMemberBean> UserList;
+    public static ArrayList<ProjctBean> projectList;
+    public int duration = 0, startDur = 0;
     boolean Privacy = false;
-    private AudioManager mAudioManager;
-    private int position = 0;
-    private String strFile = "", post_type = "", workid = "", projectID = "", imageURL = "", privacy = "3";
-    private RelativeLayout RL_imagefeed, rl_vidio;
+    private ImageButton reply;
+    private JSONObject subObject;
+    private ParseFile parseFile = null;
+    private EditText caption_txt;
+    private TextView btn_sendPost, post_header;
+    private RelativeLayout include_visual;
+    private ImageView btnVolume, imgSingleUser, img_arroe, imgRateuser, imgMention;
+    private LineBarVisualizer lineBarVisualizer;
+    private MediaPlayer mediaPlayer;
+    private Spinner projectSpinner;
+    private RelativeLayout rlSingleUser, rlpublic, rlcard, rlmember;
+    private LinearLayout rlEditext;
+    private Boolean editIcon = true;
+    private ImageButton ib_play_pause;
+    private ImageView imgPrivacy, imgpublic, imgcard, imgBinoculor;
+    private LinearLayout ll_privecy, llPlaybtn, ll_bottm;
+    private CustomFonts customFonts;
+    private JZVideoPlayerStandard jzVideoPlayerStandard;
+    private ArrayList<String> strMentionList;
+    private RelativeLayout RLMain;
+    private Autocomplete mentionsAutocomplete;
+    private Timer timer;
+    private String strFile = "", post_type = "", workid = "", projectID = "", imageURL = "", privacy = "3", strdur = "";
+    private RelativeLayout RL_imagefeed, rl_vidio, linbar;
     private AQuery aq;
-    private ImageView imgCapturedimage, btn_fullscren, ImgPostImage;
-    private TextView work_name, txt_text, txtduration;
-    private boolean isHideToolbarView = false;
+    private ImageView imgCapturedimage, btn_fullscren;
+    private TextView txtduration;
     private ACProgressFlower dialog;
     private MediaController mediaControls;
-    private ArrayList<WorkSpaceMemberBean> UserList;
-    private ArrayList<ProjctBean> projectList;
 
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        AppConstants.getstatusbar(PostfeedActivity.this);
-        AppConstants.hideKeyboard(PostfeedActivity.this);
         setContentView(R.layout.activity_postfeed);
-        aq = new AQuery(PostfeedActivity.this);
-        reply = (ImageButton) findViewById(R.id.reply);
-        strFile = getIntent().getStringExtra("file");
-        post_type = getIntent().getStringExtra("post_type");
-        imageURL = getIntent().getStringExtra("imageURL");
-        rlmember = (RelativeLayout) findViewById(R.id.rlmember);
-        rlSingleUser = (RelativeLayout) findViewById(R.id.rlSingleUser);
-        rlcard = (RelativeLayout) findViewById(R.id.rlcard);
-        rlpublic = (RelativeLayout) findViewById(R.id.rlpublic);
-        Log.e("strFile", strFile + ">>>" + post_type);
-        projectSpinner = (Spinner) findViewById(R.id.projectSpinner);
-        mediaPlayer1 = new MediaPlayer();
-        UserList = new ArrayList<>();
-        ll_privecy = (LinearLayout) findViewById(R.id.ll_privecy);
-        btnVolume = (ImageView) findViewById(R.id.btnVolume);
-        imgSingleUser = (ImageView) findViewById(R.id.imgSingleUser);
-        rlEditext = (RelativeLayout) findViewById(R.id.rlEditext);
-        workid = AppConstants.loadPreferences(PostfeedActivity.this, "workid");
-        projectID = AppConstants.loadPreferences(PostfeedActivity.this, "projectID");
-        include_visual = (RelativeLayout) findViewById(R.id.include_visual);
-        lineBarVisualizer = (LineBarVisualizer) findViewById(R.id.visualizer);
-        imgpublic = (ImageView) findViewById(R.id.imgpublic);
-        imgcard = (ImageView) findViewById(R.id.imgcard);
-        imgPrivacy = (ImageView) findViewById(R.id.imgPrivacy);
-        imgBinoculor = (ImageView) findViewById(R.id.imgBinoculor);
-        caption_txt = (EditText) findViewById(R.id.caption_txt);
-        projectList = new ArrayList<>();
-        myVideoView = (FullscreenVideoLayout) findViewById(R.id.video_view);
-        work_name = (TextView) findViewById(R.id.workname);
-        txtduration = (TextView) findViewById(R.id.txtduration);
-        btn_sendPost = (TextView) findViewById(R.id.btn_sendPost);
-        imgCapturedimage = (ImageView) findViewById(R.id.imagesPost);
-        ImgPostImage = (ImageView) findViewById(R.id.ImgPostImage);
-        btn_fullscren = (ImageView) findViewById(R.id.btn_fullscren);
-        rl_vidio = (RelativeLayout) findViewById(R.id.rl_vidio);
-
-        ib_play_pause = (ImageButton) findViewById(R.id.ib_play_pause);
-        RL_imagefeed = (RelativeLayout) findViewById(R.id.RL_imagefeed);
-        // customMultiAutoComplete.onViewAttached(caption_txt);
-        myVideoView.setShouldAutoplay(false);
+        AppConstants.getstatusbar(PostfeedActivity.this);
 
 
-        mAudioManager = (AudioManager) PostfeedActivity.this.getSystemService(Context.AUDIO_SERVICE);
+        findview();
+        initialize();
+
 
         if (mediaPlayer == null) {
             mediaPlayer = new MediaPlayer();
@@ -173,6 +155,14 @@ public class PostfeedActivity extends AppCompatActivity {
             mediaControls = new MediaController(PostfeedActivity.this);
 
         }
+        lineBarVisualizer.setColor(ContextCompat.getColor(PostfeedActivity.this, R.color.colorAccent));
+
+        // define custom number of bars you want in the visualizer between (10 - 256).
+        lineBarVisualizer.setDensity(90f);
+        //   lineBarVisualizer.setBackgroundColor(getResources().getColor(R.color.ksw_md_solid_shadow));
+
+        // Set your media player to the visualizer.
+        lineBarVisualizer.setPlayer(mediaPlayer.getAudioSessionId());
         imgPrivacy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -189,9 +179,27 @@ public class PostfeedActivity extends AppCompatActivity {
             }
         });
 
+//
+        img_arroe.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
         rlSingleUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                new SimpleTooltip.Builder(PostfeedActivity.this)
+                        .anchorView(rlSingleUser)
+                        .text("Only you")
+                        .gravity(Gravity.TOP)
+
+                        .arrowColor(getResources().getColor(R.color.colorAccent))
+                        .backgroundColor(getResources().getColor(R.color.colorAccent))
+                        .animated(false)
+                        .build()
+                        .show();
                 rlSingleUser.setBackgroundColor(getResources().getColor(R.color.txt_dark));
                 rlpublic.setBackgroundColor(getResources().getColor(R.color.white));
                 rlcard.setBackgroundColor(getResources().getColor(R.color.white));
@@ -206,6 +214,16 @@ public class PostfeedActivity extends AppCompatActivity {
         rlmember.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                new SimpleTooltip.Builder(PostfeedActivity.this)
+                        .anchorView(rlmember)
+                        .text("Followers")
+                        .gravity(Gravity.TOP)
+                        .arrowColor(getResources().getColor(R.color.colorAccent))
+                        .backgroundColor(getResources().getColor(R.color.colorAccent))
+                        .animated(false)
+                        .build()
+                        .show();
+
                 rlmember.setBackgroundColor(getResources().getColor(R.color.txt_dark));
                 rlSingleUser.setBackgroundColor(getResources().getColor(R.color.white));
                 rlpublic.setBackgroundColor(getResources().getColor(R.color.white));
@@ -219,9 +237,79 @@ public class PostfeedActivity extends AppCompatActivity {
             }
         });
 
+        RLMain.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                if (!post_type.equals("0") && !post_type.equals("2")) {
+                    int heightDiff = RLMain.getRootView().getHeight() - RLMain.getHeight();
+                    if (heightDiff > AppConstants.dpToPx(PostfeedActivity.this, 200)) {
+//
+                        btn_fullscren.setVisibility(View.GONE);
+
+
+// Gets the layout params that will allow you to resize the layout
+
+                        rlEditext.animate()
+                                .translationY(-300)
+
+
+                                .alpha(7.0f)
+
+                                .setListener(new AnimatorListenerAdapter() {
+                                    @Override
+                                    public void onAnimationEnd(Animator animation) {
+                                        super.onAnimationEnd(animation);
+                                        rlEditext.setBackground(getResources().getDrawable(R.drawable.postbackgroung));
+
+                                        caption_txt.setPadding(10, 10, 10, 0);
+
+                                        RL_imagefeed.requestLayout();
+                                        RL_imagefeed.getLayoutParams().height = ((int) getResources().getDimension(R.dimen._100sdp));
+
+                                    }
+                                });
+
+
+                    } else {
+                        rlEditext.animate()
+                                .translationY(0)
+
+                                .alpha(1.0f)
+
+                                .setListener(new AnimatorListenerAdapter() {
+                                    @Override
+                                    public void onAnimationEnd(Animator animation) {
+                                        super.onAnimationEnd(animation);
+                                        RL_imagefeed.requestLayout();
+                                        btn_fullscren.setVisibility(View.VISIBLE);
+                                        if (post_type.equals("2")) {
+                                            // RL_imagefeed.getLayoutParams().height = ((int) getResources().getDimension(R.dimen._120sdp));
+                                        } else {
+                                            RL_imagefeed.getLayoutParams().height = ((int) getResources().getDimension(R.dimen._200sdp));
+                                        }
+                                        RL_imagefeed.setBackground(null);
+                                    }
+                                });
+                        Log.e("KEYBOARD", "HIDE");
+
+
+                    }
+                }
+            }
+        });
         rlpublic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                new SimpleTooltip.Builder(PostfeedActivity.this)
+                        .anchorView(rlpublic)
+                        .text("Contact")
+                        .gravity(Gravity.TOP)
+
+                        .arrowColor(getResources().getColor(R.color.colorAccent))
+                        .backgroundColor(getResources().getColor(R.color.colorAccent))
+                        .animated(false)
+                        .build()
+                        .show();
                 rlpublic.setBackgroundColor(getResources().getColor(R.color.txt_dark));
                 rlSingleUser.setBackgroundColor(getResources().getColor(R.color.white));
                 rlcard.setBackgroundColor(getResources().getColor(R.color.white));
@@ -234,9 +322,37 @@ public class PostfeedActivity extends AppCompatActivity {
             }
         });
 
+        imgRateuser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String text = "<font color=#3F51B5>@</font>";
+                caption_txt.append(Html.fromHtml(text));
+            }
+        });
+        imgMention.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String text = "<font color=#3F51B5>#</font>";
+                caption_txt.append(Html.fromHtml(text));
+
+
+            }
+        });
+
         rlcard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                new SimpleTooltip.Builder(PostfeedActivity.this)
+                        .anchorView(rlcard)
+                        .text("Member")
+                        .gravity(Gravity.TOP)
+                        .arrowColor(getResources().getColor(R.color.colorAccent))
+                        .backgroundColor(getResources().getColor(R.color.colorAccent))
+
+                        .animated(false)
+                        .build()
+                        .show();
                 rlpublic.setBackgroundColor(getResources().getColor(R.color.white));
                 rlcard.setBackgroundColor(getResources().getColor(R.color.txt_dark));
                 rlSingleUser.setBackgroundColor(getResources().getColor(R.color.white));
@@ -251,7 +367,7 @@ public class PostfeedActivity extends AppCompatActivity {
         });
         if (NetworkAvailablity.chkStatus(PostfeedActivity.this)) {
             getprojectlist();
-            getprojectmember();
+            setupTagAutocomplete();
 
         } else {
             Toast.makeText(PostfeedActivity.this, "Please Check Your Internet Connection", Toast.LENGTH_SHORT).show();
@@ -274,70 +390,127 @@ public class PostfeedActivity extends AppCompatActivity {
                 ib_play_pause.setImageDrawable(ContextCompat.getDrawable(
                         PostfeedActivity.this,
                         R.drawable.ic_play_red_48dp));
-                mediaPlayer.stop();
-                mediaPlayer.release();
-                mediaPlayer = null;
+                String min = gettimeinminute(mediaPlayer.getDuration());
+                strdur = millisecondsToTime(mediaPlayer.getDuration());
+////
+                duration = Integer.parseInt(strdur);
+                txtduration.setText(min);
+
+//
             }
         });
+
+        linbar.getBackground().setAlpha(150);
+        ib_play_pause.getBackground().setAlpha(150);
+        txtduration.getBackground().setAlpha(150);
+
         ib_play_pause.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("Range")
             @Override
             public void onClick(View v) {
-                initialize();
+
                 if (mediaPlayer != null) {
                     if (mediaPlayer.isPlaying()) {
                         mediaPlayer.pause();
+                        timer.cancel();
+                        Log.e("inelse123", "" + duration);
+
                         ib_play_pause.setImageDrawable(ContextCompat.getDrawable(
                                 PostfeedActivity.this,
                                 R.drawable.ic_play_red_48dp));
                     } else {
                         mediaPlayer.start();
+//
+                        timer = new Timer();
+                        timer.schedule(new TimerTask() {
+                            public void run() {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        // Your code
+
+                                        startDur++;
+                                        if (startDur <= duration) {
+
+                                            if (startDur <= 9) {
+                                                txtduration.setText("00:0" + startDur);
+                                            } else {
+                                                txtduration.setText("00:" + startDur);
+                                            }
+
+
+                                        } else {
+                                            timer.cancel();
+                                            startDur = 0;
+                                            Log.e("duration", "" + startDur);
+                                            Log.e("duration12", "" + strdur);
+                                        }
+
+                                    }
+                                });
+                            }
+                        }, 1000, 1000);
+
+
                         ib_play_pause.setImageDrawable(ContextCompat.getDrawable(
                                 PostfeedActivity.this,
                                 R.drawable.ic_pause_red_48dp));
+
+
                     }
                 } else {
-                    mediaPlayer = new MediaPlayer();
 
-                    lineBarVisualizer.setColor(ContextCompat.getColor(PostfeedActivity.this, R.color.colorPrimary));
+                    strdur = millisecondsToTime(mediaPlayer.getDuration());
 
-                    // define custom number of bars you want in the visualizer between (10 - 256).
-                    lineBarVisualizer.setDensity(90f);
+                    Log.e("FileDURATION", ">>" + strdur);
+                    duration = Integer.parseInt(strdur);
+                    Log.e("inelse", "" + duration);
+                    mediaPlayer.seekTo(0);
+//                    timer = new Timer();
+                    timer.schedule(new TimerTask() {
+                        public void run() {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    // Your code
 
-                    // Set your media player to the visualizer.
-                    lineBarVisualizer.setPlayer(mediaPlayer.getAudioSessionId());
-//                    mediaPlayer.seekTo(0);
+                                    duration--;
+                                    if (duration >= 0) {
 
-                    try {
-                        mediaPlayer.setDataSource(strFile);
-                        mediaPlayer.prepare();
-                        mediaPlayer.start();
-                        mediaPlayer.setLooping(false);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-//            mediaPlayer.start();
+                                        if (duration <= 9) {
+                                            txtduration.setText("00:0" + duration);
+                                        } else {
+                                            txtduration.setText("00:" + duration);
+                                        }
 
-//                    mediaPlayer.start();
+
+                                    } else {
+                                        timer.cancel();
+                                        Log.e("duration", "" + duration);
+                                        Log.e("duration12", "" + strdur);
+                                    }
+
+                                }
+                            });
+                        }
+                    }, 1000, 1000);
                     ib_play_pause.setImageDrawable(ContextCompat.getDrawable(
                             PostfeedActivity.this,
                             R.drawable.ic_pause_red_48dp));
 
                 }
 
+
+//
             }
         });
+
 
         projectSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-
-                ((TextView) adapterView.getChildAt(0)).setTextColor(getResources().getColor(R.color.txt_dark));
-                ((TextView) adapterView.getChildAt(0)).setTextSize(13);
-
-                ((TextView) adapterView.getChildAt(0)).setSingleLine();
-                //if (userIsInteracting) {
+                ((TextView) adapterView.getChildAt(0)).setTypeface(customFonts.calibri);
                 projectID = projectList.get(i).getObjectId();
-
 
             }
 
@@ -347,10 +520,6 @@ public class PostfeedActivity extends AppCompatActivity {
             }
         });
 
-
-        txt_text = (TextView) findViewById(R.id.txt_text);
-
-        work_name.setText(AppConstants.loadPreferences(PostfeedActivity.this, "workname"));
 
         Log.e("strFile", strFile);
         // post_type="2";
@@ -363,21 +532,36 @@ public class PostfeedActivity extends AppCompatActivity {
         } else if (post_type.equals("2")) {
 
             RL_imagefeed.setVisibility(View.VISIBLE);
+            RL_imagefeed.requestLayout();
+            RL_imagefeed.getLayoutParams().height = ((int) getResources().getDimension(R.dimen._120sdp));
             File file = new File(strFile);
-//          int a=  getAudioInfo(file);
-//            txtduration.setText(""+a);
+
+            strdur = millisecondsToTime(mediaPlayer.getDuration());
+
+            Log.e("FileDURATION", ">>" + strdur);
+            duration = Integer.parseInt(strdur);
+
+            String min = gettimeinminute(mediaPlayer.getDuration());
+
+            txtduration.setText(min);
+
+
             converttexttospeech(file, strFile, post_type);
 
 
         } else if (post_type.equals("1")) {
+
             RL_imagefeed.setVisibility(View.VISIBLE);
             imgCapturedimage.setVisibility(View.VISIBLE);
-
             include_visual.setVisibility(View.GONE);
             rl_vidio.setVisibility(View.GONE);
-            if (!strFile.equals("")) {
-                setImage(strFile);
 
+            File file = new File(strFile);
+
+            if (!strFile.equals("")) {
+
+                setImage(strFile);
+//
             } else {
                 RL_imagefeed.setVisibility(View.GONE);
             }
@@ -387,21 +571,20 @@ public class PostfeedActivity extends AppCompatActivity {
             rl_vidio.setVisibility(View.VISIBLE);
             imgCapturedimage.setVisibility(View.GONE);
             include_visual.setVisibility(View.GONE);
-
-            myVideoView.setActivity(this);
-
-            Uri videoUri = Uri.parse(strFile);
-            try {
-                myVideoView.setVideoURI(videoUri);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            jzVideoPlayerStandard.dismissVolumeDialog();
+            jzVideoPlayerStandard.setUp(strFile
+                    , JZVideoPlayerStandard.SCREEN_WINDOW_NORMAL, "");
+//
         } else if (post_type.equals("4")) {
             RL_imagefeed.setVisibility(View.VISIBLE);
             imgCapturedimage.setVisibility(View.VISIBLE);
             include_visual.setVisibility(View.VISIBLE);
             rl_vidio.setVisibility(View.GONE);
+
+
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+            params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM, RL_imagefeed.getId());
+            include_visual.setLayoutParams(params);
             // callimagewidAudio();
             if (!strFile.equals("")) {
                 setImage(imageURL);
@@ -409,9 +592,13 @@ public class PostfeedActivity extends AppCompatActivity {
             } else {
                 RL_imagefeed.setVisibility(View.GONE);
             }
+            strdur = millisecondsToTime(mediaPlayer.getDuration());
+            duration = Integer.parseInt(strdur);
+
+            String min = gettimeinminute(mediaPlayer.getDuration());
+
+            txtduration.setText(min);
             File file = new File(strFile);
-//          int a=  getAudioInfo(file);
-//            txtduration.setText(""+a);
             converttexttospeech(file, strFile, post_type);
         }
 
@@ -452,7 +639,12 @@ public class PostfeedActivity extends AppCompatActivity {
                         createPostImage(parseFile);
                     }
                 } else if (post_type.equals("0")) {
+
+
                     if (caption_txt.getText().toString().equals("") || caption_txt.getText().toString() == null) {
+                        if (dialog.isShowing()) {
+                            dialog.dismiss();
+                        }
                         Toast.makeText(PostfeedActivity.this, "Please Enter something...", Toast.LENGTH_SHORT).show();
                     } else {
                         createPostImage(parseFile);
@@ -486,6 +678,40 @@ public class PostfeedActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
 
+                } else if (post_type.equals("4")) {
+                    byte[] soundBytes;
+                    try {
+                        InputStream inputStream =
+                                getContentResolver().openInputStream(Uri.fromFile(new File(strFile)));
+                        //  soundBytes = new byte[inputStream.available()];
+                        soundBytes = toByteArray(inputStream);
+
+                        ParseFile audioFile = new ParseFile("file.m4a", soundBytes);
+
+
+                        File newFile = new File(imageURL);
+                        Uri selectedImage = Uri.fromFile(newFile);
+
+
+                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(PostfeedActivity.this.getContentResolver(), selectedImage);
+
+                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                        // Compress image to lower quality scale 1 - 100
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 90, stream);
+                        byte[] image = stream.toByteArray();
+
+
+                        // Create the ParseFile
+
+                        parseFile = new ParseFile("postfile.jpg", image);
+
+
+                        createPostImageWithaudio(parseFile, audioFile);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+
                 }
 
             }
@@ -496,17 +722,11 @@ public class PostfeedActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-
-//                rlEditext.addView(RL_imagefeed);
-//                rlEditext.bringToFront();
-//                rlEditext.invalidate();
-
-
                 if (editIcon) {
                     btn_fullscren.setImageDrawable(getResources().getDrawable(R.mipmap.compress_icon));
 
                     RL_imagefeed.animate()
-                            .translationY(-700)
+                            .translationY(-500)
 
 
                             .alpha(1.0f)
@@ -548,59 +768,188 @@ public class PostfeedActivity extends AppCompatActivity {
 
     }
 
-    private void callimagewidAudio() {
+    private void findview() {
+        strMentionList = new ArrayList<>();
+        subObject = new JSONObject();
+        aq = new AQuery(PostfeedActivity.this);
+        reply = (ImageButton) findViewById(R.id.reply);
+        strFile = getIntent().getStringExtra("file");
+        post_type = getIntent().getStringExtra("post_type");
+        imageURL = getIntent().getStringExtra("imageURL");
+        rlmember = (RelativeLayout) findViewById(R.id.rlmember);
+        rlSingleUser = (RelativeLayout) findViewById(R.id.rlSingleUser);
+        customFonts = new CustomFonts(PostfeedActivity.this);
+        rlcard = (RelativeLayout) findViewById(R.id.rlcard);
+        RLMain = (RelativeLayout) findViewById(R.id.RLMain);
+        rlpublic = (RelativeLayout) findViewById(R.id.rlpublic);
+        Log.e("strFile", strFile + ">>>" + post_type + ">>>>" + imageURL);
+        projectSpinner = (Spinner) findViewById(R.id.projectSpinner);
+        jzVideoPlayerStandard = (JZVideoPlayerStandard) findViewById(R.id.jzVideoPlayerStandard);
+        UserList = new ArrayList<>();
+        ll_privecy = (LinearLayout) findViewById(R.id.ll_privecy);
+        ll_bottm = (LinearLayout) findViewById(R.id.ll_bottm);
+        llPlaybtn = (LinearLayout) findViewById(R.id.llPlaybtn);
+        btnVolume = (ImageView) findViewById(R.id.btnVolume);
+        imgSingleUser = (ImageView) findViewById(R.id.imgSingleUser);
+        img_arroe = (ImageView) findViewById(R.id.img_arroe);
+        rlEditext = (LinearLayout) findViewById(R.id.rlEditext);
+        workid = AppConstants.loadPreferences(PostfeedActivity.this, "workid");
+        projectID = AppConstants.loadPreferences(PostfeedActivity.this, "projectID");
+        include_visual = (RelativeLayout) findViewById(R.id.include_visual);
+        lineBarVisualizer = (LineBarVisualizer) findViewById(R.id.visualizer);
+        imgpublic = (ImageView) findViewById(R.id.imgpublic);
+        imgcard = (ImageView) findViewById(R.id.imgcard);
+        imgPrivacy = (ImageView) findViewById(R.id.imgPrivacy);
+        imgBinoculor = (ImageView) findViewById(R.id.imgBinoculor);
+        imgRateuser = (ImageView) findViewById(R.id.imgRateuser);
+        imgMention = (ImageView) findViewById(R.id.imgMention);
+        caption_txt = (EditText) findViewById(R.id.caption_txt);
+        projectList = new ArrayList<>();
+        txtduration = (TextView) findViewById(R.id.txtduration);
+        btn_sendPost = (TextView) findViewById(R.id.btn_sendPost);
+        post_header = (TextView) findViewById(R.id.post_header);
+        imgCapturedimage = (ImageView) findViewById(R.id.imagesPost);
 
-        if (!strFile.equals("")) {
-            setImage_widaudio(strFile);
+        btn_fullscren = (ImageView) findViewById(R.id.btn_fullscren);
+        rl_vidio = (RelativeLayout) findViewById(R.id.rl_vidio);
+        post_header.setTypeface(customFonts.CabinBold);
+        ib_play_pause = (ImageButton) findViewById(R.id.ib_play_pause);
+        RL_imagefeed = (RelativeLayout) findViewById(R.id.RL_imagefeed);
+        txtduration.setTypeface(customFonts.calibri);
+        btn_sendPost.setTypeface(customFonts.calibri);
+        linbar = (RelativeLayout) findViewById(R.id.linbar);
+    }
 
+    private void setupTagAutocomplete() {
+
+        float elevation = 6f;
+        Drawable backgroundDrawable = new ColorDrawable(Color.WHITE);
+        AutocompletePolicy policy = new CharPolicy('#'); // Look for #mentions
+        AutocompletePresenter<ProjctBean> presenter = new ProjectPresenter(PostfeedActivity.this);
+        AutocompleteCallback<ProjctBean> callback = new AutocompleteCallback<ProjctBean>() {
+            @Override
+            public boolean onPopupItemClicked(Editable editable, ProjctBean item) {
+                // Replace query text with the full name.
+                int[] range = CharPolicy.getQueryRange(editable);
+                if (range == null) return false;
+                int start = range[0];
+                int end = range[1];
+                String replacement = item.getName();
+                editable.replace(start, end, replacement);
+                editable.setSpan(new ForegroundColorSpan(Color.BLUE), start, start + replacement.length(),
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                editable.setSpan(new TextAppearanceSpan(PostfeedActivity.this, R.style.MyTheme), start, start + replacement.length(),
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                return true;
+            }
+
+            public void onPopupVisibilityChanged(boolean shown) {
+
+            }
+        };
+
+        mentionsAutocomplete = Autocomplete.<ProjctBean>on(caption_txt)
+                .with(elevation)
+                .with(backgroundDrawable)
+
+                .with(policy)
+                .with(presenter)
+                .with(callback)
+                .build();
+    }
+
+    private String gettimeinminute(int duration) {
+
+        long minutes = (duration / 1000) / 60;
+        long seconds = (duration / 1000) % 60;
+        String secondsStr = Long.toString(seconds);
+        String secs;
+        if (secondsStr.length() >= 2) {
+            secs = secondsStr.substring(0, 2);
         } else {
-            RL_imagefeed.setVisibility(View.GONE);
+            secs = "0" + secondsStr;
         }
 
-        File file = new File(strFile);
-//          int a=  getAudioInfo(file);
-//            txtduration.setText(""+a);
+        return "0" + minutes + ":" + secs;
+    }
 
 
+    public void createPostImageWithaudio(ParseFile parseFile, ParseFile audioFile) {
+
+
+        ParseObject gameScore = new ParseObject("Post");
+
+        gameScore.put("user", ParseObject.createWithoutData("_User", ParseUser.getCurrentUser().getObjectId()));
+        gameScore.put("text", caption_txt.getText().toString());
+        gameScore.put("workspace", ParseObject.createWithoutData("WorkSpace", workid));
+        gameScore.put("project", ParseObject.createWithoutData("Project", projectID));
+        gameScore.put("post_type", post_type);
+        gameScore.put("CommentCount", 0);
+        gameScore.put("likesCount", 0);
+        gameScore.put("privacy", privacy);
+        gameScore.put("post_type", post_type);
+        gameScore.put("postImage", parseFile);
+        gameScore.put("media_duration", HomeFeedActivity.prog + "");
+        gameScore.put("post_file", audioFile);
+//        gameScore.put("audioWave", wave);
+        gameScore.put("tagUserId", subObject.toString());
+
+        gameScore.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (dialog.isShowing()) {
+                    dialog.dismiss();
+                }
+                if (e == null) {
+                    Toast.makeText(PostfeedActivity.this, "Post Share", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(PostfeedActivity.this, HomeFeedActivity.class);
+                    finish();
+                    startActivity(intent);
+
+                } else {
+
+                    Toast.makeText(PostfeedActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e("POSTING", e.getMessage());
+                }
+            }
+        });
+
+    }
+
+
+
+    private String millisecondsToTime(int duration) {
+        long minutes = (duration / 1000) / 60;
+        long seconds = (duration / 1000) % 60;
+        String secondsStr = Long.toString(seconds);
+        String secs;
+        if (secondsStr.length() >= 2) {
+            secs = secondsStr.substring(0, 2);
+        } else {
+            secs = "0" + secondsStr;
+        }
+
+        return secs;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (jzVideoPlayerStandard.backPress()) {
+            return;
+        }
+        super.onBackPressed();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        jzVideoPlayerStandard.releaseAllVideos();
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
-        myVideoView.resize();
-    }
-
-    private void setImage_widaudio(String strFile) {
-
-        File newFile = new File(strFile);
-
-        File file = new File(newFile.getAbsolutePath());
-        if (file.exists()) {
-            BitmapAjaxCallback cb = new BitmapAjaxCallback();
-            cb.targetWidth(500).rotate(true);
-            aq.id(ImgPostImage).image(newFile, false, 500, cb);
-            //aq.id(imgCapturedimage).image(new File(listitem.get(position).getPost_image()), false, 500, cb);
-        } else {
-
-            if (newFile.exists()) {
-                aq.ajax(newFile.getAbsolutePath(), File.class, new AjaxCallback<File>() {
-                    @Override
-                    public void callback(String url, File bm, AjaxStatus status) {
-
-                        if (bm != null) {
-                            BitmapAjaxCallback cb = new BitmapAjaxCallback();
-                            cb.targetWidth(500).rotate(true);
-                            aq.id(ImgPostImage).image(bm, true, 500, cb);
-                        } else {
-                            ImgPostImage.setImageResource(R.mipmap.sign_up_project);
-                        }
-                    }
-                });
-            } else {
-                ImgPostImage.setImageResource(R.mipmap.sign_up_project);
-            }
-        }
     }
 
 
@@ -610,8 +959,7 @@ public class PostfeedActivity extends AppCompatActivity {
                 .themeColor(Color.WHITE)
 
                 .fadeColor(Color.DKGRAY).build();
-        acProgressFlower.setTitle("Converting speech to text");
-//        final ACProgressFlower acProgressFlower = AppConstants.CustomshowProgressDialog(PostfeedActivity.this, "Converting speech to text");
+
         acProgressFlower.show();
         String url = "https://paprspeechtotext.azurewebsites.net/api/Recognize?code=esVh5fZUJUqnm6N4JeW7FofYCmNL9ltW7fxpfOSIzq3m0VrlaRI3YA==";
 
@@ -635,13 +983,7 @@ public class PostfeedActivity extends AppCompatActivity {
                             }
                             String SpeechtoText = html.getString("SpeechtoText");
                             caption_txt.setText(SpeechtoText);
-                            lineBarVisualizer.setColor(ContextCompat.getColor(PostfeedActivity.this, R.color.colorPrimary));
 
-                            // define custom number of bars you want in the visualizer between (10 - 256).
-                            lineBarVisualizer.setDensity(90f);
-
-                            // Set your media player to the visualizer.
-                            lineBarVisualizer.setPlayer(mediaPlayer.getAudioSessionId());
                             if (woImage.equals("2")) {
                                 rl_vidio.setVisibility(View.GONE);
                                 imgCapturedimage.setVisibility(View.GONE);
@@ -694,6 +1036,7 @@ public class PostfeedActivity extends AppCompatActivity {
 
 
     private void getprojectlist() {
+//
 
         projectList.clear();
 
@@ -705,8 +1048,7 @@ public class PostfeedActivity extends AppCompatActivity {
             public void done(List<ParseObject> objects, ParseException e) {
                 if (e == null) {
                     try {
-                        //  childBeans = new ArrayList<>();
-                        // parentBeans.clear();
+
                         Log.e("ProjectDATA", "d>>>>>" + objects.size());
                         for (int i = 0; i < objects.size(); i++) {
 
@@ -730,10 +1072,6 @@ public class PostfeedActivity extends AppCompatActivity {
                                 strdefault = objects.get(i).getString("default");
                             }
 
-                            Log.e("Project_IDDSs", name + ">>>>>>>>>" + archive);
-
-//
-                            Log.e("Project_IDDSs", name + ">>>>>>>>>" + archive);
 
                             if (archive.equals("0")) {
                                 if (objectId1.equals(ParseUser.getCurrentUser().getObjectId())) {
@@ -742,26 +1080,28 @@ public class PostfeedActivity extends AppCompatActivity {
                                     projectList.add(new ProjctBean(objectId, name, updatedAt, workspaceID, objective, createdAt, image, type, objects.get(i), archive));
 
 
-                                 } else {
+                                } else {
                                     if (type.equals("1")) {
                                         projectList.add(new ProjctBean(objectId, name, updatedAt, workspaceID, objective, createdAt, image, type, objects.get(i), archive));
 
 
-                                     }
+                                    }
                                 }
                             }
-
-
-
-
-
-
 
 
 //                            }
 
                         }
                         projectSpinner.setAdapter(new MyAdapter(PostfeedActivity.this, android.R.layout.simple_dropdown_item_1line, projectList));
+
+                        for (int a = 0; a < projectList.size(); a++) {
+                            if (projectList.get(a).getObjectId().equals(projectID)) {
+                                projectSpinner.setSelection(a);
+                            }
+
+                        }
+
 
                     } catch (NullPointerException ea) {
                         ea.printStackTrace();
@@ -770,11 +1110,69 @@ public class PostfeedActivity extends AppCompatActivity {
 
                     // error
                 }
-//
+
+
+
+                getprojectmember();
+                setupMentionsAutocomplete();
 
             }
         });
 
+    }
+
+    private void setupMentionsAutocomplete() {
+
+        float elevation = 6f;
+        Drawable backgroundDrawable = new ColorDrawable(Color.WHITE);
+        AutocompletePolicy policy = new CharPolicy('@'); // Look for @mentions
+        AutocompletePresenter<WorkSpaceMemberBean> presenter = new UserPresenter(PostfeedActivity.this);
+        AutocompleteCallback<WorkSpaceMemberBean> callback = new AutocompleteCallback<WorkSpaceMemberBean>() {
+            @Override
+            public boolean onPopupItemClicked(Editable editable, WorkSpaceMemberBean item) {
+                // Replace query text with the full name.
+
+                JSONObject jsonObject = new JSONObject();
+
+
+                if (!strMentionList.contains(item.getObjectId())) {
+                    try {
+                        strMentionList.add(item.getObjectId());
+                        subObject.put(item.getFullname(), item.getObjectId());
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                int[] range = CharPolicy.getQueryRange(editable);
+                if (range == null) return false;
+                int start = range[0];
+                int end = range[1];
+                String replacement = item.getFullname();
+                editable.replace(start, end, replacement);
+
+                // This is better done with regexes and a TextWatcher, due to what happens when
+                // the user clears some parts of the text. Up to you.
+//                editable.setSpan(new ForegroundColorSpan(Color.BLUE), start, start + replacement.length(),
+//                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                editable.setSpan(new ForegroundColorSpan(Color.BLUE), start, start + replacement.length(),
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                editable.setSpan(new TextAppearanceSpan(PostfeedActivity.this, R.style.MyTheme), start, start + replacement.length(),
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                return true;
+            }
+
+            public void onPopupVisibilityChanged(boolean shown) {
+            }
+        };
+
+        mentionsAutocomplete = Autocomplete.<WorkSpaceMemberBean>on(caption_txt)
+                .with(elevation)
+                .with(backgroundDrawable)
+                .with(policy)
+                .with(presenter)
+                .with(callback)
+                .build();
     }
 
     private void getprojectmember() {
@@ -796,11 +1194,8 @@ public class PostfeedActivity extends AppCompatActivity {
 
 
                         for (int i = 0; i < objects.size(); i++) {
-                            // String objectId = objects.get(i).getObjectId();
-//
 
 
-//                            ParseObject user = ParseObject.createWithoutData("WorkSpace", "user");
                             ParseObject parseObject = objects.get(i).getParseObject("user");
 
                             String objectId = parseObject.getObjectId();
@@ -819,34 +1214,12 @@ public class PostfeedActivity extends AppCompatActivity {
                             String communityrole = parseObject.getString("communityrole");
                             String address = parseObject.getString("address");
 
-                            Log.e("EMAIL_USER", objectId + ">>" + fullname);
+
                             UserList.add(new WorkSpaceMemberBean(objectId, username, email, updatedAt, createdAt, passion, img, title, fullname
                                     , campanyrole, communityrole, address));
                         }
 
 
-//                        AutoCompleteTypeAdapter<WorkSpaceMemberBean> nameTypeAdapter =
-//                                AutoCompleteTypeAdapter.Build.from(new CountryViewBinder(), new CountryNameTokenFilter());
-//                        // listener for tokens added/removed by the user (see onTokenAdded() and onTokenRemoved() below)
-//                        nameTypeAdapter.setOnTokensChangedListener(this);
-
-                        // type adapter to match country codes prefixed with '@'
-                        // note: the data type here could be different (i.e. a Region object)
-//                        AutoCompleteTypeAdapter<WorkSpaceMemberBean> codeTypeAdapter =
-//                                AutoCompleteTypeAdapter.Build.from(new CountryViewBinder(), new CountryCodeTokenFilter());
-//
-//                        // setting items synchronously since we already have the list
-//                        // this could be also done later on in the likely case the data set comes from network or disk
-//                       // nameTypeAdapter.setItems(countryList);
-//                        codeTypeAdapter.setItems(UserList);
-
-                        // build the custom MultiAutoComplete by passing the required Tokenizer and type adapters
-//                        customMultiAutoComplete = new MultiAutoComplete.Builder()
-//                                .tokenizer(new PrefixTokenizer('@', '#'))
-//                               // .addTypeAdapter(nameTypeAdapter)
-//                                .addTypeAdapter(codeTypeAdapter)
-//                                .delayer(new TestDelayer())
-//                                .build();
                     }
 
                 } else {
@@ -855,6 +1228,9 @@ public class PostfeedActivity extends AppCompatActivity {
                     Log.e("else", e.getMessage());
                     // error
                 }
+                ll_bottm.setVisibility(View.VISIBLE);
+//
+
 
             }
         });
@@ -874,7 +1250,9 @@ public class PostfeedActivity extends AppCompatActivity {
                 && checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(WRITE_EXTERNAL_STORAGE_PERMS, AUDIO_PERMISSION_REQUEST_CODE);
         } else {
-            setPlayer();
+            if (post_type.equals("2") || post_type.equals("4")) {
+                setPlayer();
+            }
         }
     }
 
@@ -892,28 +1270,8 @@ public class PostfeedActivity extends AppCompatActivity {
         }
 
 
-//        init();
     }
 
-    //    public void playPause(View view) {
-//        playPauseBtnClicked((ImageButton) view);
-//    }
-//
-//    public void playPauseBtnClicked(ImageButton btnPlayPause) {
-//        if (mediaPlayer != null) {
-//            if (mediaPlayer.isPlaying()) {
-//                mediaPlayer.pause();
-//                btnPlayPause.setImageDrawable(ContextCompat.getDrawable(
-//                        this,
-//                        R.drawable.ic_play_red_48dp));
-//            } else {
-//                mediaPlayer.start();
-//                btnPlayPause.setImageDrawable(ContextCompat.getDrawable(
-//                        this,
-//                        R.drawable.ic_pause_red_48dp));
-//            }
-//        }
-//    }
     @Override
     public void onRequestPermissionsResult(
             int requestCode,
@@ -923,7 +1281,9 @@ public class PostfeedActivity extends AppCompatActivity {
             case AUDIO_PERMISSION_REQUEST_CODE:
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    setPlayer();
+                    if (post_type.equals("2") || post_type.equals("4")) {
+                        setPlayer();
+                    }
                 } else {
                     this.finish();
                 }
@@ -944,17 +1304,17 @@ public class PostfeedActivity extends AppCompatActivity {
         gameScore.put("likesCount", 0);
         gameScore.put("privacy", privacy);
         gameScore.put("post_type", post_type);
+        gameScore.put("tagUserId", subObject.toString());
+
         if (post_type.equals("1")) {
             if (parseFile != null) {
                 gameScore.put("postImage", parseFile);
             }
         } else if (post_type.equals("2")) {
             gameScore.put("post_file", parseFile);
-            gameScore.put("media_duration", HomeFeedActivity.prog + " sec");
+            gameScore.put("media_duration", HomeFeedActivity.prog + "");
         } else if (post_type.equals("3")) {
             gameScore.put("post_file", parseFile);
-            // gameScore.put("media_duration", HomeFeedActivity.prog + " sec");
-        } else {
 
         }
 
@@ -965,7 +1325,7 @@ public class PostfeedActivity extends AppCompatActivity {
                     dialog.dismiss();
                 }
                 if (e == null) {
-                    Toast.makeText(PostfeedActivity.this, "Success", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(PostfeedActivity.this, "Post Share", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(PostfeedActivity.this, HomeFeedActivity.class);
                     finish();
                     startActivity(intent);
@@ -981,13 +1341,15 @@ public class PostfeedActivity extends AppCompatActivity {
     }
 
     private void setImage(String strFile) {
+
+
         File newFile = new File(strFile);
 
         File file = new File(newFile.getAbsolutePath());
         if (file.exists()) {
             BitmapAjaxCallback cb = new BitmapAjaxCallback();
             cb.targetWidth(500).rotate(true);
-            aq.id(imgCapturedimage).image(newFile, false, 500, cb);
+            aq.id(imgCapturedimage).image(newFile, true, 500, cb);
             //aq.id(imgCapturedimage).image(new File(listitem.get(position).getPost_image()), false, 500, cb);
         } else {
 
@@ -1046,6 +1408,7 @@ public class PostfeedActivity extends AppCompatActivity {
                     .inflate(R.layout.country_item, parent, false);
 
             TextView make = (TextView) row.findViewById(R.id.color);
+            make.setTypeface(customFonts.calibri);
             make.setText(patientlist.get(position).getName());
 
             return row;

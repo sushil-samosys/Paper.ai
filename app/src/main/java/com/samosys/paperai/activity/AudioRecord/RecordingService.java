@@ -52,10 +52,10 @@ public class RecordingService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
+        if (intent != null) {
         where = intent.getStringExtra("image");
         strFile = intent.getStringExtra("imageURL");
-        startRecording();
+        startRecording();}
 //
         return START_STICKY;
     }
@@ -88,15 +88,17 @@ public class RecordingService extends Service {
         mRecorder.setOutputFile(mFilePath);
 
         try {
-            mRecorder.prepare();
-            mRecorder.start();
+            if (mRecorder != null) {
+                mRecorder.prepare();
+                mRecorder.start();
+            }
             mStartingTimeMillis = System.currentTimeMillis();
 
             //startTimer();
             //startForeground(1, createNotification());
 
         } catch (IOException e) {
-            Log.e(LOG_TAG, "prepare() failed");
+            Log.e(LOG_TAG, e.getMessage());
         }
     }
 
@@ -104,22 +106,22 @@ public class RecordingService extends Service {
         int count = 0;
 
         if (where.equals("no")) {
-        do {
-            Calendar cal = Calendar.getInstance();
-            long millisecondOfDay =
-                    TimeUnit.HOURS.toMillis(cal.get(Calendar.HOUR_OF_DAY)) +
-                            TimeUnit.MINUTES.toMillis(cal.get(Calendar.MINUTE));
-            count++;
+            do {
+                Calendar cal = Calendar.getInstance();
+                long millisecondOfDay =
+                        TimeUnit.HOURS.toMillis(cal.get(Calendar.HOUR_OF_DAY)) +
+                                TimeUnit.MINUTES.toMillis(cal.get(Calendar.MINUTE));
+                count++;
 
-            mFileName = getString(R.string.app_name)
-                    + "_" + millisecondOfDay + ".m4a";
-            mFilePath = Environment.getExternalStorageDirectory().getAbsolutePath();
-            mFilePath += "/SoundRecorder/" + mFileName;
+                mFileName = getString(R.string.app_name)
+                        + "_" + millisecondOfDay + ".m4a";
+                mFilePath = Environment.getExternalStorageDirectory().getAbsolutePath();
+                mFilePath += "/SoundRecorder/" + mFileName;
 
                 HomeFeedActivity.file = new File(mFilePath);
 
-        } while
-                (HomeFeedActivity.file.exists() && !HomeFeedActivity.file.isDirectory());
+            } while
+                    (HomeFeedActivity.file.exists() && !HomeFeedActivity.file.isDirectory());
         } else {
 
             do {
@@ -143,11 +145,14 @@ public class RecordingService extends Service {
     }
 
     public void stopRecording() {
+        if (mRecorder != null) {
 
 
-        mRecorder.stop();
-        mElapsedMillis = (System.currentTimeMillis() - mStartingTimeMillis);
-        mRecorder.release();
+            mRecorder.stop();
+            mRecorder.release();
+        }
+        //mElapsedMillis = (System.currentTimeMillis() - mStartingTimeMillis);
+
 //        Toast.makeText(this, getString(R.string.app_name) + " " + mFilePath, Toast.LENGTH_LONG).show();
         Log.e("SoundRecorder", mFilePath);
 

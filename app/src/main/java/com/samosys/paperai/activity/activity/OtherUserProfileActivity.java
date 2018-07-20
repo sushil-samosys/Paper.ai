@@ -13,7 +13,6 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.samosys.paperai.R;
 import com.samosys.paperai.activity.utils.AppConstants;
-import com.samosys.paperai.activity.utils.First_Char_Capital;
 import com.squareup.picasso.Picasso;
 
 public class OtherUserProfileActivity extends AppCompatActivity {
@@ -48,32 +47,18 @@ public class OtherUserProfileActivity extends AppCompatActivity {
                     String title = object.getString("title");
                     String passion = object.getString("passion");
 
-                    other_pro_header.setText(First_Char_Capital.capitalizeString(fullname));
-                    userName.setText(First_Char_Capital.capitalizeString(fullname));
-                    other_user_postoion.setText(First_Char_Capital.capitalizeString(title));
+                    other_pro_header.setText(fullname);
+                    userName.setText(fullname);
+                    other_user_postoion.setText(title);
 
-                    if (image != null) {
+                    if (imageUrl != null) {
                         Picasso.with(OtherUserProfileActivity.this)
                                 .load(imageUrl)
                                 .fit()
                                 .centerCrop()
 
                                 .into(other_user_img);
-//                        image.getDataInBackground(new GetDataCallback() {
-//                            @Override
-//                            public void done(byte[] data, ParseException e) {
-//
-//                                Bitmap bmp = BitmapFactory
-//                                        .decodeByteArray(
-//                                                data, 0,
-//                                                data.length);
-//                                Log.e("OTHEr_id", bmp+"");
-//                                // initialize
-//                                //other_user_img.setImageBitmap(bmp);
-//
-//
-//                            }
-//                        });
+
                     }
 
 

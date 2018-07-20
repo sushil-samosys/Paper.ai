@@ -22,6 +22,8 @@ import android.graphics.Paint;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 
+import com.samosys.paperai.R;
+
 
 /**
  * Custom view that creates a Line and Bar visualizer effect for
@@ -49,10 +51,10 @@ public class LineBarVisualizer extends BaseVisualizer {
 
     @Override
     protected void init() {
-        density = 50;
-        gap = 4;
+        density = 30;
+        gap = 3;
         middleLine = new Paint();
-        middleLine.setColor(Color.BLUE);
+        middleLine.setColor(getResources().getColor(R.color.colorAccent));
     }
 
     /**
@@ -67,7 +69,7 @@ public class LineBarVisualizer extends BaseVisualizer {
             this.middleLine.setStrokeWidth(1);
             this.gap = 1;
         } else {
-            this.gap = 4;
+            this.gap = 3;
         }
         this.density = density;
         if (density > 256) {

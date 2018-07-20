@@ -27,13 +27,11 @@ import java.util.ArrayList;
  */
 
 public class WorkspaceAdapter extends RecyclerView.Adapter<WorkspaceAdapter.Holder> {
-    //     int radius = 5;
-//     int margin = 5;
-//     RoundedCornersTransformation.Corners corners;
-    Context context;
-    CustomFonts customFonts;
-    ArrayList<WorkspaceBean> listitem;
-    TextView workspace_name;
+
+    private Context context;
+    private CustomFonts customFonts;
+    private ArrayList<WorkspaceBean> listitem;
+    private TextView workspace_name;
     private int mSelectedItem = 0;
 
 
@@ -82,23 +80,17 @@ public class WorkspaceAdapter extends RecyclerView.Adapter<WorkspaceAdapter.Hold
         if (pos == 0) {
 
             if (position == mSelectedItem) {
-               // if (AppConstants.loadPreferences(context, "workid").equals("00")) {
 
-                    AppConstants.savePreferences(context, "workid", listitem.get(position).getObjectId());
-                    AppConstants.savePreferences(context, "workname", listitem.get(position).getWorkspace_name());
-                    workspace_name.setText(First_Char_Capital.capitalizeString(listitem.get(position).getWorkspace_name()));
-                    holder.txtSelect.setVisibility(View.VISIBLE);
-                    if (context instanceof HomeFeedActivity) {
-//                    ((HomeFeedActivity)context).getworkspace("");
-                        ((HomeFeedActivity) context).getprojectlist();
-//                    ((HomeFeedActivity)context).getfeedpost();
+                AppConstants.savePreferences(context, "workid", listitem.get(position).getObjectId());
+                AppConstants.savePreferences(context, "workname", listitem.get(position).getWorkspace_name());
+                workspace_name.setText(listitem.get(position).getWorkspace_name());
+                holder.txtSelect.setVisibility(View.VISIBLE);
+                if (context instanceof HomeFeedActivity) {
 
-//                    ((HomeFeedActivity)context).getuncatproject();
-                        // ((HomeFeedActivity)context).getcatogory();
+                    ((HomeFeedActivity) context).getprojectlist();
 
+                }
 
-                    }
-                //}
             } else {
                 holder.txtSelect.setVisibility(View.INVISIBLE);
             }
@@ -112,12 +104,7 @@ public class WorkspaceAdapter extends RecyclerView.Adapter<WorkspaceAdapter.Hold
                 Log.e("workspaceID", "else>>>>>" + AppConstants.loadPreferences(context, "workid"));
                 holder.txtSelect.setVisibility(View.VISIBLE);
                 if (context instanceof HomeFeedActivity) {
-//                    getuncatproject();
-//                    getcatogory();
-//                    ((HomeFeedActivity)context).getworkspace("1");
                     ((HomeFeedActivity) context).getprojectlist();
-                    // ((HomeFeedActivity)context).getcatogory();
-//                    ((HomeFeedActivity)context).getuncatproject();
                 }
             } else {
                 holder.txtSelect.setVisibility(View.INVISIBLE);
@@ -134,10 +121,10 @@ public class WorkspaceAdapter extends RecyclerView.Adapter<WorkspaceAdapter.Hold
 
 
     public class Holder extends RecyclerView.ViewHolder {
-        TextView txtSelect;
-        LinearLayout rl_item;
-        ProgressBar img_progrss;
-        ShapedImageView imgwork;
+        private TextView txtSelect;
+        private LinearLayout rl_item;
+        private ProgressBar img_progrss;
+        private ShapedImageView imgwork;
 
         public Holder(View itemView) {
             super(itemView);
@@ -145,7 +132,6 @@ public class WorkspaceAdapter extends RecyclerView.Adapter<WorkspaceAdapter.Hold
             imgwork = (ShapedImageView) itemView.findViewById(R.id.imgwork);
             rl_item = (LinearLayout) itemView.findViewById(R.id.rl_item);
             txtSelect = (TextView) itemView.findViewById(R.id.txtSelect);
-
             img_progrss = (ProgressBar) itemView.findViewById(R.id.img_progrss);
         }
     }

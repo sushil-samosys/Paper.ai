@@ -25,9 +25,9 @@ import java.util.ArrayList;
  */
 
 public class Useradapter extends RecyclerView.Adapter<Useradapter.Viewholder> {
-    ArrayList<UserBean> userlist;
-    CustomFonts customFonts;
-    Context context;
+    private ArrayList<UserBean> userlist;
+    private CustomFonts customFonts;
+    private Context context;
 
     public Useradapter(FragmentActivity activity, ArrayList<UserBean> userlist) {
         this.context = activity;
@@ -45,8 +45,8 @@ public class Useradapter extends RecyclerView.Adapter<Useradapter.Viewholder> {
 
     @Override
     public void onBindViewHolder(final Viewholder holder, int position) {
-        holder.userName_folloe.setText(First_Char_Capital.capitalizeString(userlist.get(position).getFullname()));
-        holder.userName_work.setText(First_Char_Capital.capitalizeString(userlist.get(position).getPassion()));
+        holder.userName_folloe.setText(userlist.get(position).getFullname());
+        holder.userName_work.setText(userlist.get(position).getPassion());
 
         userlist.get(position).getProfileimage().getDataInBackground(new GetDataCallback() {
             @Override
@@ -68,15 +68,14 @@ public class Useradapter extends RecyclerView.Adapter<Useradapter.Viewholder> {
     }
 
     public class Viewholder extends RecyclerView.ViewHolder {
-        TextView userName_folloe, userName_work;
-        ImageView user_image_folle;
+        private TextView userName_folloe, userName_work;
+        private ImageView user_image_folle;
 
         public Viewholder(View itemView) {
             super(itemView);
             userName_folloe = (TextView) itemView.findViewById(R.id.userName_folloe);
             userName_work = (TextView) itemView.findViewById(R.id.userName_work);
             user_image_folle = (ImageView) itemView.findViewById(R.id.user_image_folle);
-
             userName_folloe.setTypeface(customFonts.HelveticaNeueBold);
             userName_work.setTypeface(customFonts.HelveticaNeue);
         }

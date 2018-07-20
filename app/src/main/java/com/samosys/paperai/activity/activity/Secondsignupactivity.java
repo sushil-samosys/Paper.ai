@@ -46,19 +46,19 @@ import cc.cloudist.acplibrary.ACProgressConstant;
 import cc.cloudist.acplibrary.ACProgressFlower;
 
 public class Secondsignupactivity extends AppCompatActivity {
-    CustomFonts customFonts;
-    RelativeLayout rl_profilePic;
-    ImageView user_image;
-    String email = "", pwd = "";
-    LinearLayout llSignup;
-    EditText edt_fullname, edt_title, edt_passion;
-    String image = "";
-    ParseFile file = null;
-    Bitmap bitmap = null;
+   private CustomFonts customFonts;
+    private RelativeLayout rl_profilePic;
+    private ImageView user_image;
+    private String email = "", pwd = "";
+    private LinearLayout llSignup;
+    private EditText edt_fullname, edt_title, edt_passion;
+    private String image = "";
+    private ParseFile file = null;
+    private Bitmap bitmap = null;
     private TextView text, txtTerm1, txtTerm2;
     private String userChoosenTask;
     private int REQUEST_CAMERA = 0, SELECT_FILE = 1;
-    MarshMallowPermission marshMallowPermission;
+    private MarshMallowPermission marshMallowPermission;
     private ACProgressFlower dialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -249,10 +249,16 @@ public class Secondsignupactivity extends AppCompatActivity {
                 } else if (items[item].equals("Choose from Library")) {
                     userChoosenTask = "Choose from Library";
                     if (result) {
-                        Intent intent = new Intent();
+
+                        Intent intent = new Intent(
+                                Intent.ACTION_PICK,
+                                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                         intent.setType("image/*");
-                        intent.setAction(Intent.ACTION_GET_CONTENT);//
-                        startActivityForResult(Intent.createChooser(intent, "Select File"), SELECT_FILE);
+                        startActivityForResult(
+                                Intent.createChooser(intent, "Select File"),
+                                SELECT_FILE);
+
+
                     }
 
                 } else if (items[item].equals("Cancel")) {
@@ -346,8 +352,6 @@ public class Secondsignupactivity extends AppCompatActivity {
         user_image.setImageBitmap(bm);
 
 
-//        image = BitMapToString(bm);
-//        file = new File(image);
 
 
         final double viewWidthToBitmapWidthRatio = (double) user_image.getWidth() / (double) bm.getWidth();

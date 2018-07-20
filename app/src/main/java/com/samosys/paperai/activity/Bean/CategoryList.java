@@ -5,11 +5,11 @@ package com.samosys.paperai.activity.Bean;
  */
 
 public class CategoryList {
-    String objectId;
-    String name;
-    String updatedAt;
-    String workspaceID;
-    String createdAt;
+    private  String objectId;
+    private  String name;
+    private  String updatedAt;
+    private  String workspaceID;
+    private String createdAt;
 
     public CategoryList(String objectId, String name, String updatedAt, String workspaceID, String createdAt) {
         this.objectId=objectId;

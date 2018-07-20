@@ -93,7 +93,7 @@ public class MyProfilebookmarsAdapter  extends RecyclerView.Adapter<MyProfileboo
         holder.num_likes.setText(listitem.get(position).getLikesCount() + " Likes");
         holder.num_comment.setText(listitem.get(position).getCommentCount() + " Comments");
         holder.post_text.setText(listitem.get(position).getText());
-        holder.poster_name.setText(First_Char_Capital.capitalizeString(listitem.get(position).getUsername()));
+        holder.poster_name.setText(listitem.get(position).getUsername());
         holder.post_time.setText(listitem.get(position).getUpdatedAt());
 
 

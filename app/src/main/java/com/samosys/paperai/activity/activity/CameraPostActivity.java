@@ -23,8 +23,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -43,11 +41,9 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -62,10 +58,10 @@ import com.google.android.cameraview.CameraView;
 import com.samosys.paperai.R;
 import com.samosys.paperai.activity.utils.AppConstants;
 import com.samosys.paperai.activity.utils.AspectRatioFragment;
+import com.samosys.paperai.activity.utils.CircularProgressBar;
 import com.samosys.paperai.activity.utils.CustomFonts;
 import com.samosys.paperai.activity.utils.MarshMallowPermission;
 import com.samosys.paperai.activity.utils.SimpleTooltip;
-import com.samosys.paperai.activity.utils.SquaredFrameLayout;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -106,23 +102,16 @@ public class CameraPostActivity extends AppCompatActivity implements
             R.string.flash_on,
     };
     private static final int CAPTURE_MEDIA = 368;
-    public static int prog = 0;
-    final GestureDetector gestureDetector = new GestureDetector(new GestureDetector.SimpleOnGestureListener() {
-        public void onLongPress(MotionEvent e) {
-            Log.e("", "Longpress detected");
-        }
-    });
-    MarshMallowPermission marshMallowPermission;
-    AQuery aq;
-    TextView txtNext, txtHeader;
-    SquaredFrameLayout squareImage;
-    File imageFile = new File("");
-    int REQUEST_CAMERA = 0, SELECT_FILE = 1, SELECT_VIDEO = 3;
-    ImageView capturedImage, imgback_camera;
-    RelativeLayout rl_bottom_capture;
-    CustomFonts customFonts;
 
-
+    private MarshMallowPermission marshMallowPermission;
+    private AQuery aq;
+    private CustomFonts customFonts;
+    private CircularProgressBar circularProgressbar_vid;
+    private TextView txtNext, txtHeader;
+    private File imageFile = new File("");
+    private int SELECT_FILE = 1;
+    private ImageView capturedImage, imgback_camera;
+    private RelativeLayout rl_bottom_capture, linbar;
     private int mCurrentFlash;
     private ImageView take_picture, img_switchcam, img_gallary;
     private CameraView mCameraView;
@@ -131,7 +120,7 @@ public class CameraPostActivity extends AppCompatActivity implements
         @Override
         public void onClick(View v) {
             switch (v.getId()) {
-                case R.id.take_picture:
+                case R.id.circularProgressbar_vid:
                     if (mCameraView != null) {
                         mCameraView.takePicture();
                         mCameraView.setVisibility(View.GONE);
@@ -166,9 +155,6 @@ public class CameraPostActivity extends AppCompatActivity implements
                     File file = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES),
                             "picture.jpg");
 
-//                  Bitmap bit=  convertToBitmap(file);
-//                    persistImage(bit,"picture.jpg");
-                    // startCrop(Uri.fromFile(file));
                     OutputStream os = null;
                     try {
                         os = new FileOutputStream(file);
@@ -185,37 +171,6 @@ public class CameraPostActivity extends AppCompatActivity implements
                             }
                         }
                     }
-
-
-//                    if (file.exists()) {
-//                        BitmapAjaxCallback cb = new BitmapAjaxCallback();
-//                        cb.targetWidth(500).rotate(true);
-//                        aq.id(capturedImage).image(new File(file.getAbsolutePath()), true, 500, cb);
-//                        //aq.id(imgCapturedimage).image(new File(listitem.get(position).getPost_image()), false, 500, cb);
-//                    } else {
-//
-//                        if (file.exists()) {
-//                            aq.ajax(file.getAbsolutePath(), File.class, new AjaxCallback<File>() {
-//                                @Override
-//                                public void callback(String url, File bm, AjaxStatus status) {
-//
-//                                    if (bm != null) {
-////                                        mCameraView.setVisibility(View.GONE);
-////                                        rl_bottom_capture.setVisibility(View.GONE);
-////                                        squareImage.setVisibility(View.VISIBLE);
-//                                        BitmapAjaxCallback cb = new BitmapAjaxCallback();
-//                                        cb.targetWidth(1000).rotate(true);
-//                                        aq.id(capturedImage).image(bm, true, 500, cb);
-//
-//                                    } else {
-//                                        capturedImage.setImageResource(R.mipmap.sign_up_project);
-//                                    }
-//                                }
-//                            });
-//                        } else {
-//                            capturedImage.setImageResource(R.mipmap.sign_up_project);
-//                        }
-//                    }
                     imageFile = file;
                     Intent intent = new Intent(CameraPostActivity.this, RecordAudioActivity.class);
 
@@ -237,7 +192,6 @@ public class CameraPostActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-//        AppConstants.getTranparentstatusbar(CameraPostActivity.this);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -246,25 +200,22 @@ public class CameraPostActivity extends AppCompatActivity implements
         aq = new AQuery(CameraPostActivity.this);
         marshMallowPermission = new MarshMallowPermission(CameraPostActivity.this);
         capturedImage = (ImageView) findViewById(R.id.capturedImage);
-//        mCameraView = (CameraView) findViewById(R.id.camera);
         customFonts = new CustomFonts(CameraPostActivity.this);
-
+        circularProgressbar_vid = (CircularProgressBar) findViewById(R.id.circularProgressbar_vid);
         txtNext = (TextView) findViewById(R.id.txtNext);
         txtHeader = (TextView) findViewById(R.id.txtHeader);
         txtHeader.setTypeface(customFonts.CabinBold);
-        txtNext.setTypeface(customFonts.CabinBold);
+        txtNext.setTypeface(customFonts.calibri);
         rl_bottom_capture = (RelativeLayout) findViewById(R.id.rl_bottom_capture);
-        // squareImage = (SquaredFrameLayout) findViewById(R.id.squareImage);
+
         take_picture = (ImageView) findViewById(R.id.take_picture);
         img_switchcam = (ImageView) findViewById(R.id.img_switchcam);
         imgback_camera = (ImageView) findViewById(R.id.imgback_camera);
         img_gallary = (ImageView) findViewById(R.id.img_gallary);
-//        if (take_picture != null) {
-//            take_picture.setOnClickListener(mOnClickListener);
-//        }
-//
+
+
         new SimpleTooltip.Builder(this)
-                .anchorView(take_picture)
+                .anchorView(circularProgressbar_vid)
                 .text("Tap to take a picture or press hold to record video")
                 .gravity(Gravity.TOP)
 
@@ -309,7 +260,7 @@ public class CameraPostActivity extends AppCompatActivity implements
         });
 
 
-        take_picture.setOnLongClickListener(new View.OnLongClickListener() {
+        circularProgressbar_vid.setOnLongClickListener(new View.OnLongClickListener() {
             @SuppressLint("MissingPermission")
             @Override
             public boolean onLongClick(View v) {
@@ -383,11 +334,11 @@ public class CameraPostActivity extends AppCompatActivity implements
             if (!marshMallowPermission.checkPermissionForExternalStorage()) {
                 marshMallowPermission.requestPermissionForExternalStorage();
             } else {
-                //  showDialog();
+
                 opengallary();
             }
         } else {
-            //  showDialog();
+
             opengallary();
         }
     }
@@ -426,12 +377,6 @@ public class CameraPostActivity extends AppCompatActivity implements
                     startActivity(intent);
                     finish();
 
-//                    Intent intent = new Intent(CameraPostActivity.this, PostfeedActivity.class);
-//
-//                    intent.putExtra("file", filePath);
-//                    intent.putExtra("post_type", "3");
-//
-//                    startActivity(intent);
                 } else {
                     Toast.makeText(CameraPostActivity.this, "Something went wrong", Toast.LENGTH_SHORT).show();
                 }
@@ -453,7 +398,7 @@ public class CameraPostActivity extends AppCompatActivity implements
         c.close();
 
 
-        Bitmap bitmap = BitmapFactory.decodeFile(selectedImagePath);
+//        Bitmap bitmap = BitmapFactory.decodeFile(selectedImagePath);
         Log.e("MEW_BITMAP12", "" + selectedImagePath);
 
 
@@ -479,10 +424,10 @@ public class CameraPostActivity extends AppCompatActivity implements
     protected void onResume() {
         super.onResume();
         imageFile = null;
-//        mCameraView.start();
 
-        if (take_picture != null) {
-            take_picture.setOnClickListener(mOnClickListener);
+
+        if (circularProgressbar_vid != null) {
+            circularProgressbar_vid.setOnClickListener(mOnClickListener);
         }
 
 
@@ -538,14 +483,7 @@ public class CameraPostActivity extends AppCompatActivity implements
                                            @NonNull int[] grantResults) {
         switch (requestCode) {
             case REQUEST_CAMERA_PERMISSION:
-//                if (permissions.length != 1 || grantResults.length != 1) {
-//                    throw new RuntimeException("Error on requesting camera permission.");
-//                }
-//                if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-//                    Toast.makeText(this, R.string.camera_permission_not_granted,
-//                            Toast.LENGTH_SHORT).show();
-//                }
-                // No need to start camera here; it is handled by onResume
+
                 break;
         }
     }

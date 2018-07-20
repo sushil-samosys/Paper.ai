@@ -3,16 +3,21 @@
     android:id="@+id/rel_videocontrols"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:gravity="center"
+    android:layout_centerInParent="true"
+    android:layout_gravity="center"
     android:layout_margin="0dp"
-    android:background="#cccccccc">
+   >
 
     <ImageButton
         android:id="@+id/vcv_img_play"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_centerVertical="true"
+
+        android:layout_centerInParent="true"
+
         android:layout_margin="10dp"
+
         android:background="@drawable/fvl_selector_play" />
 
     <TextView
@@ -22,6 +27,7 @@
         android:layout_centerVertical="true"
         android:layout_toRightOf="@+id/vcv_img_play"
         android:text="00:00"
+        android:visibility="gone"
         android:textColor="@android:color/black" />
 
     <ImageButton
@@ -31,8 +37,10 @@
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:layout_margin="10dp"
+
+
         android:background="@drawable/fvl_selector_fullscreen"
-        android:visibility="invisible" />
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/vcv_txt_total"
@@ -41,6 +49,7 @@
         android:layout_centerVertical="true"
         android:layout_toLeftOf="@+id/vcv_img_fullscreen"
         android:text="00:00"
+        android:visibility="gone"
         android:textColor="@android:color/black" />
 
     <SeekBar
@@ -57,6 +66,7 @@
         android:minHeight="13dp"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
+        android:visibility="gone"
         android:progressDrawable="@drawable/fvl_progress"
         android:thumb="@drawable/fvl_control_normal"
         android:thumbOffset="16dp" />

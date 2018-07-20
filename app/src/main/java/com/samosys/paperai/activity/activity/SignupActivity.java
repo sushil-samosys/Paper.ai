@@ -16,7 +16,7 @@ import com.samosys.paperai.activity.utils.AppConstants;
 import com.samosys.paperai.activity.utils.CustomFonts;
 
 public class SignupActivity extends AppCompatActivity {
-    LinearLayout llBottomView;
+    private LinearLayout llBottomView;
     CustomFonts customFonts;
     private EditText dt_emailwork, dt_password, dt_conf_password;
     private TextView txtNext;
@@ -31,14 +31,7 @@ public class SignupActivity extends AppCompatActivity {
         AppConstants.getstatusbar(SignupActivity.this);
         findviews();
 
-//        txtNext.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent intent = new Intent(SignupActivity.this, Secondsignupactivity.class);
-//                startActivity(intent);
-//
-//            }
-//        });
+
 
         llBottomView.setOnClickListener(new View.OnClickListener() {
             @Override

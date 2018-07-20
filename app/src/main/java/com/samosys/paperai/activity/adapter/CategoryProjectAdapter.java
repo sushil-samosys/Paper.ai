@@ -16,7 +16,6 @@ import com.samosys.paperai.R;
 import com.samosys.paperai.activity.Bean.ProjctBean;
 import com.samosys.paperai.activity.activity.CreateCategoryActivity;
 import com.samosys.paperai.activity.utils.CustomFonts;
-import com.samosys.paperai.activity.utils.First_Char_Capital;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -34,7 +33,6 @@ public class CategoryProjectAdapter extends RecyclerView.Adapter<CategoryProject
     public CategoryProjectAdapter(Context context, ArrayList<ProjctBean> listitem) {
         this.context = context;
         this.listitem = listitem;
-
         customFonts = new CustomFonts(context);
     }
 
@@ -49,7 +47,7 @@ public class CategoryProjectAdapter extends RecyclerView.Adapter<CategoryProject
     public void onBindViewHolder(final Holder holder, final int position) {
 
 
-        holder.txt_project_value.setText(First_Char_Capital.capitalizeString(listitem.get(position).getName()));
+        holder.txt_project_value.setText(listitem.get(position).getName());
 
         if (listitem.get(position).getImage() != null) {
 
@@ -88,11 +86,11 @@ public class CategoryProjectAdapter extends RecyclerView.Adapter<CategoryProject
 
 
     public class Holder extends RecyclerView.ViewHolder {
-        TextView txt_project_value, txt_project;
-        ProgressBar img_progrss;
-        LinearLayout ll_projectName;
-        ImageView imgProject;
-        CheckBox checkboxcategort;
+        private TextView txt_project_value, txt_project;
+        private ProgressBar img_progrss;
+        private LinearLayout ll_projectName;
+        private ImageView imgProject;
+        private CheckBox checkboxcategort;
 
         public Holder(View itemView) {
             super(itemView);

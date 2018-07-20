@@ -10,7 +10,7 @@ import com.samosys.paperai.R;
 import com.samosys.paperai.activity.utils.AppConstants;
 
 public class CreateNjoinworkActivity extends AppCompatActivity {
-TextView txtcreate,txtjoin;
+private TextView txtcreate,txtjoin;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

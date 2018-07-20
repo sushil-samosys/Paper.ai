@@ -8,10 +8,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-
-
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,15 +15,11 @@ import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-
 import com.samosys.paperai.R;
 import com.samosys.paperai.activity.Bean.ProjctBean;
 import com.samosys.paperai.activity.activity.ProjectDetailActivity;
 import com.samosys.paperai.activity.activity.ProjectSettingActivity;
 import com.samosys.paperai.activity.utils.CustomFonts;
-import com.samosys.paperai.activity.utils.First_Char_Capital;
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -41,12 +33,11 @@ public class ArchiveProjectAdapter extends RecyclerView.Adapter<ArchiveProjectAd
     private Context context;
     private CustomFonts customFonts;
     private ArrayList<ProjctBean> listitem;
-    private String frag;
 
     public ArchiveProjectAdapter(Context context, ArrayList<ProjctBean> listitem, String frag) {
         this.context = context;
         this.listitem = listitem;
-        this.frag = frag;
+
         customFonts = new CustomFonts(context);
     }
 
@@ -61,21 +52,19 @@ public class ArchiveProjectAdapter extends RecyclerView.Adapter<ArchiveProjectAd
     public void onBindViewHolder(final Holder holder, final int position) {
 
 
-        holder.txtItem.setText(First_Char_Capital.capitalizeString(listitem.get(position).getName()));
-
+        holder.txtItem.setText(listitem.get(position).getName());
 
 
     }
 
     private void delete(final int position) {
         ActionSheet actionSheet = new ActionSheet.Builder()
-                // .setTitle("Title", Color.BLUE)
-                //.setTitleTextSize(20)
-                .setOtherBtn(new String[]{"View Project", "Delete Project"}, new int[]{Color.parseColor("#2dc8bc"),Color.parseColor("#2dc8bc")})
 
-                //.setOtherBtnSubTextSize(20)
+                .setOtherBtn(new String[]{"View Project", "Delete Project"}, new int[]{Color.parseColor("#2dc8bc"), Color.parseColor("#2dc8bc")})
+
+
                 .setCancelBtn("Cancel", Color.parseColor("#2dc8bc"))
-                //.setCancelBtnTextSize(30)
+
                 .setCancelableOnTouchOutside(true)
                 .setActionSheetListener(new ActionSheet.ActionSheetListener() {
                     @Override
@@ -86,12 +75,11 @@ public class ArchiveProjectAdapter extends RecyclerView.Adapter<ArchiveProjectAd
                     @Override
                     public void onButtonClicked(ActionSheet actionSheet, int index) {
                         if (index == 0) {
-                            Intent intent=new Intent(context, ProjectDetailActivity.class);
-                            intent.putExtra("id",listitem.get(position).getObjectId());
+                            Intent intent = new Intent(context, ProjectDetailActivity.class);
+                            intent.putExtra("id", listitem.get(position).getObjectId());
                             context.startActivity(intent);
                         }
                         if (index == 1) {
-
 
 
                             ParseQuery<ParseObject> query = ParseQuery.getQuery("Project");
@@ -101,16 +89,13 @@ public class ArchiveProjectAdapter extends RecyclerView.Adapter<ArchiveProjectAd
                                     if (e == null) {
                                         object.deleteInBackground();
                                         Toast.makeText(context, "Delete Projct Successfully", Toast.LENGTH_SHORT).show();
-                                        ((ProjectSettingActivity)context).getprojectlist();
+                                        ((ProjectSettingActivity) context).getprojectlist();
 //                                        ((HomeFeedActivity)context).getprojectlist();
                                     } else {
                                         Toast.makeText(context, e.getMessage(), Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             });
-
-
-
 
 
                         }
@@ -122,6 +107,7 @@ public class ArchiveProjectAdapter extends RecyclerView.Adapter<ArchiveProjectAd
 
         actionSheet.show(((Activity) context).getFragmentManager());
     }
+
     public void removeItem(int position) {
         listitem.remove(position);
         // notify the item removed by position
@@ -137,13 +123,13 @@ public class ArchiveProjectAdapter extends RecyclerView.Adapter<ArchiveProjectAd
 
 
     public class Holder extends RecyclerView.ViewHolder {
-        TextView txtItem;
-         public Holder(View itemView) {
+        private TextView txtItem;
+
+        public Holder(View itemView) {
             super(itemView);
             customFonts = new CustomFonts(context);
 
             txtItem = (TextView) itemView.findViewById(R.id.txtItem);
-
 
 
             txtItem.setTypeface(customFonts.CabinRegular);

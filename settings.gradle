@@ -1,1 +1,1 @@
-include ':app', ':material-viewpagerindicator', ':library', ':audiovisualizer', ':annca', ':autoplayvideorecyclerview', ':autolinklibrary'
+include ':app', ':library', ':annca', ':autolinklibrary', ':jiaozivideoplayer'

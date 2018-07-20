@@ -5,12 +5,13 @@ package com.samosys.paperai.activity.Bean;
  */
 
 public class CategoriesProjectbeanclass {
-    String name;
-    String objective;
-    String createdAt;
-    String updatedAt;
-    String catProjectobjectId;
-String type;
+  private   String name;
+    private String objective;
+    private String createdAt;
+    private String updatedAt;
+    private String catProjectobjectId;
+    private String type;
+
     public CategoriesProjectbeanclass(String name, String objective, String createdAt, String updatedAt, String catProjectobjectId, String type) {
         this.name = name;
         this.objective = objective;

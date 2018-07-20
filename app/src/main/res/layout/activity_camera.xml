@@ -4,25 +4,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!--<com.samosys.paperai.activity.utils.SquaredFrameLayout-->
-    <!--android:id="@+id/squareImage"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:visibility="gone"-->
-    <!--android:layout_below="@+id/rlTopbar"-->
-    <!--android:layout_height="wrap_content">-->
+
     <ImageView
         android:id="@+id/capturedImage"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
         android:visibility="gone" />
-    <!--</com.samosys.paperai.activity.utils.SquaredFrameLayout>-->
 
     <com.google.android.cameraview.CameraView
         android:id="@+id/camera"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:adjustViewBounds="true"
@@ -99,18 +92,14 @@
 
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-
             android:layout_centerInParent="true">
 
             <com.samosys.paperai.activity.utils.CircularProgressBar
                 android:id="@+id/circularProgressbar_vid"
-                android:layout_width="60dp"
+                android:layout_width="@dimen/_60sdp"
                 android:layout_height="wrap_content"
-
                 app:cpb_background_progressbar_color="#fff"
                 app:cpb_background_progressbar_width="6dp"
-
-
                 app:cpb_progressbar_color="@color/colorAccent"
                 app:cpb_progressbar_width="6dp" />
 
@@ -118,10 +107,12 @@
                 android:id="@+id/take_picture"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
+
+                android:visibility="gone"
+                android:background="@mipmap/home_inactive"
                 android:layout_centerInParent="true"
                 android:layout_centerVertical="true"
-                android:src="@mipmap/home_inactive" />
+                 />
         </RelativeLayout>
 
         <ImageView

@@ -2,14 +2,12 @@ package com.samosys.paperai.activity.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.samosys.paperai.R;
@@ -19,7 +17,6 @@ import com.samosys.paperai.activity.Bean.ProjctBean;
 import com.samosys.paperai.activity.activity.HomeFeedActivity;
 import com.samosys.paperai.activity.utils.AppConstants;
 import com.samosys.paperai.activity.utils.CustomFonts;
-import com.samosys.paperai.activity.utils.First_Char_Capital;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,11 +27,11 @@ import java.util.List;
  */
 
 public class MenuProjectAdapter extends BaseExpandableListAdapter {
-    ArrayList<ProjctBean> projectList;
-    HashMap<String, List<String>> expandableListDetail;
-    CustomFonts customFonts;
-    ExpandableListView project_expandableList;
     int SELECTEDPOSITION = 0;
+    private ArrayList<ProjctBean> projectList;
+    private HashMap<String, List<String>> expandableListDetail;
+    private CustomFonts customFonts;
+    private ExpandableListView project_expandableList;
     private Context context;
     private ArrayList<ParentBean> parentBeans;
 
@@ -113,7 +110,7 @@ public class MenuProjectAdapter extends BaseExpandableListAdapter {
         }
 
         ImageView img_expand = (ImageView) convertView.findViewById(R.id.img_expand);
-        LinearLayout ll_project_item = (LinearLayout) convertView.findViewById(R.id.ll_project_item);
+
         if (groupPosition == 0) {
 
             project_expandableList.setGroupIndicator(null);
@@ -134,43 +131,17 @@ public class MenuProjectAdapter extends BaseExpandableListAdapter {
             img_expand.setVisibility(View.INVISIBLE);
 
         }
-        String PID = AppConstants.loadPreferences(context, "projectID");
-
-//        if (PID.equals("00")) {
-////            if (parentBeans.size() >= 3) {
-////            AppConstants.savePreferences(context, "projectID", "00");
-////                ((HomeFeedActivity) context).getfeedpost();
-////            }
-////            Log.e("getGroupView IF", "==> " + parentBeans.get(2).getCategoryId());
-//
-//
-//
-//
-//        } else {
-//
-//            if (PID.equals(parentBeans.get(groupPosition).getCategoryId())) {
-//                //if (SELECTEDPOSITION == groupPosition) {
-//                AppConstants.savePreferences(context, "projectID", PID);
-//
-//                Log.e("getGroupView _ELSE11", "==> " + PID);
-//                ((HomeFeedActivity) context).getfeedpost();
-//            }
-//            Log.e("getGroupView _ELSE22", "==> " +PID);
-////            }
-//            //
-//
-//        }
 
 
         if (groupPosition == 2) {
 
             project_expandableList.setGroupIndicator(null);
-//            ll_project_item.setBackgroundColor(context.getResources().getColor(R.color.black));
+
         }
 
         TextView listTitleTextView = (TextView) convertView
                 .findViewById(R.id.listTitle);
-        listTitleTextView.setText(First_Char_Capital.capitalizeString(group.getCategoryName()));
+        listTitleTextView.setText(group.getCategoryName());
 
 
         return convertView;
@@ -178,26 +149,15 @@ public class MenuProjectAdapter extends BaseExpandableListAdapter {
 
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-//         String expandedListText = (String) getChild(groupPosition, childPosition);
 
         ChildBean child = (ChildBean) getChild(groupPosition,
                 childPosition);
-//        Log.e("parentBeans_adapter",parentBeans.indexOf(groupPosition).);
         if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) this.context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = layoutInflater.inflate(R.layout.child_view_item, null);
         }
         ImageView img_proLock = (ImageView) convertView.findViewById(R.id.img_proLock);
-        if (AppConstants.loadPreferences(context, "projectID").equals("00")) {
-
-//            AppConstants.savePreferences(context, "projectID", parentBeans.get(groupPosition).getChildBeans().get(childPosition).getChildObjectId());
-//            ((HomeFeedActivity) context).getfeedpost();
-
-        } else {
-//            ((HomeFeedActivity) context).getfeedpost();
-            // Toast.makeText(context, "else", Toast.LENGTH_SHORT).show();
-        }
         if (child.getChildType().equals("2")) {
             img_proLock.setVisibility(View.VISIBLE);
         } else {

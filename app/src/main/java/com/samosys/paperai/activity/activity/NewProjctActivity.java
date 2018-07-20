@@ -45,19 +45,18 @@ import cc.cloudist.acplibrary.ACProgressConstant;
 import cc.cloudist.acplibrary.ACProgressFlower;
 
 public class NewProjctActivity extends AppCompatActivity {
-    EditText edt_workspace, edt_mission;
-    LinearLayout llcreate;
-    String id;
-    SwitchButton awesomeToggle;
-    boolean toggle=true;
-    LinearLayout rl_toggle;
+    private  EditText edt_workspace, edt_mission;
+    private  LinearLayout llcreate;
+    private  String id="", togg="1";;
+    private SwitchButton awesomeToggle;
+    private  boolean toggle=true;
+    private LinearLayout rl_toggle;
     private int REQUEST_CAMERA = 0, SELECT_FILE = 1;
-    ImageView img_project;
+    private  ImageView img_project;
     private String userChoosenTask;
-    Bitmap bitmap = null;
-    ParseFile file = null;
-    MarshMallowPermission marshMallowPermission;
-    String togg="1";
+    private  Bitmap bitmap = null;
+    private  ParseFile file = null;
+    private  MarshMallowPermission marshMallowPermission;
     private ACProgressFlower dialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,21 +109,7 @@ public class NewProjctActivity extends AppCompatActivity {
             }
         });
 
-//        awesomeToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-//            @Override
-//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-//                if (!toggle){
-//                    toggle=true;
-//                    togg="1";
-//                    Log.e("toggle>>",">"+togg);
-//                }else {
-//                    toggle=false;
-//                    togg="2";
-//                    Log.e("toggle22>>","22>"+togg);
-//
-//                }
-//            }
-//        });
+
 
         img_project.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -202,9 +187,6 @@ public class NewProjctActivity extends AppCompatActivity {
         img_project.setImageBitmap(bm);
 
 
-//        image = BitMapToString(bm);
-
-//        file = new File(image);
 
 
         final double viewWidthToBitmapWidthRatio = (double) img_project.getWidth() / (double) bm.getWidth();

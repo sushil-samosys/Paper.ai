@@ -17,13 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class InviteMemberActivity extends AppCompatActivity {
-    EditText edt_email_add, edtemaiFirt;
-    LinearLayout linear;
-    TextView txt, txt_skip,txt_invite;
-    String work_id;
-    CustomFonts customFonts;
-    List<EditText> allEds = new ArrayList<EditText>();
-    private int btn_email_id = 1784450;
+   private EditText  edtemaiFirt;
+    private TextView txt, txt_skip,txt_invite;
+    private String work_id;
+    private CustomFonts customFonts;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

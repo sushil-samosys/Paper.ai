@@ -7,16 +7,16 @@ import com.parse.ParseFile;
  */
 
 public class Myfollowlist {
-    String objectId;
-    String user;
-    String mission;
-    String updatedAt;
-    String workspaceID;
-    String workspace_name;
-    String createdAt;
-    ParseFile image;
-    String user_name;
-    String workspace_url;
+    private String objectId;
+    private  String user;
+    private String mission;
+    private String updatedAt;
+    private String workspaceID;
+    private String workspace_name;
+    private String createdAt;
+    private ParseFile image;
+    private String user_name;
+    private String workspace_url;
 
     public Myfollowlist(String objectId, String user, String mission, String updatedAt, String workspace_name,
                         String createdAt, ParseFile image, String user_name, String workspace_url) {

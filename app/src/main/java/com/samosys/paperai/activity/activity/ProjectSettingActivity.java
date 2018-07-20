@@ -32,7 +32,7 @@ import cc.cloudist.acplibrary.ACProgressConstant;
 import cc.cloudist.acplibrary.ACProgressFlower;
 
 public class ProjectSettingActivity extends AppCompatActivity {
-    CustomFonts customFonts;
+    private CustomFonts customFonts;
     private String name = "", workID;
     private TextView txt_project_header;
     private ImageView img_project_back;

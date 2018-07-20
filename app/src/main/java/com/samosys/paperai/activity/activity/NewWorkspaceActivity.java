@@ -47,16 +47,15 @@ import cc.cloudist.acplibrary.ACProgressConstant;
 import cc.cloudist.acplibrary.ACProgressFlower;
 
 public class NewWorkspaceActivity extends AppCompatActivity {
-    EditText edt_workspace, edt_mission, edt_workspace_url;
-    LinearLayout llcreate;
-    String mainurl = "";
-    ImageView img_work_space;
-    ArrayList<String> mylist;
+    private EditText edt_workspace, edt_mission, edt_workspace_url;
+    private LinearLayout llcreate;
+    private String mainurl = "";
+    private ImageView img_work_space;
+    private ArrayList<String> mylist;
 
-    Bitmap bitmap = null;
-    ParseFile file = null;
-    MarshMallowPermission marshMallowPermission;
-    private String userChoosenTask;
+    private Bitmap bitmap = null;
+    private ParseFile file = null;
+    private MarshMallowPermission marshMallowPermission;
     private ACProgressFlower dialogProgred;
     private int REQUEST_CAMERA = 0, SELECT_FILE = 1;
 
@@ -157,14 +156,14 @@ public class NewWorkspaceActivity extends AppCompatActivity {
                 boolean result = Utility.checkPermission(NewWorkspaceActivity.this);
 
                 if (items[item].equals("Take Photo")) {
-                    userChoosenTask = "Take Photo";
+
                     if (result) {
                         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                         startActivityForResult(intent, REQUEST_CAMERA);
                     }
 
                 } else if (items[item].equals("Choose from Library")) {
-                    userChoosenTask = "Choose from Library";
+
                     if (result) {
                         Intent intent = new Intent();
                         intent.setType("image/*");
@@ -240,9 +239,6 @@ public class NewWorkspaceActivity extends AppCompatActivity {
         img_work_space.setImageBitmap(bm);
 
 
-//        image = BitMapToString(bm);
-
-//        file = new File(image);
 
 
         final double viewWidthToBitmapWidthRatio = (double) img_work_space.getWidth() / (double) bm.getWidth();
@@ -355,9 +351,6 @@ public class NewWorkspaceActivity extends AppCompatActivity {
                     creategeneral(gameScore.getObjectId());
 
 
-//                    Intent intent = new Intent(NewWorkspaceActivity.this, InviteMemberActivity.class);
-//                    intent.putExtra("id", gameScore.getObjectId());
-//                    startActivity(intent);
                 } else {
                     Log.e("WROKSOACEERROR", "" + e.getMessage());
                     Toast.makeText(NewWorkspaceActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -369,7 +362,7 @@ public class NewWorkspaceActivity extends AppCompatActivity {
 
     private void createmynotes(final String objectId) {
         ParseObject gameScore = new ParseObject("Project");
-        //gameScore.put("user", ParseUser.getCurrentUser().getObjectId());
+
         gameScore.put("user", ParseObject.createWithoutData("_User", ParseUser.getCurrentUser().getObjectId()));
         gameScore.put("name", "My Notes");
         gameScore.put("workspace", ParseObject.createWithoutData("WorkSpace", objectId));
@@ -411,13 +404,9 @@ public class NewWorkspaceActivity extends AppCompatActivity {
         gameScore.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
-//                if (dialog.isShowing()) {
-//                    dialog.dismiss();
-//                }
+//
                 if (e == null) {
-//                    Intent intent = new Intent(NewWorkspaceActivity.this, HomeFeedActivity.class);
-//                    startActivity(intent);
-//                    finish();
+//
                     createmynotes(objectId);
                 } else {
                     Log.e("ERRROr", e.getMessage());

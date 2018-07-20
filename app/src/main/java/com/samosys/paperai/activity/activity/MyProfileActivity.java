@@ -31,7 +31,7 @@ import java.util.List;
 import cc.cloudist.acplibrary.ACProgressFlower;
 
 public class MyProfileActivity extends AppCompatActivity {
-    CustomFonts customFonts;
+    private CustomFonts customFonts;
     private String user_id = "";
     private ImageView my_img, img_mybookmark, img_mypost, imgSetting;
     private TextView userName, my_postoion;
@@ -47,7 +47,7 @@ public class MyProfileActivity extends AppCompatActivity {
         AppConstants.getTranparentstatusbar(MyProfileActivity.this);
 
         findview();
-        //    user_id = getIntent().getStringExtra("id");
+
 
 
         MyprofilePostFragment prospectFragment = new MyprofilePostFragment();
@@ -116,7 +116,7 @@ public class MyProfileActivity extends AppCompatActivity {
                         String campanyrole = objects.get(i).getString("campanyrole");
                         String communityrole = objects.get(i).getString("communityrole");
                         String address = objects.get(i).getString("address");
-                        userName.setText(First_Char_Capital.capitalizeString(fullname));
+                        userName.setText(fullname);
                         my_postoion.setText(campanyrole);
 //                        edtcommunityrole.setText(communityrole);
 //                        edtAdress.setText(address);

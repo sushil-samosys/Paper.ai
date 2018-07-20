@@ -43,11 +43,11 @@ import cc.cloudist.acplibrary.ACProgressFlower;
 
 public class LoginActivity extends AppCompatActivity {
     public static String KEY_ACCESS_TOKEN = "";
-    TextView txtForgot;
-    CustomFonts customFonts;
-    RelativeLayout RL_logWithpapr, rl_slack;
-    EditText edt_workEmail, edt_workpwd;
-    Auth0 auth0;
+    private  TextView txtForgot;
+    private CustomFonts customFonts;
+    private RelativeLayout RL_logWithpapr, rl_slack;
+    private  EditText edt_workEmail, edt_workpwd;
+    private  Auth0 auth0;
     private UserProfile userProfile;
     private AuthenticationAPIClient authenticationAPIClient;
     private UsersAPIClient usersClient;
@@ -59,7 +59,6 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         AppConstants.getstatusbar(LoginActivity.this);
-//        slackToken = AppConstants.loadPreferences(LoginActivity.this, "slack_token");
 
         findview();
         AppConstants.savePreferences(LoginActivity.this, "projectID", "00");
@@ -181,29 +180,19 @@ public class LoginActivity extends AppCompatActivity {
 
         if (!pictureURL.equals("")) {
             File newFile = new File(pictureURL);
-            Uri selectedImage = Uri.fromFile(newFile);
+
 
 
             try {
-                //  Bitmap bitmap = MediaStore.Images.Media.getBitmap(LoginActivity.this.getContentResolver(), selectedImage);
 
-                // ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                // Compress image to lower quality scale 1 - 100
-//                bitmap.compress(Bitmap.CompressFormat.JPEG, 90, stream);//
-//                byte[] image = stream.toByteArray();
-                // String imageString = "abcde......"; //quite a long string
-//                String a=(new String(utf8bytes, "utf-8")).getBytes("utf-16");
-                byte[] imageBytes = pictureURL.getBytes("UTF-16");
 
                 File file = new File(pictureURL);
                 // Create the ParseFile
                 Log.e("profileimage", file + "");
-//                https://i2.wp.com/cdn.auth0.com/avatars/aj.png?ssl=1
-//                parseFile = new ParseFile("postfile.jpg", imageBytes);
-//                user.put("profileimage", parseFile);
+//
                 callparse(user);
 
-            } catch (IOException e) {
+            } catch (NullPointerException e) {
                 e.printStackTrace();
             }
 
@@ -293,17 +282,12 @@ public class LoginActivity extends AppCompatActivity {
 
                                 KEY_ACCESS_TOKEN = credentials.getAccessToken();
 
-                                // CredentialsManager.saveCredentials(LoginActivity.this, credentials);
-//                                Intent intent = new Intent(LoginActivity.this, HomeFeedActivity.class);
-//                                intent.putExtra("id", "");
-//
-//                                startActivity(intent);
-//                                finish();r23: An error occurred when trying to authenticate with the server.
+
 
                             }
                         });
                         Log.e("KEY_ACCESS_TOKEN", KEY_ACCESS_TOKEN);
-                        //credentialsManager.saveCredentials(credentials);
+
                         getProfile(credentials.getAccessToken());
                     }
                 });
@@ -371,21 +355,7 @@ public class LoginActivity extends AppCompatActivity {
                 });
     }
 
-    private void refreshScreenInformation() {
 
-
-        Log.e("username", userProfile.getName());
-        Log.e("useremail", userProfile.getEmail());
-        Log.e("userImage", userProfile.getPictureURL());
-//        if (userProfile.getPictureURL() != null) {
-//            Picasso.with(this)
-//                    .load(userProfile.getPictureURL())
-//                    .into(userPicture);
-//        }
-
-        String country = (String) userProfile.getUserMetadata().get("country");
-        Log.e("country", country);
-    }
 
 
     private void findview() {

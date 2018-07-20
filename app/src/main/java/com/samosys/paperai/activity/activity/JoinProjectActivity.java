@@ -21,11 +21,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JoinProjectActivity extends AppCompatActivity {
-    RecyclerView RV_project;
-    EditText edtSerchproject;
-    String id = "";
-    ProjectAdapter adapter;
-    ArrayList<ProjctBean> mylist;
+    private  RecyclerView RV_project;
+    private EditText edtSerchproject;
+    private   String id = "";
+    private  ProjectAdapter adapter;
+    private   ArrayList<ProjctBean> mylist;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
